@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL || '';
 console.log('VITE_API_URL (production) =', import.meta.env.VITE_API_URL);
 
 export const axios = axiosImport.create({
-    baseURL: `${API_URL}/fsdf/api`,
+    baseURL: `${API_URL}/api`,
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
