@@ -1,8 +1,10 @@
 import axiosImport from 'axios';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+console.log('VITE_API_URL (production) =', import.meta.env.VITE_API_URL);
 
 export const axios = axiosImport.create({
-    baseURL: `${API_URL}/api`,
+    baseURL: `${API_URL}/fsdf/api`,
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
@@ -12,7 +14,7 @@ export const axios = axiosImport.create({
 
 // Request interceptor (auth, tracing)
 axios.interceptors.request.use((config) => {
-    config.headers['X-Request-ID'] = crypto.randomUUID();
+    config.headers['X-Request-ID'] = window.crypto.randomUUID();
     return config;
 });
 
