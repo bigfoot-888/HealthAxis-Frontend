@@ -1,8 +1,6 @@
 import axiosImport from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || '';
 
-console.log('VITE_API_URL (production) =', import.meta.env.VITE_API_URL);
-
 export const axios = axiosImport.create({
     baseURL: `${API_URL}/api`,
     timeout: 5000,
