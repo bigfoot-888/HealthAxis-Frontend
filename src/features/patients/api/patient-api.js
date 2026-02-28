@@ -50,6 +50,16 @@ export async function deactivatePatient(id){
     }
 }
 
+export async function reactivatePatient(id){
+    try {
+        const response = await axios.patch('/patients/reactivate', {id: id});
+        return response.data;
+    } catch (err) {
+        console.error('Error reactivating patient:', err);
+        throw err;
+    }
+}
+
 export async function importPatients(patientData){
     try {
         const response = await axios.post('/patients/import', {patients: patientData});

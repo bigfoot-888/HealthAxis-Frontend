@@ -1,5 +1,5 @@
 
-import UserProfileManagement from '../../../features/user-management/components/UserProfileManagement';
+import UserProfileManagement from '../../../features/users/components/UserProfileManagement';
 export default function UsersPage() {
     return (
         <>

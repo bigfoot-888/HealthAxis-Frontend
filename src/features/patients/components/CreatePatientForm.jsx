@@ -77,7 +77,7 @@ export default function CreatePatientForm() {
                                 </Typography>
                             </Grid>
                             <Grid size={12}>
-                                <Typography variant='h4' component='h3'>
+                                <Typography variant='h4' component='h3' sx={{pb: 1}}>
                                     Datos personales
                                 </Typography>
                             </Grid>
@@ -109,28 +109,11 @@ export default function CreatePatientForm() {
                                 />
                             </Grid>
                             <Grid size={6}>
-                                <Controller
+                                <RHFDatePicker
                                     name='date_of_birth'
                                     control={control}
-                                    rules={{
-                                        required:
-                                            'La fecha de nacimiento es obligatoria',
-                                    }}
-                                    render={({ field, fieldState }) => (
-                                        <RHFDatePicker
-                                            {...field}
-                                            name={field.name}
-                                            label='Fecha de nacimiento'
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                            onBlur={field.onBlur}
-                                            error={!!errors.date_of_birth}
-                                            helperText={
-                                                errors.date_of_birth?.message
-                                            }
-                                            isTouched={fieldState.isTouched}
-                                        />
-                                    )}
+                                    rules={{required: 'La fecha de nacimiento es obligatoria',}}
+                                    label='Fecha de nacimiento'
                                 />
                             </Grid>
                             <Grid size={6}>
@@ -149,7 +132,8 @@ export default function CreatePatientForm() {
                                             <RadioGroup
                                                 row
                                                 aria-labelledby='sex-form-label'
-                                                {...field}
+                                                value={field.value || ''}
+                                                onChange={field.onChange}
                                             >
                                                 <FormControlLabel
                                                     value='FEMALE'
@@ -213,7 +197,7 @@ export default function CreatePatientForm() {
                                 />
                             </Grid>
                             <Grid size={12}>
-                                <Typography variant='h4' component='h3'>
+                                <Typography variant='h4' component='h3' sx={{pb: 1}}>
                                     Información de contacto
                                 </Typography>
                             </Grid>

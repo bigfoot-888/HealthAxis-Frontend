@@ -1,5 +1,5 @@
 
-import CreateUserForm from '../../../features/user-management/components/CreateUserForm'; 
+import CreateUserForm from '../../../features/users/components/CreateUserForm'; 
 export default function CreateUserPage() {
   return (
     <>

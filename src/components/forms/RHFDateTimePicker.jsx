@@ -1,9 +1,9 @@
 import * as React from 'react';
 import dayjs from 'dayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Controller } from 'react-hook-form';
 
-export default function RHFDatePicker({ name, control, rules, label }) {
+export default function RHFDateTimePicker({ name, control, rules, label }) {
     return (
         <Controller
             name={name}
@@ -35,7 +35,8 @@ export default function RHFDatePicker({ name, control, rules, label }) {
                 );
 
                 return (
-                    <DatePicker
+                    <DateTimePicker
+                        ampm={false}
                         label={label}
                         value={value ? dayjs(value) : null}
                         onChange={handleChange}

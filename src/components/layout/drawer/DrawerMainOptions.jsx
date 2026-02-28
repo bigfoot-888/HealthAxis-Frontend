@@ -6,6 +6,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import EventNoteIcon from '@mui/icons-material/EventNote';
 import CustomListItem from './CustomListItem';
 
 export default function DrawerMainOptions({open}) {
@@ -21,6 +22,10 @@ export default function DrawerMainOptions({open}) {
 
             <CustomListItem text='Citas' link='/appointments' open={open}>
                 <CalendarMonthIcon />
+            </CustomListItem>
+
+            <CustomListItem text='Agendas' link='/agendas' open={open}>
+                <EventNoteIcon />
             </CustomListItem>
 
             <CustomListItem text='Pacientes' link='/patients' open={open}>

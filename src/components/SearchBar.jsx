@@ -18,26 +18,6 @@ const Search = styled('div')(({ theme }) => ({
         width: 'auto',
     },
 }));
-// const Search = styled('div')(({ theme }) => ({
-//   position: 'relative',
-//   borderRadius: theme.shape.borderRadius,
-//   backgroundColor: theme.palette.background.paper,
-
-//   // subtle depth
-//   boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-//   transition: theme.transitions.create(['box-shadow']),
-
-//   '&:hover': {
-//     boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
-//   },
-
-//   '&:focus-within': {
-//     boxShadow: `
-//       0 2px 8px rgba(0,0,0,0.12),
-//       0 0 0 3px ${alpha(theme.palette.primary.main, 0.25)}
-//     `,
-//   },
-// }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
