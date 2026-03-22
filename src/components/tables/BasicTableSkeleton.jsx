@@ -1,5 +1,5 @@
 import { Box, Skeleton, Stack } from '@mui/material';
-import DrawerHeader from '../layout/DrawerHeader';
+import DrawerHeader from '../layout/drawer/DrawerHeader';
 
 export default function TableSkeleton({ rows = 6, cols = 5 }) {
   return (

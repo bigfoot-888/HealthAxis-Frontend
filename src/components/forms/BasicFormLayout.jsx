@@ -1,5 +1,5 @@
 import { Stack, Box } from '@mui/material';
-import DrawerHeader from '../layout/DrawerHeader';
+import DrawerHeader from '../layout/drawer/DrawerHeader';
 export default function BasicFormLayout({children}) {
     return (
         <Stack sx={{ flexDirection: 'column', height: '100%', mb: 8 }}>

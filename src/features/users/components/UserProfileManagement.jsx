@@ -1,5 +1,5 @@
-import { useUserProfile } from '../hooks/useUserProfile';
-import ProfileCard from './ProfileCard';
+import { useUserProfile } from '@users/hooks/useUserProfile';
+import ProfileCard from '@users/components/ProfileCard';
 
 export default function UserProfileManagement() {
     const { data: user, isLoading, error, refetch } = useUserProfile();

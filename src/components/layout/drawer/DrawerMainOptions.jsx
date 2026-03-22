@@ -32,7 +32,7 @@ export default function DrawerMainOptions({open}) {
                 <PersonIcon />
             </CustomListItem>
 
-            <CustomListItem text='Documentos' link='/documents' open={open}>
+            <CustomListItem text='Registros clínicos' link='/clinical-records/clinical-documents' open={open}>
                 <TextSnippetIcon />
             </CustomListItem>
             

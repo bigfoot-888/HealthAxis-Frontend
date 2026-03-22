@@ -6,7 +6,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 import CustomListItem from './CustomListItem';
 import { Navigate, useNavigate } from 'react-router';
-import { logout } from '../../../features/user-management/api/user-api';
+import { logout } from '../../../features/users/api/user-api';
 
 export default function DrawerSecondaryOptions({open}) {
     const navigate = useNavigate(); 

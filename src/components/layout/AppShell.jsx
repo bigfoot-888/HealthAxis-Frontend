@@ -14,13 +14,13 @@ export default function AppShell({ children }) {
         setDrawerOpen(false);
     };
     return (
-        <Box sx={{ display: 'flex', height: '100%' }}>
+        <Box sx={{ display: 'flex', height: '100vh' }}>
             <MiniDrawer
                 open={drawerOpen}
                 setOpen={handleDrawerOpen}
                 setClose={handleDrawerClose}
             />
-            <Stack sx={{ width: '100%' }}>
+            <Stack sx={{ width: '100%', height: '100%' }}>
                 <Header open={drawerOpen} />
 
                 {/* Main content of the site, dynamically added */}

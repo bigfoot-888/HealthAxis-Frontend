@@ -5,22 +5,20 @@ import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 
-export function UserAutocomplete({ control, errors, rules }) {
+export default function UserAutocomplete({ control, name, rules, multiple = false }) {
     const [options, setOptions] = useState([]);
-    const debounceTimeout = useRef(null); // keep track of timeout across renders
+    const debounceTimeout = useRef(null);
 
     const fetchUsers = (query) => {
-        // Cancel previous timeout
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
-        // Minimum characters check
+
         if (!query || query.length < 2) {
             setOptions([]);
             return;
         }
 
-        // Set new timeout
         debounceTimeout.current = setTimeout(async () => {
             try {
                 const res = await getUsers({ query, limit: 20 });
@@ -28,35 +26,36 @@ export function UserAutocomplete({ control, errors, rules }) {
             } catch (err) {
                 console.error('Error fetching users:', err);
             }
-        }, 200); // 300ms debounce
+        }, 200);
     };
+
     return (
         <Controller
-            name='user'
+            name={name}
             control={control}
             rules={rules}
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
                 <Autocomplete
                     {...field}
                     options={options}
-                    name='user'
+                    multiple={multiple}
                     fullWidth
                     disablePortal
+                    value={field.value ?? (multiple ? [] : null)}
                     isOptionEqualToValue={(option, value) => option.id === value?.id}
-                    getOptionLabel={(option) =>
-                        `${option.name} ${option.surname} — ${option.roles.map((r) => r.name).join(', ')}`
-                    }
-                    value={field?.value || null}
-                    onInputChange={(_, value) => fetchUsers(value)}
-                    onChange={(_, value) => {
-                        field.onChange(value);
+                    getOptionLabel={(option) => {
+                        if (!option) return ''; 
+                        const roles = option.roles?.map((r) => r.name).join(', ') ?? '';
+                        return `${option.name ?? ''} ${option.surname ?? ''}${roles ? ` — ${roles}` : ''}`;
                     }}
+                    onInputChange={(_, value) => fetchUsers(value)}
+                    onChange={(_, value) => field.onChange(value)}
                     renderInput={(params) => (
                         <TextField
                             {...params}
                             label='Profesional'
-                            error={!!errors['user']}
-                            helperText={errors['user']?.message || ' '}
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message || ' '}
                         />
                     )}
                 />

@@ -1,11 +1,11 @@
-import { useUser } from '../hooks/useUser';
-import UpdateUserForm from './UpdateUserForm';
+import { useUser } from '@users/hooks/useUser';
+import EditUserForm from '@users/components/EditUserForm';
 import { useParams } from 'react-router';
 export default function EditUserManagement() {
-    const { id } = useParams(); // this is the uuid from the URL
-    const { data: user, isLoading, error, refetch } = useUser(id);
+    const { uuid } = useParams(); // this is the uuid from the URL
+    const { data: user, isLoading, error, refetch } = useUser(uuid);
     if (isLoading) return <p>Loading users…</p>;
     if (error) return <p>Failed to load users</p>;
     if (!user) return <p>vaya</p>;
-    return <UpdateUserForm user={user} uuid={id} />;
+    return <EditUserForm user={user} uuid={iuuidd} />;
 }

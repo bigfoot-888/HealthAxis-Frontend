@@ -1,19 +1,22 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+
 import { Grid, Box, Paper } from '@mui/material';
 import { Typography, Button, IconButton } from '@mui/material';
 import { FormControl, TextField } from '@mui/material';
 import { OutlinedInput, InputLabel, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import loginBgImage from '@auth/assets/login-bg.jpg';
+import { validateLogin } from '@auth/auth-api';
 
-import loginBgImage from './assets/login-bg.jpg';
-import FullLogo from '../../components/FullLogo';
-import { validateLogin } from './auth-api';
+import { handleApiError } from '@/utils/handle-errors';
+
+import {ErrorAlert, FullLogo} from '@/components/ui/index';
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(null);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const navigate = useNavigate();
 
@@ -25,7 +28,7 @@ export default function LoginForm() {
             await validateLogin(formData);
             navigate('/');
         } catch (err) {
-            setError(err.response.data.message);
+            handleApiError(err, setError, null); 
         }
     };
 
@@ -133,16 +136,8 @@ export default function LoginForm() {
                                     />
                                 </FormControl>
                             </Grid>
-                            <Grid container sx={{ height: 2 }}>
-                                {error && (
-                                    <Typography
-                                        color='error'
-                                        variant='body2'
-                                        sx={{ mb: 2 }}
-                                    >
-                                        {error}
-                                    </Typography>
-                                )}
+                            <Grid size={12}>
+                                <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
                             </Grid>
                             <Grid
                                 container

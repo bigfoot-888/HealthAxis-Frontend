@@ -1,8 +1,8 @@
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import SearchBar from '../SearchBar';
-import DrawerHeader from '../layout/DrawerHeader';
+import SearchBar from '../ui/SearchBar';
+import DrawerHeader from '../layout/drawer/DrawerHeader';
 import { Alert } from '@mui/material';
 import ContentLayout from '../layout/ContentLayout';
 

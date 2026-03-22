@@ -1,47 +1,28 @@
 
-import DrawerHeader from '../../../components/layout/DrawerHeader';
-import Paper from '@mui/material/Paper';
-import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router';
 
-import Box from '@mui/material/Box';
+import {Paper, Stack, Typography, Divider} from '@mui/material'
 
-import { Link, useNavigate } from 'react-router';
+import { ContentLayout } from '@/components/layout';
 
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-
-export default function ProfileCard({user}) {
-
+export default function ProfileCard({ user }) {
     const navigate = useNavigate();
     return (
-        <Stack sx={{ flexDirection: 'column', height: '100%', mb: 8 }}>
-            <DrawerHeader />
-            <Box
-                sx={{
-                    flexGrow: 1,
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                <Paper
-                    variant='surface-form-outlined'
-                    sx={{ width: '480px'}}
-                >
-                    <Typography variant="h2" component="h2" sx={{p: 4}}>
-                        Datos Personales
+        <ContentLayout>
+            <Paper variant='surface-form-outlined' sx={{ width: '480px' }}>
+                <Typography variant='h2' component='h2' sx={{ p: 4 }}>
+                    Datos Personales
+                </Typography>
+                <Divider />
+                <Stack sx={{ p: 4 }}>
+                    <Typography variant='body1' gutterBottom>
+                        Nombre: {user.name + ' ' + user.surname}
                     </Typography>
-                    <Divider/>
-                    <Stack sx={{p: 4}}>
-                        <Typography variant="body1" gutterBottom>
-                            Nombre: {user.name + " " + user.surname} 
-                        </Typography>
-                        <Typography variant="body1" gutterBottom>
-                            Correo: {user.email} 
-                        </Typography>
-                    </Stack>
-                </Paper>
-            </Box>
-        </Stack>
+                    <Typography variant='body1' gutterBottom>
+                        Correo: {user.email}
+                    </Typography>
+                </Stack>
+            </Paper>
+        </ContentLayout>
     );
 }

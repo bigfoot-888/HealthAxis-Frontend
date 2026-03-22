@@ -1,6 +1,6 @@
 import AppShell from '../../../components/layout/AppShell';
 import { useRouteError, isRouteErrorResponse } from 'react-router';
-import DrawerHeader from '../../../components/layout/DrawerHeader';
+import DrawerHeader from '../../../components/layout/drawer/DrawerHeader';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';

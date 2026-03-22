@@ -1,18 +1,22 @@
-import FormDialog from '../../../components/FormDialog';
 import { useForm } from 'react-hook-form';
-import DialogFormInput from '../../../components/forms/DialogFormInput';
-import { Grid } from '@mui/material';
-import { useAgendas } from '../hooks/useAgendas';
-import { updateAgenda } from '../api/agenda-api';
-import { useNavigate } from 'react-router';
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-export default function EditAgendaForm({ agenda, handleClose }) {
+import { Grid } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
+
+import { DialogTextInput } from '@/components/forms/inputs/index';
+import { FormDialog } from '@/components/dialogs/index';
+
+import { handleApiError } from '@/utils/handle-errors';
+
+import { useAgendas } from '@agendas/hooks/useAgendas';
+import { updateAgenda } from '@agendas/api/agenda-api';
+
+export default function EditAgendaForm({ agenda, handleClose, setError }) {
     const {
         register,
         handleSubmit,
-        setError,
+        setError: setFormError,
         formState: { errors },
         reset,
     } = useForm({
@@ -22,16 +26,16 @@ export default function EditAgendaForm({ agenda, handleClose }) {
         },
     });
     const { refetch } = useAgendas();
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
+
     const onSubmit = async (data) => {
         try {
             await updateAgenda(agenda.uuid, data);
             queryClient.invalidateQueries(['agenda', agenda.uuid]);
             refetch();
-            handleClose(); 
+            handleClose();
         } catch (err) {
-            console.log(err);
+            handleApiError(err, setError, setFormError);
         }
     };
     useEffect(() => {
@@ -51,7 +55,7 @@ export default function EditAgendaForm({ agenda, handleClose }) {
         >
             <Grid container rowSpacing={1.5} columnSpacing={3} sx={{ p: 1 }}>
                 <Grid size={12}>
-                    <DialogFormInput
+                    <DialogTextInput
                         label='Nombre'
                         name='name'
                         type='text'

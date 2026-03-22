@@ -1,4 +1,4 @@
-import CreatePatientForm from '../../../features/patient-management/components/CreatePatientForm'
+import CreatePatientForm from '@patients/components/forms/CreatePatientForm'
 export default function CreatePatientPage() {
     return (
         <>

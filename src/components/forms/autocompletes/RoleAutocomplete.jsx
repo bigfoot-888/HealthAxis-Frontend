@@ -1,7 +1,6 @@
 import { ROLE_LABELS } from '../../../config/roles';
 import { Controller } from 'react-hook-form';
 import { Autocomplete, TextField } from '@mui/material';
-import Chip from '@mui/material/Chip';
 
 export default function RoleAutocomplete({control, errors}) {
     return (
@@ -16,7 +15,6 @@ export default function RoleAutocomplete({control, errors}) {
                     multiple
                     {...field}
                     onChange={(_, value) => field.onChange(value)}
-                    value={field.value || []}
                     disablePortal
                     options={Object.values(ROLE_LABELS)}
                     fullWidth

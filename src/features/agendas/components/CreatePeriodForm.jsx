@@ -1,31 +1,30 @@
-import FormDialog from '../../../components/FormDialog';
-import TextField from '@mui/material/TextField';
-import { useForm, Controller } from 'react-hook-form';
-import DialogFormInput from '../../../components/forms/DialogFormInput';
-import { Dialog, Grid } from '@mui/material';
-import RHFDatePicker from '../../../components/forms/RHFDatePicker'; 
-import { useAgendas } from '../hooks/useAgendas';
-import { createAgendaPeriod } from '../api/agenda-period-api';
+import { useForm } from 'react-hook-form';
+import { Grid } from '@mui/material';
 
-export default function CreateAgendaForm({
-    agenda,
-    handleClose,
-}) {
+import { FormDialog } from '@/components/dialogs/index';
+import { RHFDatePicker } from '@/components/forms/pickers/index';
+
+import { useAgendas } from '@agendas/hooks/useAgendas';
+import { createAgendaPeriod } from '@agendas/api/agenda-period-api';
+
+import { handleApiError } from '@/utils/handle-errors';
+
+export default function CreateAgendaForm({ agenda, handleClose, setError }) {
     const {
-        register,
         handleSubmit,
         control,
-        setError,
+        setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur' });
+
     const { refetch } = useAgendas();
     const onSubmit = async (data) => {
         try {
-            await createAgendaPeriod(agenda.uuid, data); 
+            await createAgendaPeriod(agenda.uuid, data);
             refetch();
-            handleClose(); 
+            handleClose();
         } catch (err) {
-            console.log(err);
+            handleApiError(err, setError, setFormError);
         }
     };
 

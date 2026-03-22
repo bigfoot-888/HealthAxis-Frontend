@@ -1,4 +1,4 @@
-import PatientManagement from '../../../features/patient-management/components/PatientManagement';
+import PatientManagement from '@patients/components/wrappers/PatientManagement';
 export default function PatientsPage() {
     return (
         <>

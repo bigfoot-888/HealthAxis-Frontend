@@ -1,22 +1,26 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import DrawerHeader from '../layout/DrawerHeader';
-import { Alert } from '@mui/material';
+import {DrawerHeader} from '@/components/layout/drawer/index';
+import {ErrorAlert} from '@/components/ui/index';
 
 export default function ContentLayout({
     children,
     error=null,
     onErrorClose = ()=>{},
 }) {
-    return (
-        <Stack sx={{ width: '100%' }}>
+return (
+        <Stack sx={{ width: '100%', height: '100%' }}>
             <DrawerHeader />
-            {error && (
-                <Alert severity='error' onClose={onErrorClose} sx={{ margin: 2 }}>
-                    {error}
-                </Alert>
-            )}
-            <Box sx={{ width: '95%', marginY: 'auto', marginX: 'auto' }}>
+            <ErrorAlert error={error} onErrorClose={onErrorClose}/>
+
+            <Box sx={{ 
+                width: '95%', 
+                marginX: 'auto', 
+                flexGrow: 1, 
+                display: 'flex', 
+                flexDirection: 'column',
+                pb: 3 
+            }}>
                 {children}
             </Box>
         </Stack>

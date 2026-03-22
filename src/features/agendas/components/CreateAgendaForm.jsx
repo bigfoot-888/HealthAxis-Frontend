@@ -1,42 +1,47 @@
-import FormDialog from '../../../components/FormDialog';
-import TextField from '@mui/material/TextField';
-import { useForm, Controller } from 'react-hook-form';
-import DialogFormInput from '../../../components/forms/DialogFormInput';
-import { Dialog, Grid } from '@mui/material';
-import RHFDatePicker from '../../../components/forms/RHFDatePicker';
-import { useAgendas } from '../hooks/useAgendas';
-import { createAgenda } from '../api/agenda-api';
+import { useForm } from 'react-hook-form';
+import { Grid } from '@mui/material';
+import { useState } from 'react';
+import {DialogTextInput} from '@/components/forms/inputs/index';
+import {RHFDatePicker} from '@/components/forms/pickers/index';
+import {FormDialog} from '@/components/dialogs/index.js';
 
-export default function CreateAgendaForm({ openCreateForm, handleClose }) {
+import { handleApiError } from '@/utils/handle-errors';
+
+import { useAgendas } from '@agendas/hooks/useAgendas';
+import { createAgenda } from '@agendas/api/agenda-api';
+
+export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
     const {
         register,
         handleSubmit,
         control,
-        setError,
+        setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur' });
+
     const { refetch } = useAgendas();
+    const [error, setError] = useState(null); 
+
     const onSubmit = async (data) => {
         try {
-            console.log('hoal');
             await createAgenda(data);
             refetch();
             handleClose();
         } catch (err) {
-            console.log(err);
+            handleApiError(err, setError, setFormError); 
         }
     };
 
     return (
         <FormDialog
-            open={openCreateForm}
+            open={isCreateAgendaOpen}
             handleClose={handleClose}
             handleSubmit={handleSubmit(onSubmit)}
             title='Añadir nueva agenda'
         >
             <Grid container rowSpacing={1.5} columnSpacing={3} sx={{ p: 1 }}>
                 <Grid size={12}>
-                    <DialogFormInput
+                    <DialogTextInput
                         label='Nombre'
                         name='name'
                         type='text'

@@ -1,4 +1,4 @@
-import { axios } from '../../../lib/axios';
+import { axios } from '@/lib/axios';
 
 export async function createPatient(patientData){
     try {
@@ -26,6 +26,16 @@ export async function getPatient(id){
         return response.data;
     } catch (err) {
         console.error('Error getting patient data:', err);
+        throw err;
+    }
+}
+
+export async function getPatientDetail(uuid){
+    try {
+        const response = await axios.get(`/patients/${uuid}/detail`);
+        return response.data;
+    } catch (err) {
+        console.error('Error getting detailed patient data:', err);
         throw err;
     }
 }

@@ -1,5 +1,5 @@
-import { useUsers } from '../hooks/useUsers';
-import UsersTable from './UsersTable';
+import { useUsers } from '@users/hooks/useUsers';
+import UsersTable from '@users/components/UsersTable';
 import Skeleton from '@mui/material/Skeleton';
 
 export default function UserManagement() {

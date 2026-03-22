@@ -13,6 +13,20 @@ import AppointmentsPage from './pages/appointment-pages/AppointmentsPage';
 import AgendasPage from './pages/agenda-pages/AgendasPage';
 import CreateAppointmentPage from './pages/appointment-pages/CreateAppointmentPage';
 import EditAppointmentPage from './pages/appointment-pages/EditAppointmentPage'
+import ClinicalRecordsPage from './pages/clinical-record-pages/ClinicalRecordsPage'
+import DiagnosesPage from './pages/diagnosis-pages/DiagnosesPage'
+import CreateDiagnosisPage from './pages/diagnosis-pages/CreateDiagnosisPage'
+import CreateTreatmentPage from './pages/treatment-pages/CreateTreatmentPage'
+import TreatmentsPage from './pages/treatment-pages/TreatmentsPage'
+import ClinicalDocumentsPage from './pages/clinical-document-pages/ClinicalDocumentsPage';
+import CreateExternalClinicalDocumentForm from '@/app/pages/clinical-document-pages/CreateExternalClinicalDocumentPage'
+import ViewClinicalAttachmentsDocumentManagement from '@/features/clinical-records/clinical-documents/components/wrappers/ViewClinicalAttachmentsDocumentManagement';
+
+import PatientDetailPage from '@/app/pages/patient-pages/PatientDetailPage'
+import PatientDetailProfilePage from '@/app/pages/patient-pages/PatientDetailProfilePage';
+
+import PatientFlowPage from '@/app/pages/patient-pages/PatientFlowPage';
+
 import { redirect } from 'react-router';
 
 async function requireAuth() {
@@ -46,7 +60,7 @@ export const router = createBrowserRouter([
                 handle: { title: 'Añadir Usuario' },
             },
             {
-                path: '/users/edit/:id',
+                path: '/users/edit/:uuid',
                 Component: UpdateUserPage,
                 handle: { title: 'Editar Usuario' },
             },
@@ -61,12 +75,59 @@ export const router = createBrowserRouter([
                 handle: { title: 'Pacientes' },
             },
             {
+                path: '/patients/:uuid/detail',
+                Component: PatientDetailPage,
+                handle: { title: 'Vista detallada de paciente' },
+                children: [
+                    {
+                        path: 'profile',
+                        Component: PatientDetailProfilePage,
+                        handle: {title: 'Documentos clínicos'}
+                    },
+                    {
+                        path: 'clinical-documents/:uuid',
+                        Component: ViewClinicalAttachmentsDocumentManagement,
+                        handle: {title: 'Ver documento clínico'}
+                    },
+                    {
+                        path: 'clinical-documents/new-external',
+                        Component: CreateExternalClinicalDocumentForm,
+                        handle: {title: 'Crear documento clínico externo'}
+                    },
+                    {
+                        path: 'treatments',
+                        Component: TreatmentsPage,
+                        handle: {title: 'Tratamientos'}
+                    },
+                    {
+                        path: 'treatments/new',
+                        Component: CreateTreatmentPage,
+                        handle: {title: 'Crear tratamiento'}
+                    },
+                    {
+                        path: 'diagnoses',
+                        Component: DiagnosesPage,
+                        handle: {title: 'Diagnósticos'}
+                    },
+                    {
+                        path: 'diagnoses/new',
+                        Component: CreateDiagnosisPage,
+                        handle: {title: 'Crear diagnóstico'}
+                    },
+                ]
+            },
+            {
+                path: '/patients/:uuid/flow',
+                Component: PatientFlowPage,
+                handle: {title: "Flujo del paciente"}
+            },
+            {
                 path: '/patients/new',
                 Component: CreatePatientPage,
                 handle: { title: 'Añadir Paciente' },
             },
             {
-                path: '/patients/edit/:id',
+                path: '/patients/edit/:uuid',
                 Component: UpdatePatientPage,
                 handle: { title: 'Editar Paciente' },
             },
@@ -86,10 +147,52 @@ export const router = createBrowserRouter([
                 handle: { title: 'Crear Cita' },
             },
             {
-                path: '/appointments/edit/:id',
+                path: '/appointments/edit/:uuid',
                 Component: EditAppointmentPage,
                 handle: { title: 'Editar Cita' },
-            }
+            },
+            {
+                path: '/clinical-records',
+                Component: ClinicalRecordsPage,
+                handle: {title: 'Registros clínicos'},
+                children: [
+                    {
+                        path: 'clinical-documents',
+                        Component: ClinicalDocumentsPage,
+                        handle: {title: 'Documentos clínicos'}
+                    },
+                    {
+                        path: 'clinical-documents/:uuid',
+                        Component: ViewClinicalAttachmentsDocumentManagement,
+                        handle: {title: 'Ver documento clínico'}
+                    },
+                    {
+                        path: 'clinical-documents/new-external',
+                        Component: CreateExternalClinicalDocumentForm,
+                        handle: {title: 'Crear documento clínico externo'}
+                    },
+                    {
+                        path: 'treatments',
+                        Component: TreatmentsPage,
+                        handle: {title: 'Tratamientos'}
+                    },
+                    {
+                        path: 'treatments/new',
+                        Component: CreateTreatmentPage,
+                        handle: {title: 'Crear tratamiento'}
+                    },
+                    {
+                        path: 'diagnoses',
+                        Component: DiagnosesPage,
+                        handle: {title: 'Diagnósticos'}
+                    },
+                    {
+                        path: 'diagnoses/new',
+                        Component: CreateDiagnosisPage,
+                        handle: {title: 'Crear diagnóstico'}
+                    },
+                ]
+            },
         ],
     },
     {

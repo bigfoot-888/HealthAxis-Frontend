@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 
-export function AgendaAutocomplete({ control, errors, rules }) {
+export default function AgendaAutocomplete({ control, errors, rules }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null); // keep track of timeout across renders
 

@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 
-export function PatientAutocomplete({ control, errors, rules }) {
+export default function PatientAutocomplete({ control, errors, rules }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null); // keep track of timeout across renders
 

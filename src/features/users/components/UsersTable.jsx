@@ -1,24 +1,26 @@
-import { useState, useEffect, useMemo } from 'react';
-import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router';
-import Button from '@mui/material/Button';
+import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 
+import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RestoreIcon from '@mui/icons-material/Restore';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
-import { useUsers } from '../hooks/useUsers';
-import { deactivateUser, reactivateUser, importUsers } from '../api/user-api';
-import AlertDialog from '../../../components/AlertDialog';
-import BasicTableLayout from '../../../components/tables/BasicTableLayout';
-import { Chip } from '@mui/material';
-import ContentLayout from '../../../components/layout/ContentLayout';
+import { useUsers } from '@users/hooks/useUsers';
+import { deactivateUser, reactivateUser, importUsers } from '@users/api/user-api';
 
-function ActionsCell({ row, onDelete, onReactivate }) {
+import { AlertDialog } from '@/components/dialogs/index';
+import { BasicTableLayout } from '@/components/tables/index';
+import { ContentLayout } from '@/components/layout/index';
+import { useSearchFilter } from '@/hooks/useSearchFilter';
+import { handleApiError } from '@/utils/handle-errors';
+
+function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
-        <GridActionsCell>
+        <GridActionsCell {...gridParams}>
             {row.state === 'ACTIVE' && (
                 <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={() => onDelete(row)} />
             )}
@@ -36,28 +38,15 @@ function ActionsCell({ row, onDelete, onReactivate }) {
     );
 }
 
-export default function BulkEditing({ users }) {
+export default function UsersTable({ users }) {
     const [searchText, setSearchText] = useState('');
     const [error, setError] = useState(null);
-    const [filteredUsers, setFilteredUsers] = useState(users);
 
-    // Filter users whenever searchText or users change
-    useEffect(() => {
-        const lowerSearch = searchText.toLowerCase();
-        setFilteredUsers(
-            users.filter((user) =>
-                ['id', 'name', 'surname', 'email'].some((field) => {
-                    const value = user[field]?.toString().toLowerCase() || '';
-                    return value.includes(lowerSearch);
-                }),
-            ),
-        );
-    }, [searchText, users]);
+    const filteredUsers = useSearchFilter(users, searchText, ['id', 'name', 'surname', 'email']);
 
     const { refetch } = useUsers();
-    const [pendingDeleteRow, setPendingDeleteRow] = useState(null);
-    const [pendingReactivateRow, setPendingReactivateRow] = useState(null);
-    // const [isSaving, setIsSaving] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [userToReactivate, setUserToReactivate] = useState(null);
 
     const handleUsersFileSelect = async (event) => {
         const file = event.target.files[0];
@@ -68,33 +57,41 @@ export default function BulkEditing({ users }) {
             await importUsers(users);
             refetch();
         } catch (err) {
-            setError(err.response.data.message);
+            handleApiError(err, setError, null);
         }
         event.target.value = '';
     };
 
     const handleCloseAlertDialog = (e) => {
-        setPendingDeleteRow(null);
+        setUserToDelete(null);
     };
 
     const handleConfirmAlertDialog = async (row) => {
-        if (row) {
-            const user = await deactivateUser(Number(row.id));
-            refetch();
+        try {
+            if (row) {
+                await deactivateUser(Number(row.id));
+                refetch();
+            }
+            handleCloseAlertDialog();
+        } catch (err) {
+            handleApiError(err, setError, null);
         }
-        handleCloseAlertDialog();
     };
 
     const handleCloseReactivateDialog = (e) => {
-        setPendingReactivateRow(null);
+        setUserToReactivate(null);
     };
 
     const handleConfirmReactivateDialog = async (row) => {
-        if (row) {
-            await reactivateUser(Number(row.id));
-            refetch();
+        try {
+            if (row) {
+                await reactivateUser(Number(row.id));
+                refetch();
+            }
+            handleCloseReactivateDialog();
+        } catch (err) {
+            handleApiError(err, setError, null);
         }
-        handleCloseReactivateDialog();
     };
 
     const columns = useMemo(() => {
@@ -166,7 +163,7 @@ export default function BulkEditing({ users }) {
                 type: 'actions',
                 flex: 2,
                 renderCell: (params) => (
-                    <ActionsCell {...params} onDelete={setPendingDeleteRow} onReactivate={setPendingReactivateRow} />
+                    <ActionsCell {...params} onDelete={setUserToDelete} onReactivate={setUserToReactivate} />
                 ),
             },
         ];
@@ -175,17 +172,17 @@ export default function BulkEditing({ users }) {
     return (
         <>
             <AlertDialog
-                open={!!pendingReactivateRow}
+                open={!!userToReactivate}
                 handleClose={handleCloseReactivateDialog}
-                handleConfirm={() => handleConfirmReactivateDialog(pendingReactivateRow)}
-                title={`¿Reactivar la cuenta de ${!!pendingReactivateRow && pendingReactivateRow.name + ' ' + pendingReactivateRow.surname}?`}
+                handleConfirm={() => handleConfirmReactivateDialog(userToReactivate)}
+                title={`¿Reactivar la cuenta de ${!!userToReactivate && userToReactivate.name + ' ' + userToReactivate.surname}?`}
                 content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
             />
             <AlertDialog
-                open={!!pendingDeleteRow}
+                open={!!userToDelete}
                 handleClose={handleCloseAlertDialog}
-                handleConfirm={() => handleConfirmAlertDialog(pendingDeleteRow)}
-                title={`¿Dar de baja a ${!!pendingDeleteRow && pendingDeleteRow.name + ' ' + pendingDeleteRow.surname}?`}
+                handleConfirm={() => handleConfirmAlertDialog(userToDelete)}
+                title={`¿Dar de baja a ${!!userToDelete && userToDelete.name + ' ' + userToDelete.surname}?`}
                 content='Esta acción es reversible. Si el usuario tiene alguna dependencia activa en el sistema
                 se cancelará el proceso. En caso contrario, el usuario será dado de baja. '
             />

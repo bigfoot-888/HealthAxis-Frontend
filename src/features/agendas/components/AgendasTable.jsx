@@ -1,26 +1,31 @@
-import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
-import { useState, useEffect, useMemo } from 'react';
-import Button from '@mui/material/Button';
+import { useState, useMemo } from 'react';
 
+import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
+import Button from '@mui/material/Button';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RestoreIcon from '@mui/icons-material/Restore';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
-import { useAgendas } from '../hooks/useAgendas';
-import { deactivateAgenda, reactivateAgenda } from '../api/agenda-api';
-import AlertDialog from '../../../components/AlertDialog';
-import CreateAgendaForm from './CreateAgendaForm';
-import CreateAgendaPeriodForm from './CreatePeriodForm';
-import EditAgendaForm from './EditAgendaForm';
-import BasicTableLayout from '../../../components/tables/BasicTableLayout';
-import ContentLayout from '../../../components/layout/ContentLayout';
+import { AlertDialog } from '@/components/dialogs/index';
+import { BasicTableLayout } from '@/components/tables/index';
+import { ContentLayout } from '@/components/layout/index';
 
-function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod }) {
+import { handleApiError } from '@/utils/handle-errors';
+import { useSearchFilter } from '@/hooks/useSearchFilter';
+
+import CreateAgendaForm from '@agendas/components/CreateAgendaForm';
+import CreateAgendaPeriodForm from '@agendas/components/CreatePeriodForm';
+import EditAgendaForm from '@agendas/components/EditAgendaForm';
+
+import { useAgendas } from '@agendas/hooks/useAgendas';
+import { deactivateAgenda, reactivateAgenda } from '@agendas/api/agenda-api';
+import { formatCreatedAt } from '@/utils/date-formatters';
+
+function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, ...gridParams }) {
     return (
-        <GridActionsCell>
+        <GridActionsCell {...gridParams}>
             <GridActionsCellItem
                 icon={<EditCalendarIcon />}
                 disabled={row.state === 'INACTIVE'}
@@ -44,45 +49,40 @@ function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod }) {
 }
 
 export default function AgendasTable({ agendas }) {
-    const [searchText, setSearchText] = useState(''); // Searchbar text
-    const [error, setError] = useState(null); // Non-form errors
-    const [filteredAgendas, setFilteredAgendas] = useState(agendas);
-    const [openCreateForm, setOpenCreateForm] = useState(false);
-    const [openEditForm, setOpenEditForm] = useState(null);
-    const [openCreatePeriodForm, setOpenCreatePeriodForm] = useState(null);
-
-    // Filter agendas whenever searchText or agendas change
-    useEffect(() => {
-        const lowerSearch = searchText.toLowerCase();
-        setFilteredAgendas(
-            agendas.filter((agenda) =>
-                ['id', 'name'].some((field) => {
-                    const value = agenda[field]?.toString().toLowerCase() || '';
-                    return value.includes(lowerSearch);
-                }),
-            ),
-        );
-    }, [searchText, agendas]);
-
     const { refetch } = useAgendas();
-    const [pendingDeleteRow, setPendingDeleteRow] = useState(null);
-    const [pendingReactivateRow, setPendingReactivateRow] = useState(null);
-    // const [isSaving, setIsSaving] = useState(false);
+    const [searchText, setSearchText] = useState(''); 
+    const [error, setError] = useState(null); 
 
+    const [isCreateAgendaOpen, setIsCreateAgendaOpen] = useState(false);
+    const [agendaToEdit, setAgendaToEdit] = useState(null);
+    const [agendaForNewPeriod, setAgendaForNewPeriod] = useState(null);
+    const [agendaToDelete, setAgendaToDelete] = useState(null);
+    const [agendaToReactivate, setAgendaToReactivate] = useState(null);
+
+    const filteredAgendas = useSearchFilter(agendas, searchText, ["id", "name"])
+    
     const handleConfirmAlertDialog = async (row) => {
-        if (row) {
-            await deactivateAgenda(Number(row.id));
-            refetch();
+        try {
+            if (row) {
+                await deactivateAgenda(Number(row.id));
+                refetch();
+                setAgendaToDelete(null);
+            }
+        } catch (err) {
+            handleApiError(err, setError, null);
         }
-        setPendingDeleteRow(null);
     };
 
     const handleConfirmReactivateDialog = async (row) => {
-        if (row) {
-            await reactivateAgenda(Number(row.id));
-            refetch();
+        try {
+            if (row) {
+                await reactivateAgenda(Number(row.id));
+                refetch();
+            }
+            setAgendaToReactivate(null);
+        } catch (err) {
+            handleApiError(err, setError, null); 
         }
-        setPendingReactivateRow(null);
     };
 
     // https://stackoverflow.com/questions/79546439/why-are-params-undefined-in-valuegetter-but-not-in-rendercell-when-using-mui-dat
@@ -129,21 +129,7 @@ export default function AgendasTable({ agendas }) {
                 field: 'createdAt',
                 headerName: 'Fecha de Creación',
                 flex: 2,
-                valueFormatter: (value) => {
-                    const date = new Date(value);
-                    const now = new Date();
-                    const isToday =
-                        date.getDate() === now.getDate() &&
-                        date.getMonth() === now.getMonth() &&
-                        date.getFullYear() === now.getFullYear();
-
-                    return isToday
-                        ? date.toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                          })
-                        : date.toLocaleDateString('es-ES');
-                },
+                valueFormatter: (value) => formatCreatedAt(value),
             },
             {
                 field: 'actions',
@@ -152,10 +138,10 @@ export default function AgendasTable({ agendas }) {
                 renderCell: (params) => (
                     <ActionsCell
                         {...params}
-                        onDelete={setPendingDeleteRow}
-                        onReactivate={setPendingReactivateRow}
-                        onEdit={setOpenEditForm}
-                        onCreatePeriod={setOpenCreatePeriodForm}
+                        onDelete={setAgendaToDelete}
+                        onReactivate={setAgendaToReactivate}
+                        onEdit={setAgendaToEdit}
+                        onCreatePeriod={setAgendaForNewPeriod}
                     />
                 ),
             },
@@ -165,28 +151,29 @@ export default function AgendasTable({ agendas }) {
     return (
         <>
             <AlertDialog
-                open={!!pendingReactivateRow}
-                handleClose={() => setPendingReactivateRow(null)}
-                handleConfirm={() => handleConfirmReactivateDialog(pendingReactivateRow)}
-                title={`¿Reactivar la agenda de ${!!pendingReactivateRow && pendingReactivateRow.name}?`}
+                open={!!agendaToReactivate}
+                handleClose={() => setAgendaToReactivate(null)}
+                handleConfirm={() => handleConfirmReactivateDialog(agendaToReactivate)}
+                title={`¿Reactivar la agenda de ${!!agendaToReactivate && agendaToReactivate.name}?`}
                 content='Esta acción es reversible. Al finalizar, la agenda será reactivada. '
             />
             <AlertDialog
-                open={!!pendingDeleteRow}
-                handleClose={() => setPendingDeleteRow(null)}
-                handleConfirm={() => handleConfirmAlertDialog(pendingDeleteRow)}
-                title={`¿Dar de baja a la agenda de ${!!pendingDeleteRow && pendingDeleteRow.name}?`}
+                open={!!agendaToDelete}
+                handleClose={() => setAgendaToDelete(null)}
+                handleConfirm={() => handleConfirmAlertDialog(agendaToDelete)}
+                title={`¿Dar de baja a la agenda de ${!!agendaToDelete && agendaToDelete.name}?`}
                 content='Esta acción es reversible. Si la agenda tiene alguna dependencia activa en el sistema
                 se cancelará el proceso. En caso contrario, la agenda será dada de baja. '
             />
-            {openCreateForm && (
-                <CreateAgendaForm openCreateForm={openCreateForm} handleClose={() => setOpenCreateForm(false)} />
+            {isCreateAgendaOpen && (
+                <CreateAgendaForm isCreateAgendaOpen={isCreateAgendaOpen} handleClose={() => setIsCreateAgendaOpen(false)} />
             )}
-            {openEditForm && <EditAgendaForm agenda={openEditForm} handleClose={() => setOpenEditForm(null)} />}
-            {openCreatePeriodForm && (
+            {agendaToEdit && <EditAgendaForm agenda={agendaToEdit} handleClose={() => setAgendaToEdit(null)} setError={setError}/>}
+            {agendaForNewPeriod && (
                 <CreateAgendaPeriodForm
-                    agenda={openCreatePeriodForm}
-                    handleClose={() => setOpenCreatePeriodForm(null)}
+                    agenda={agendaForNewPeriod}
+                    handleClose={() => setAgendaForNewPeriod(null)}
+                    setError={setError}
                 />
             )}
             <ContentLayout error={error} onErrorClose={() => setError(null)}>
@@ -200,7 +187,7 @@ export default function AgendasTable({ agendas }) {
                         <Button
                             variant='contained'
                             onClick={() => {
-                                setOpenCreateForm(true);
+                                setIsCreateAgendaOpen(true);
                                 console.log('hola');
                             }}
                             startIcon={<PersonAddAltIcon />}
