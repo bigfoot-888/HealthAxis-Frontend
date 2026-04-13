@@ -8,7 +8,7 @@ import { OutlinedInput, InputLabel, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import loginBgImage from '@auth/assets/login-bg.jpg';
-import { validateLogin } from '@auth/auth-api';
+import { login } from '@auth/auth-api';
 
 import { handleApiError } from '@/utils/handle-errors';
 
@@ -25,7 +25,7 @@ export default function LoginForm() {
         try {
             const data = new FormData(e.currentTarget);
             const formData = Object.fromEntries(data);
-            await validateLogin(formData);
+            await login(formData);
             navigate('/');
         } catch (err) {
             handleApiError(err, setError, null); 

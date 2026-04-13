@@ -45,6 +45,7 @@ export default function RHFDatePicker({ name, control, rules, label }) {
                                 onBlur: handleBlur,
                             },
                             textField: {
+                                name: name,
                                 fullWidth: true,
                                 error: !!error,
                                 helperText: error?.message || ' ',

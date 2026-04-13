@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAppointment, getAppointmentPlain } from '@appointments/api/appointment-api';
+import { getAppointment, getAppointmentPlain } from '@appointments/api/appointment.api';
 
 export function useAppointment(uuid) {
     return useQuery({

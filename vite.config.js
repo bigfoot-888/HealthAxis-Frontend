@@ -18,7 +18,7 @@ export default defineConfig({
       '@treatments': path.resolve(__dirname, 'src/features/clinical-records/treatments'),
       '@clinical-documents': path.resolve(__dirname, 'src/features/clinical-records/clinical-documents'),
       '@patient-flows': path.resolve(__dirname, 'src/features/patient-flows'),
-      '@dashboards': path.resolve(__dirname, 'src/features/dasbhoards'),
+      '@dashboards': path.resolve(__dirname, 'src/features/dashboards'),
     },
   },
   server: {

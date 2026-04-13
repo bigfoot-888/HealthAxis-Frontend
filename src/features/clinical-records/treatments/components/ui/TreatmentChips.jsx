@@ -1,26 +1,25 @@
+
 import {
-    TREATMENT_STATE_LABELS,
-    TREATMENT_STATE_COLORS,
-    TREATMENT_RECORD_STATE_LABELS,
-    TREATMENT_RECORD_STATE_COLORS,
-} from '@treatments/utils/chip-values';
+    TREATMENT_CLINICAL_STATUS_CONFIG,
+    TREATMENT_STATUS_CONFIG,
+} from '@/shared/constants/treatment.constants'; 
 import { Chip } from '@mui/material';
 
-export function TreatmentStateChip({ value }) {
+export function TreatmentClinicalStatusChip({ value }) {
     return (
         <Chip
-            label={TREATMENT_STATE_LABELS[value] || value}
-            color={TREATMENT_STATE_COLORS[value] || 'default'}
+            label={TREATMENT_CLINICAL_STATUS_CONFIG[value].label || value}
+            color={TREATMENT_CLINICAL_STATUS_CONFIG[value].color || 'default'}
             size='small'
         />
     );
 }
 
-export function TreatmentRecordStateChip({ value }) {
+export function TreatmentStatusChip({ value }) {
     return (
         <Chip
-            label={TREATMENT_RECORD_STATE_LABELS[value] || value}
-            color={TREATMENT_RECORD_STATE_COLORS[value] || 'default'}
+            label={TREATMENT_STATUS_CONFIG[value].label || value}
+            color={TREATMENT_STATUS_CONFIG[value].color || 'default'}
             size='small'
         />
     );

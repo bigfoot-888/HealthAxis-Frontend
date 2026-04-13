@@ -5,14 +5,15 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
-import { createAppointment } from '@appointments/api/appointment-api';
+import { createAppointment } from '@appointments/api/appointment.api';
 
 import { BasicTextInput, SelectInput } from '@/components/forms/inputs/index';
-import { PatientAutocomplete, UserAutocomplete, AgendaAutocomplete } from '@/components/forms/autocompletes/index';
+import { PatientAutocomplete, UserAutocomplete } from '@/components/forms/autocompletes/index';
 import { RHFDateTimePicker } from '@/components/forms/pickers/index';
 import { handleApiError } from '@/utils/handle-errors';
 import { BasicFormLayout } from '@/components/forms';
 import { ErrorAlert } from '@/components/ui';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateAppointmentForm() {
     const {
@@ -31,11 +32,15 @@ export default function CreateAppointmentForm() {
     const navigate = useNavigate();
     const { refetch } = useAppointments();
     const [error, setError] = useState(null); 
+    const queryClient = useQueryClient();
 
     const onSubmit = async (data) => {
         try {
             await createAppointment(data);
             refetch();
+            console.log(data)
+            await queryClient.invalidateQueries({ queryKey: ['appointments', {userUuid: data.user.uuid}] });
+
             navigate('/appointments');
         } catch (err) {
             handleApiError(err, setError, setFormError);
@@ -92,7 +97,7 @@ export default function CreateAppointmentForm() {
                         </Grid>
                         <Grid size={12}>
                             <RHFDateTimePicker
-                                name='start_time'
+                                name='startTime'
                                 control={control}
                                 rules={{ required: 'La fecha y hora de inicio es obligatoria' }}
                                 label='Fecha y hora de inicio'
@@ -125,13 +130,6 @@ export default function CreateAppointmentForm() {
                                     required: 'El motivo es obligatorio',
                                 }}
                                 errors={errors}
-                            />
-                        </Grid>
-                        <Grid size={12}>
-                            <AgendaAutocomplete
-                                control={control}
-                                errors={errors}
-                                rules={{ required: 'La agenda es obligatoria' }}
                             />
                         </Grid>
                         <Grid size={12}>

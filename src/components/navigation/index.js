@@ -1,0 +1,1 @@
+export {default as AppBreadcrumbs} from '@/components/navigation/AppBreadcrumbs'

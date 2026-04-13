@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Grid, Paper, Button, TextField, Typography } from '@mui/material';
 
-import { updateUser } from '@users/api/user-api';
+import { updateUser } from '@users/api/user.api';
 import { useUsers } from '@users/hooks/useUsers';
 
 import { BasicFormLayout } from '@/components/forms/index';

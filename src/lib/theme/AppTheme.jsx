@@ -40,6 +40,7 @@ function AppTheme(props) {
                                   },
                               ],
                           },
+
                       },
                   },
                   coreEsES,

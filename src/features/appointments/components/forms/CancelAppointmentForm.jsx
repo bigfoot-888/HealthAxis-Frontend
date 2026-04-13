@@ -3,28 +3,27 @@ import { useForm } from 'react-hook-form';
 import { Grid } from '@mui/material';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
-import { updateAppointmentState } from '@appointments/api/appointment-api';
+import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import {BasicTextInput, RHFRadioInput} from '@/components/forms/inputs/index';
 import {FormDialog} from '@/components/dialogs/index';
 
 import { handleApiError } from '@/utils/handle-errors';
 
-export default function CancelAppointmentForm({ appointment, handleClose }) {
+export default function CancelAppointmentForm({ appointment, handleClose, refetch }) {
     const {
         register,
         handleSubmit,
         control,
         setError: setFormError,
         formState: { errors },
-    } = useForm({ mode: 'onBlur', defaultValues: { state: "NO_SHOW" }, });
+    } = useForm({ mode: 'onBlur', defaultValues: { status: "NO_SHOW" }, });
     
-    const { refetch } = useAppointments();
     const [error, setError] = useState(null);
     const onSubmit = async (data) => {
         try {
-            await updateAppointmentState(appointment.uuid, data.state, data.notes);
-            refetch();
+            await updateAppointmentStatus(appointment.uuid, data.status, data.notes);
+            refetch(); 
             handleClose();
         } catch (err) {
             handleApiError(err, setError, setFormError)
@@ -47,7 +46,7 @@ export default function CancelAppointmentForm({ appointment, handleClose }) {
             <Grid container columnSpacing={3} sx={{pt:1}}>
                 <Grid size={12}>
                     <RHFRadioInput
-                        name='state'
+                        name='status'
                         control={control}
                         rules={{ required: 'Es obligatorio indicar el tipo de cancelación' }}
                         errors={errors}

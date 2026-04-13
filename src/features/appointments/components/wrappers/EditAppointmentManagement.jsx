@@ -7,5 +7,5 @@ export default function EditAppointmentManagement() {
     if (isLoading) return <p>Loading users…</p>;
     if (error) return <p>Failed to load users</p>;
     if (!appointment) return <p>vaya</p>;
-    return <EditAppointmentForm appointment={appointment} uuid={id} />;
+    return <EditAppointmentForm appointment={appointment} uuid={uuid} />;
 }

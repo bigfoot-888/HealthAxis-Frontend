@@ -5,7 +5,7 @@ import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 
-export default function DiagnosisAutocomplete({ control, name, rules, multiple = false }) {
+export default function DiagnosisAutocomplete({ control, rules={}, multiple = false }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null);
 
@@ -31,7 +31,7 @@ export default function DiagnosisAutocomplete({ control, name, rules, multiple =
 
     return (
         <Controller
-            name={name}
+            name="diagnosis"
             control={control}
             rules={rules}
             render={({ field, fieldState }) => (

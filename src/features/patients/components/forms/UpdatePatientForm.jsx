@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { Button, Stack, Paper, Grid, Box, TextField, Typography } from '@mui/material';
 
-import { updatePatient } from '@patients/api/patient-api';
+import { updatePatient } from '@patients/api/patient.api';
 import { usePatients } from '@patients/hooks/usePatients';
 import { handleApiError } from '@/utils/handle-errors';
 
@@ -129,7 +129,7 @@ export default function CreatePatientForm({ patient, uuid }) {
                         <Grid size={12}>
                             <BasicTextInput
                                 label='Dirección'
-                                name='address_line1'
+                                name='addressLine1'
                                 register={register}
                                 rules={{ required: 'La dirección es obligatoria' }}
                                 type='text'
@@ -139,7 +139,7 @@ export default function CreatePatientForm({ patient, uuid }) {
                         <Grid size={12}>
                             <BasicTextInput
                                 label='Dirección complementaria'
-                                name='address_line2'
+                                name='addressLine2'
                                 register={register}
                                 rules={{}}
                                 type='text'

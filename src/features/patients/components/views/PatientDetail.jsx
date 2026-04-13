@@ -7,23 +7,11 @@ import {
 import { usePatientContext } from '@patients/hooks/usePatientContext';
 import { formatDateTimeUTC } from '@/utils/date-formatters';
 
-// Iconos esenciales
 import AddIcon from '@mui/icons-material/Add';
-import TimelineIcon from '@mui/icons-material/Timeline';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router';
 
-const calculateAge = (dob) => {
-    if (!dob) return '';
-    const diffMs = Date.now() - new Date(dob).getTime();
-    const ageDt = new Date(diffMs); 
-    return Math.abs(ageDt.getUTCFullYear() - 1970);
-};
-
-const translateSex = (sex) => {
-    const map = { MALE: 'Hombre', FEMALE: 'Mujer', OTHER: 'Otro' };
-    return map[sex] || sex;
-};
+import { calculateAge, translateSex } from '@patients/utils/patient.utils';
+import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 
 export default function PatientDetail() {
     const { setError, patient, uuid } = usePatientContext();
@@ -39,38 +27,47 @@ export default function PatientDetail() {
     return (
         <DetailLayout>
             <Stack sx={{ p: { xs: 2, md: 3 } }} spacing={3}>
-                
-                {/* 1. CABECERA: ESTILO EXPEDIENTE CLÍNICO */}
                 <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                     <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                        <Grid container spacing={3} alignItems="flex-start">
-                            
+                        <Grid container spacing={3} alignItems='flex-start'>
                             <Grid>
-                                <Avatar sx={{ width: 80, height: 80, fontSize: '2rem', bgcolor: 'grey.300', color: 'grey.800' }}>
+                                <Avatar
+                                    sx={{
+                                        width: 80,
+                                        height: 80,
+                                        fontSize: '2rem',
+                                        bgcolor: 'grey.300',
+                                        color: 'grey.800',
+                                    }}
+                                >
                                     {initials}
                                 </Avatar>
                             </Grid>
 
                             <Grid size={{ xs: 12, sm: 'grow' }}>
-                                <Stack direction="row" spacing={2} alignItems="center" mb={1} flexWrap="wrap">
-                                    <Typography variant="h4" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                                <Stack direction='row' spacing={2} alignItems='center' mb={1} flexWrap='wrap'>
+                                    <Typography variant='h4' sx={{ fontWeight: 600, color: 'text.primary' }}>
                                         {patientSurname}, {patientName}
                                     </Typography>
-                                    <Chip 
-                                        label={patient.state === 'ACTIVE' ? 'Activo' : 'Inactivo'} 
-                                        color={patient.state === 'ACTIVE' ? 'success' : 'default'}
-                                        size="small"
-                                        variant="outlined"
+                                    <Chip
+                                        label={patient.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
+                                        color={patient.status === 'ACTIVE' ? 'success' : 'default'}
+                                        size='small'
+                                        variant='outlined'
                                     />
                                 </Stack>
 
-                                <Stack direction="row" spacing={3} mb={2}>
-                                    <Typography variant="body1">
-                                        <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>NHC: </Box>
+                                <Stack direction='row' spacing={3} mb={2}>
+                                    <Typography variant='body1'>
+                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                            NHC:{' '}
+                                        </Box>
                                         {patient.nhc}
                                     </Typography>
-                                    <Typography variant="body1">
-                                        <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>DNI: </Box>
+                                    <Typography variant='body1'>
+                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                            DNI:{' '}
+                                        </Box>
                                         {patient.dni}
                                     </Typography>
                                 </Stack>
@@ -79,33 +76,44 @@ export default function PatientDetail() {
 
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant="body2">
-                                            <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>Edad: </Box>
+                                        <Typography variant='body2'>
+                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                                Edad:{' '}
+                                            </Box>
                                             {age} años
                                         </Typography>
                                     </Grid>
                                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant="body2">
-                                            <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>Sexo: </Box>
+                                        <Typography variant='body2'>
+                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                                Sexo:{' '}
+                                            </Box>
                                             {translateSex(patient.sex)}
                                         </Typography>
                                     </Grid>
                                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant="body2">
-                                            <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>Teléfono: </Box>
+                                        <Typography variant='body2'>
+                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                                Teléfono:{' '}
+                                            </Box>
                                             {patient.phone}
                                         </Typography>
                                     </Grid>
                                     <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant="body2">
-                                            <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>Email: </Box>
+                                        <Typography variant='body2'>
+                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                                Email:{' '}
+                                            </Box>
                                             {patient.email}
                                         </Typography>
                                     </Grid>
                                     <Grid size={12}>
-                                        <Typography variant="body2">
-                                            <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>Dirección: </Box>
-                                            {fullAddress}
+                                        <Typography variant='body2'>
+                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                                                Dirección:{' '}
+                                            </Box>
+                                            {patient.addressLine1 +
+                                                (patient.addressLine2 ? ', ' + patient.addressLine2 : '')}
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -113,28 +121,16 @@ export default function PatientDetail() {
 
                             <Grid size={{ xs: 12, md: 'auto' }}>
                                 <Stack direction={{ xs: 'column', sm: 'row', md: 'column' }} spacing={1.5}>
-                                    <Button 
-                                        variant="contained" 
-                                        startIcon={<AddIcon />} 
-                                        disableElevation 
-                                        size="large"
+                                    <Button
+                                        variant='contained'
+                                        startIcon={<AddIcon />}
+                                        disableElevation
+                                        size='large'
                                         sx={{ px: 3 }}
                                     >
                                         Nueva Cita
                                     </Button>
-                                    <Button 
-                                        variant="outlined" 
-                                        startIcon={<TimelineIcon />}
-                                        component={Link}
-                                        to={`/patients/${uuid}/flow`}
-                                    >
-                                        Flujo Paciente
-                                    </Button>
-                                    <Button 
-                                        variant="text" 
-                                        startIcon={<EditIcon />} 
-                                        color="inherit"
-                                    >
+                                    <Button variant='text' startIcon={<EditIcon />} color='inherit'>
                                         Editar
                                     </Button>
                                 </Stack>
@@ -143,32 +139,41 @@ export default function PatientDetail() {
                     </CardContent>
                 </Card>
 
-                {/* 2. GRID DE DATOS CLÍNICOS LIMPIO */}
                 <Grid container spacing={3}>
-                    
-                    {/* Citas */}
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant="outlined">
+                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
                             <CardContent>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
+                                <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                                     Próximas Citas
                                 </Typography>
                                 <Divider sx={{ mb: 1 }} />
-                                
+
                                 {patient.appointments?.length > 0 ? (
                                     <List dense disablePadding>
                                         {patient.appointments.slice(0, 3).map((appt) => (
-                                            <ListItem key={appt.id} disableGutters sx={{ alignItems: 'flex-start', py: 1 }}>
-                                                <ListItemText 
+                                            <ListItem
+                                                key={appt.id}
+                                                disableGutters
+                                                sx={{ alignItems: 'flex-start', py: 1 }}
+                                            >
+                                                <ListItemText
                                                     disableTypography
                                                     primary={
-                                                        <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary' }}>
+                                                        <Typography
+                                                            variant='body2'
+                                                            sx={{ fontWeight: 500, color: 'text.primary' }}
+                                                        >
                                                             {appt.reason || 'Consulta General'}
                                                         </Typography>
                                                     }
                                                     secondary={
-                                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                                                            {appt.start_time ? formatDateTimeUTC(appt.start_time) : 'Sin fecha'}
+                                                        <Typography
+                                                            variant='caption'
+                                                            sx={{ color: 'text.secondary', display: 'block' }}
+                                                        >
+                                                            {appt.startTime
+                                                                ? formatDateTimeUTC(appt.startTime)
+                                                                : 'Sin fecha'}
                                                         </Typography>
                                                     }
                                                     sx={{ m: 0 }}
@@ -177,18 +182,19 @@ export default function PatientDetail() {
                                         ))}
                                     </List>
                                 ) : (
-                                    <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>Ninguna registrada.</Typography>
+                                    <Typography variant='body2' color='text.secondary' sx={{ py: 1 }}>
+                                        Ninguna registrada.
+                                    </Typography>
                                 )}
                             </CardContent>
                         </Card>
                     </Grid>
 
-                    {/* Tratamientos */}
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant="outlined">
+                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
                             <CardContent>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
-                                    Tratamientos Activos
+                                <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
+                                    Tratamientos
                                 </Typography>
                                 <Divider sx={{ mb: 1 }} />
 
@@ -196,11 +202,22 @@ export default function PatientDetail() {
                                     <List dense disablePadding>
                                         {patient.treatments.slice(0, 3).map((t) => (
                                             <ListItem key={t.id} disableGutters sx={{ py: 1 }}>
-                                                <ListItemText 
+                                                <ListItemText
                                                     disableTypography
                                                     primary={
-                                                        <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary' }}>
+                                                        <Typography
+                                                            variant='body2'
+                                                            sx={{ fontWeight: 500, color: 'text.primary' }}
+                                                        >
                                                             {t.name}
+                                                        </Typography>
+                                                    }
+                                                    secondary={
+                                                        <Typography
+                                                            variant='caption'
+                                                            sx={{ color: 'text.secondary', display: 'block' }}
+                                                        >
+                                                            {TREATMENT_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label}
                                                         </Typography>
                                                     }
                                                     sx={{ m: 0 }}
@@ -209,17 +226,18 @@ export default function PatientDetail() {
                                         ))}
                                     </List>
                                 ) : (
-                                    <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>Sin tratamientos activos.</Typography>
+                                    <Typography variant='body2' color='text.secondary' sx={{ py: 1 }}>
+                                        Sin tratamientos activos.
+                                    </Typography>
                                 )}
                             </CardContent>
                         </Card>
                     </Grid>
 
-                    {/* Diagnósticos */}
                     <Grid size={{ xs: 12, md: 4 }}>
-                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant="outlined">
+                        <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
                             <CardContent>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
+                                <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                                     Diagnósticos
                                 </Typography>
                                 <Divider sx={{ mb: 1 }} />
@@ -227,17 +245,29 @@ export default function PatientDetail() {
                                 {patient.diagnoses?.length > 0 ? (
                                     <List dense disablePadding>
                                         {patient.diagnoses.slice(0, 3).map((d) => (
-                                            <ListItem key={d.id} disableGutters sx={{ alignItems: 'flex-start', py: 1 }}>
-                                                <ListItemText 
+                                            <ListItem
+                                                key={d.id}
+                                                disableGutters
+                                                sx={{ alignItems: 'flex-start', py: 1 }}
+                                            >
+                                                <ListItemText
                                                     disableTypography
                                                     primary={
-                                                        <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.primary' }}>
+                                                        <Typography
+                                                            variant='body2'
+                                                            sx={{ fontWeight: 500, color: 'text.primary' }}
+                                                        >
                                                             {d.name}
                                                         </Typography>
                                                     }
                                                     secondary={
-                                                        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                                                            {d.resolvedAt ? `Resuelto: ${formatDateTimeUTC(d.resolvedAt)}` : 'Activo'}
+                                                        <Typography
+                                                            variant='caption'
+                                                            sx={{ color: 'text.secondary', display: 'block' }}
+                                                        >
+                                                            {d.resolvedAt
+                                                                ? `Resuelto: ${formatDateTimeUTC(d.resolvedAt)}`
+                                                                : 'Activo'}
                                                         </Typography>
                                                     }
                                                     sx={{ m: 0 }}
@@ -246,12 +276,13 @@ export default function PatientDetail() {
                                         ))}
                                     </List>
                                 ) : (
-                                    <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>Ninguno registrado.</Typography>
+                                    <Typography variant='body2' color='text.secondary' sx={{ py: 1 }}>
+                                        Ninguno registrado.
+                                    </Typography>
                                 )}
                             </CardContent>
                         </Card>
                     </Grid>
-
                 </Grid>
             </Stack>
         </DetailLayout>

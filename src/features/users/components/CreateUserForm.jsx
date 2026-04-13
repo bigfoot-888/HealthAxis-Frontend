@@ -4,14 +4,16 @@ import { Link, useNavigate } from 'react-router';
 
 import { Grid, Paper, TextField, Button, Typography } from '@mui/material';
 
-import { createUser } from '@users//api/user-api';
-import { useUsers } from '@users//hooks/useUsers';
+import { createUser } from '@users//api/user.api';
+import { useUsers } from '@users/hooks/useUsers';
 
 import { PasswordInput, BasicTextInput } from '@/components/forms/inputs/index';
-import { RoleAutocomplete } from '@/components/forms/autocompletes/index';
+import { RoleAutocomplete, AgendaAutocomplete } from '@/components/forms/autocompletes/index';
 import { BasicFormLayout } from '@/components/forms/index';
 import { handleApiError } from '@/utils/handle-errors';
 import { ErrorAlert } from '@/components/ui/index';
+
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateUserForm() {
     const {
@@ -23,13 +25,15 @@ export default function CreateUserForm() {
     } = useForm({ mode: 'onBlur' });
 
     const navigate = useNavigate();
-    const { refetch } = useUsers();
+    const { refetch: refetchUsers } = useUsers();
     const [error, setError] = useState(null);
+    const queryClient = useQueryClient();
 
     const onSubmit = async (data) => {
         try {
             await createUser(data);
-            refetch();
+            refetchUsers();
+            await queryClient.invalidateQueries({ queryKey: ['users', {agendaUuid: data.agenda.uuid}] });
             navigate('/users');
         } catch (err) {
             handleApiError(err, setError, setFormError);
@@ -97,7 +101,14 @@ export default function CreateUserForm() {
                             />
                         </Grid>
                         <Grid size={12}>
-                            <RoleAutocomplete control={control} errors={errors} />
+                            <AgendaAutocomplete
+                                control={control}
+                                errors={errors}
+                                rules={{ required: 'La agenda es obligatoria' }}
+                            />
+                        </Grid>
+                        <Grid size={12}>
+                            <RoleAutocomplete control={control} rules={{required: "El rol es obligatorio."}} />
                         </Grid>
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>

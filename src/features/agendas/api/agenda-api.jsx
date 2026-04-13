@@ -1,61 +1,44 @@
 import { axios } from '../../../lib/axios';
 
-export async function createAgenda(agendaData){
-    try {
-        const response = await axios.post('/agendas/new', agendaData);
-        return response.data;
-    } catch (err) {
-        console.error('Error creating agenda:', err);
-        throw err;
-    }
+// ===== CREATE =====
+
+export async function createAgenda(agendaData) {
+    const response = await axios.post('/agendas', agendaData);
+    return response.data;
 }
 
-export async function updateAgenda(uuid, agendaData){
-    try {
-        const response = await axios.put(`/agendas/edit/${uuid}`, agendaData);
-        return response.data;
-    } catch (err) {
-        console.error('Error updating agenda data:', err);
-        throw err;
-    }
+// ===== UPDATE =====
+
+export async function updateAgenda(uuid, agendaData) {
+    const response = await axios.put(`/agendas/${uuid}`, agendaData);
+    return response.data;
 }
 
-export async function getAgendas(){
-    try {
-        const response = await axios.get('/agendas');
-        return response.data;
-    } catch (err) {
-        console.error('Error fetching agenda data:', err);
-        throw err;
-    }
+export async function deactivateAgenda(uuid) {
+    const response = await axios.patch(`/agendas/${uuid}/deactivate`);
+    return response.data;
 }
 
-export async function getAgenda(uuid){
-    try {
-        const response = await axios.get(`/agendas/${uuid}`);
-        return response.data;
-    } catch (err) {
-        console.error('Error getting agenda data:', err);
-        throw err;
-    }
+export async function reactivateAgenda(uuid) {
+    const response = await axios.patch(`/agendas/${uuid}/reactivate`);
+    return response.data;
 }
 
-export async function deactivateAgenda(id){
-    try {
-        const response = await axios.patch('/agendas/deactivate', {id: id});
-        return response.data;
-    } catch (err) {
-        console.error('Error deactivating agenda:', err);
-        throw err;
-    }
+// ===== READ =====
+
+export async function getAgendas() {
+    const response = await axios.get('/agendas');
+    return response.data;
 }
 
-export async function reactivateAgenda(id){
-    try {
-        const response = await axios.patch('/agendas/reactivate', {id: id});
-        return response.data;
-    } catch (err) {
-        console.error('Error reactivating agenda:', err);
-        throw err;
-    }
+export async function getAgenda(uuid) {
+    const response = await axios.get(`/agendas/${uuid}`);
+    return response.data;
+}
+
+export async function getFilteredAgendas(query, limit = 20) {
+    const response = await axios.get('/agendas/filtered', {
+        params: { query, limit },
+    });
+    return response.data;
 }

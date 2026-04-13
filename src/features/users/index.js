@@ -1,0 +1,1 @@
+export {default as UserSummaryCard} from '@users/components/ui/UserSummaryCard'

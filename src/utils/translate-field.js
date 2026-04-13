@@ -40,3 +40,22 @@ export function translateTreatmentState(state) {
             return 'N.A.';
     }
 }
+
+export function translateDashboardComponentTitle(title) {
+    switch (title) {
+        case 'TOTAL_PATIENTS':
+            return 'Pacientes totales';
+        case 'ACTIVE_PATIENTS':
+            return 'Pacientes activos';
+        case 'PATIENTS_OVER_TIME':
+            return 'Pacientes ingresados con el tiempo';
+        case 'APPOINTMENTS_OVER_TIME':
+            return 'Citas creadas con el tiempo';
+        case 'DIAGNOSIS_SEVERITY_DISTRIBUTION':
+            return 'Distribución de la severidad de los diagnósticos';
+        case 'TREATMENT_STATE_DISTRIBUTION':
+            return 'Distribución del estado de los tratamientos';
+        default:
+            return 'N.A.';
+    }
+}

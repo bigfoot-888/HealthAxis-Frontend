@@ -20,7 +20,13 @@ export default function CreateAgendaForm({ agenda, handleClose, setError }) {
     const { refetch } = useAgendas();
     const onSubmit = async (data) => {
         try {
-            await createAgendaPeriod(agenda.uuid, data);
+            const payload = {
+                ...data,
+                openingDate: data.openingDate?.toISOString(),
+                closingDate: data.closingDate?.toISOString(),
+            };
+            console.log(payload)
+            await createAgendaPeriod(agenda.uuid, payload);
             refetch();
             handleClose();
         } catch (err) {
@@ -38,7 +44,7 @@ export default function CreateAgendaForm({ agenda, handleClose, setError }) {
             <Grid container rowSpacing={1.5} columnSpacing={3} sx={{ pt: 3 }}>
                 <Grid size={6}>
                     <RHFDatePicker
-                        name='opening_date'
+                        name='openingDate'
                         control={control}
                         rules={{ required: 'La fecha de apertura es obligatoria' }}
                         label='Fecha de apertura'
@@ -46,7 +52,7 @@ export default function CreateAgendaForm({ agenda, handleClose, setError }) {
                 </Grid>
                 <Grid size={6}>
                     <RHFDatePicker
-                        name='closing_date'
+                        name='closingDate'
                         control={control}
                         rules={{ required: 'La fecha de cierre es obligatoria' }}
                         label='Fecha de cierre'

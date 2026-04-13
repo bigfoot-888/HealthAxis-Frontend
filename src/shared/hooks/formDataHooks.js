@@ -1,6 +1,5 @@
-
 import { useQuery } from '@tanstack/react-query';
-import { getUsers, getPatients, getAgendas, getAppointment, getDiagnoses} from '../api/formDataApi';
+import { getUsers, getPatients, getAgendas, getAppointments, getDiagnoses, getRoles } from '../api/formDataApi';
 
 export function useUsers() {
     return useQuery({
@@ -29,11 +28,17 @@ export function useAppointments() {
     });
 }
 
-
 export function useDiagnoses() {
     return useQuery({
         queryKey: ['diagnoses_filtered'],
         queryFn: getDiagnoses,
     });
 }
+a;
 
+export function useRoles() {
+    return useQuery({
+        queryKey: ['roles_filtered'],
+        queryFn: getRoles,
+    });
+}

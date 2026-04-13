@@ -38,6 +38,8 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
             handleClose={handleClose}
             handleSubmit={handleSubmit(onSubmit)}
             title='Añadir nueva agenda'
+            error={error}
+            onErrorClose={() => setError(null)}
         >
             <Grid container rowSpacing={1.5} columnSpacing={3} sx={{ p: 1 }}>
                 <Grid size={12}>
@@ -52,7 +54,7 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
                 </Grid>
                 <Grid size={6}>
                     <RHFDatePicker
-                        name='opening_date'
+                        name='openingDate'
                         control={control}
                         rules={{ required: 'La fecha de apertura es obligatoria' }}
                         label='Fecha de apertura'
@@ -60,7 +62,7 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
                 </Grid>
                 <Grid size={6}>
                     <RHFDatePicker
-                        name='closing_date'
+                        name='closingDate'
                         control={control}
                         rules={{ required: 'La fecha de cierre es obligatoria' }}
                         label='Fecha de cierre'

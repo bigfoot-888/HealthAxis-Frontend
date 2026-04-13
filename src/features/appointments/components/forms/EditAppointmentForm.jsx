@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 import { useEffect, useState} from 'react';
 
 import { Grid, Paper, Alert } from '@mui/material';
@@ -14,7 +14,7 @@ import { ErrorAlert } from '@/components/ui';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
-import { updateAppointment } from '@appointments/api/appointment-api';
+import { updateAppointment } from '@appointments/api/appointment.api';
 
 export default function EditAppointmentForm({appointment, uuid}) {
     const {
@@ -29,13 +29,16 @@ export default function EditAppointmentForm({appointment, uuid}) {
         defaultValues: {
             reason: appointment?.reason || '',
             notes: appointment?.notes || '',
-            start_time: appointment?.start_time ? new Date(appointment.start_time) : null,
+            startTime: appointment?.startTime ? new Date(appointment.startTime) : null,
             location: appointment?.location || '',
             type: appointment?.type || ''
         },
     });
 
     const navigate = useNavigate();
+    const location = useLocation(); 
+    const from = location.state?.from || '/appointments';
+
     const { refetch } = useAppointments();
     const [error, setError] = useState(null);
 
@@ -45,7 +48,7 @@ export default function EditAppointmentForm({appointment, uuid}) {
             await updateAppointment(uuid, data);
             queryClient.invalidateQueries(['appointment_plain', uuid]);
             refetch();
-            navigate('/appointments');
+            navigate(from);
         } catch (err) {
             handleApiError(err, setError, setFormError)
         }
@@ -57,7 +60,7 @@ export default function EditAppointmentForm({appointment, uuid}) {
             reset({
                 reason: appointment?.reason || '',
                 notes: appointment?.notes || '',
-                start_time: appointment?.start_time ? new Date(appointment.start_time) : null,
+                startTime: appointment?.startTime ? new Date(appointment.startTime) : null,
                 location: appointment?.location || '',
                 type: appointment?.type || ''
             });
@@ -99,7 +102,7 @@ export default function EditAppointmentForm({appointment, uuid}) {
                         </Grid>
                         <Grid size={12}>
                             <RHFDateTimePicker
-                                name='start_time'
+                                name='startTime'
                                 control={control}
                                 rules={{ required: 'La fecha y hora de inicio es obligatoria' }}
                                 label='Fecha y hora de inicio'
@@ -152,7 +155,7 @@ export default function EditAppointmentForm({appointment, uuid}) {
                                 </Button>
                             </Grid>
                             <Grid>
-                                <Button variant='outlined' size='large' component={Link} to='/appointments'>
+                                <Button variant='outlined' size='large' component={Link} to={from}>
                                     Cancelar
                                 </Button>
                             </Grid>

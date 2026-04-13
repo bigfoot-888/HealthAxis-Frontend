@@ -1,17 +1,17 @@
 import {
-    CLINICAL_DOCUMENT_STATE_LABELS,
-    CLINICAL_DOCUMENT_STATE_COLORS,
+    CLINICAL_DOCUMENT_STATUS_LABELS,
+    CLINICAL_DOCUMENT_STATUS_COLORS,
     CLINICAL_DOCUMENT_TYPE_COLORS,
     CLINICAL_DOCUMENT_TYPE_LABELS
 } from '@clinical-documents/utils/chip-values';
 import { Chip } from '@mui/material';
 
 
-export function ClinicalDocumentStateChip({ value }) {
+export function ClinicalDocumentStatusChip({ value }) {
     return (
         <Chip
-            label={CLINICAL_DOCUMENT_STATE_LABELS[value] || value}
-            color={CLINICAL_DOCUMENT_STATE_COLORS[value] || 'default'}
+            label={CLINICAL_DOCUMENT_STATUS_LABELS[value] || value}
+            color={CLINICAL_DOCUMENT_STATUS_COLORS[value] || 'default'}
             size='small'
         />
     );

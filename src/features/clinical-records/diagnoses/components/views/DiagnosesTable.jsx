@@ -5,33 +5,37 @@ import { useState, useMemo } from 'react';
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
-import {BasicTableLayout} from '@/components/tables/index';
+import { BasicTableLayout } from '@/components/tables/index';
 
 import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 
-import { DiagnosisStateChip, DiagnosisRecordStateChip, DiagnosisSeverityChip } from '@diagnoses/components/ui/DiagnosisChips';
-import UpdateDiagnosisStateForm from '@diagnoses/components/forms/UpdateDiagnosisStateForm';
-import UpdateDiagnosisRecordStateForm from '@diagnoses/components/forms/UpdateDiagnosisRecordStateForm';
+import {
+    DiagnosisClinicalStatusChip,
+    DiagnosisStatusChip,
+    DiagnosisSeverityChip,
+} from '@diagnoses/components/ui/DiagnosisChips';
+import UpdateDiagnosisClinicalStatusForm from '@diagnoses/components/forms/UpdateDiagnosisClinicalStatusForm';
+import UpdateDiagnosisStatusForm from '@diagnoses/components/forms/UpdateDiagnosisStatusForm';
 
-function ActionsCell({ row, onUpdateState, onUpdateRecordState, ...gridParams }) {
+function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             <GridActionsCellItem
                 showInMenu
                 icon={<SyncAltIcon />}
                 label='Actualizar estado'
-                onClick={() => onUpdateState(row)}
+                onClick={() => onUpdateClinicalStatus(row)}
             ></GridActionsCellItem>
             <GridActionsCellItem
                 showInMenu
                 icon={<AutorenewIcon />}
                 label='Actualizar estado del registro'
-                onClick={() => onUpdateRecordState(row)}
+                onClick={() => onUpdateStatus(row)}
             ></GridActionsCellItem>
         </GridActionsCell>
     );
@@ -39,11 +43,10 @@ function ActionsCell({ row, onUpdateState, onUpdateRecordState, ...gridParams })
 
 export default function DiagnosesTable({ diagnoses }) {
     const [searchText, setSearchText] = useState(''); // Searchbar text
-
     const filteredDiagnoses = useSearchFilter(diagnoses, searchText, ['id', 'name']);
-
-    const [updateDiagnosisStateRow, setUpdateDiagnosisStateRow] = useState(null);
-    const [updateDiagnosisRecordStateRow, setUpdateDiagnosisRecordStateRow] = useState(null);
+    const navigate = useNavigate();
+    const [updateDiagnosisClinicalStatusRow, setUpdateDiagnosisClinicalStatusRow] = useState(null);
+    const [updateDiagnosisStatusRow, setUpdateDiagnosisStatusRow] = useState(null);
 
     const columns = useMemo(() => {
         return [
@@ -83,21 +86,21 @@ export default function DiagnosesTable({ diagnoses }) {
                 valueFormatter: (value) => formatDateTimeUTC(value),
             },
             {
-                field: 'state',
+                field: 'clinicalStatus',
                 headerName: 'Estado',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
-                    return <DiagnosisStateChip value={value} />;
+                    return <DiagnosisClinicalStatusChip value={value} />;
                 },
             },
             {
-                field: 'recordState',
+                field: 'status',
                 headerName: 'Estado del registro',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
-                    return <DiagnosisRecordStateChip value={value} />;
+                    return <DiagnosisStatusChip value={value} />;
                 },
             },
             {
@@ -115,8 +118,8 @@ export default function DiagnosesTable({ diagnoses }) {
                 renderCell: (params) => (
                     <ActionsCell
                         {...params}
-                        onUpdateState={setUpdateDiagnosisStateRow}
-                        onUpdateRecordState={setUpdateDiagnosisRecordStateRow}
+                        onUpdateClinicalStatus={setUpdateDiagnosisClinicalStatusRow}
+                        onUpdateStatus={setUpdateDiagnosisStatusRow}
                     />
                 ),
             },
@@ -125,16 +128,16 @@ export default function DiagnosesTable({ diagnoses }) {
 
     return (
         <>
-            {updateDiagnosisStateRow && (
-                <UpdateDiagnosisStateForm
-                    diagnosis={updateDiagnosisStateRow}
-                    handleClose={() => setUpdateDiagnosisStateRow(null)}
+            {updateDiagnosisClinicalStatusRow && (
+                <UpdateDiagnosisClinicalStatusForm
+                    diagnosis={updateDiagnosisClinicalStatusRow}
+                    handleClose={() => setUpdateDiagnosisClinicalStatusRow(null)}
                 />
             )}
-            {updateDiagnosisRecordStateRow && (
-                <UpdateDiagnosisRecordStateForm
-                    diagnosis={updateDiagnosisRecordStateRow}
-                    handleClose={() => setUpdateDiagnosisRecordStateRow(null)}
+            {updateDiagnosisStatusRow && (
+                <UpdateDiagnosisStatusForm
+                    diagnosis={updateDiagnosisStatusRow}
+                    handleClose={() => setUpdateDiagnosisStatusRow(null)}
                 />
             )}
             <BasicTableLayout
@@ -143,6 +146,9 @@ export default function DiagnosesTable({ diagnoses }) {
                 searchValue={searchText}
                 searchPlaceholder={'Busca por ID, nombre'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                onRowClick={(params) => {
+                    navigate(`/clinical-records/diagnoses/${params.row.uuid}`);
+                }}
                 actions={
                     <Button
                         variant='contained'

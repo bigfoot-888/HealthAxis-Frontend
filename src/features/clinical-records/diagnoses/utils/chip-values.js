@@ -1,11 +1,11 @@
-export const DIAGNOSIS_STATE_COLORS = {
+export const DIAGNOSIS_CLINICAL_STATUS_COLORS = {
     ACTIVE: 'primary',
     RESOLVED: 'success',
     CHRONIC: 'warning',
     RULED_OUT: 'info',
 };
 
-export const DIAGNOSIS_RECORD_STATE_COLORS = {
+export const DIAGNOSIS_STATUS_COLORS = {
     VALID: 'success',
     VOID: 'warning',
     ENTERED_IN_ERROR: 'error',
@@ -18,14 +18,14 @@ export const DIAGNOSIS_SEVERITY_COLORS = {
     CRITICAL: 'error',
 };
 
-export const DIAGNOSIS_STATE_LABELS = {
+export const DIAGNOSIS_CLINICAL_STATUS_LABELS = {
     ACTIVE: 'Activo',
     RESOLVED: 'Resuelto',
     CHRONIC: 'Crónico',
     RULED_OUT: 'Descartado',
 };
 
-export const DIAGNOSIS_RECORD_STATE_LABELS = {
+export const DIAGNOSIS_STATUS_LABELS = {
     VALID: 'Válido',
     VOID: 'Anulado',
     ENTERED_IN_ERROR: 'Registrado por error',

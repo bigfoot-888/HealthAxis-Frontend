@@ -16,7 +16,7 @@ import {
 
 import { useState } from 'react';
 
-import { createPatient } from '@patients/api/patient-api';
+import { createPatient } from '@patients/api/patient.api';
 import { usePatients } from '@patients/hooks/usePatients';
 
 import { RHFDatePicker } from '@/components/forms/pickers/index';
@@ -88,7 +88,7 @@ export default function CreatePatientForm() {
                             </Grid>
                             <Grid size={6}>
                                 <RHFDatePicker
-                                    name='date_of_birth'
+                                    name='dateOfBirth'
                                     control={control}
                                     rules={{ required: 'La fecha de nacimiento es obligatoria' }}
                                     label='Fecha de nacimiento'
@@ -159,7 +159,7 @@ export default function CreatePatientForm() {
                             <Grid size={12}>
                                 <BasicTextInput
                                     label='Dirección'
-                                    name='address_line1'
+                                    name='addressLine1'
                                     register={register}
                                     rules={{required: 'La dirección es obligatoria'}}
                                     type="text"
@@ -169,7 +169,7 @@ export default function CreatePatientForm() {
                             <Grid size={12}>
                                 <BasicTextInput
                                     label='Dirección complementaria'
-                                    name='address_line2'
+                                    name='addressLine2'
                                     register={register}
                                     rules={{}}
                                     type="text"

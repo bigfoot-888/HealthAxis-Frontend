@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 
 import Button from '@mui/material/Button';
@@ -10,7 +10,7 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { useUsers } from '@users/hooks/useUsers';
-import { deactivateUser, reactivateUser, importUsers } from '@users/api/user-api';
+import { deactivateUser, reactivateUser, importUsers } from '@users/api/user.api';
 
 import { AlertDialog } from '@/components/dialogs/index';
 import { BasicTableLayout } from '@/components/tables/index';
@@ -18,13 +18,17 @@ import { ContentLayout } from '@/components/layout/index';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
 
+import { ROLE_LABELS } from '@/config/roles'; 
+import { UserStatusChip } from '@users/components/ui/UserChips';
+import { formatCreatedAt } from '@/utils/date-formatters';
+
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
-            {row.state === 'ACTIVE' && (
+            {row.status === 'ACTIVE' && (
                 <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={() => onDelete(row)} />
             )}
-            {row.state === 'INACTIVE' && (
+            {row.status === 'INACTIVE' && (
                 <GridActionsCellItem icon={<RestoreIcon />} label='Restore' onClick={() => onReactivate(row)} />
             )}
 
@@ -44,6 +48,7 @@ export default function UsersTable({ users }) {
 
     const filteredUsers = useSearchFilter(users, searchText, ['id', 'name', 'surname', 'email']);
 
+    const navigate = useNavigate(); 
     const { refetch } = useUsers();
     const [userToDelete, setUserToDelete] = useState(null);
     const [userToReactivate, setUserToReactivate] = useState(null);
@@ -63,13 +68,14 @@ export default function UsersTable({ users }) {
     };
 
     const handleCloseAlertDialog = (e) => {
+        setError(null); 
         setUserToDelete(null);
     };
 
     const handleConfirmAlertDialog = async (row) => {
         try {
             if (row) {
-                await deactivateUser(Number(row.id));
+                await deactivateUser(row.uuid);
                 refetch();
             }
             handleCloseAlertDialog();
@@ -79,13 +85,14 @@ export default function UsersTable({ users }) {
     };
 
     const handleCloseReactivateDialog = (e) => {
+        setError(null); 
         setUserToReactivate(null);
     };
 
     const handleConfirmReactivateDialog = async (row) => {
         try {
             if (row) {
-                await reactivateUser(Number(row.id));
+                await reactivateUser(row.uuid);
                 refetch();
             }
             handleCloseReactivateDialog();
@@ -106,7 +113,7 @@ export default function UsersTable({ users }) {
                 headerName: 'Cargos',
                 flex: 3,
                 valueGetter: (value, row) => {
-                    return row.roles ? row.roles.map((role) => role.name).join(', ') : '';
+                    return row.roles ? row.roles.map((role) => ROLE_LABELS[role.name]).join(', ') : '';
                 },
             },
             {
@@ -130,11 +137,12 @@ export default function UsersTable({ users }) {
                 flex: 2,
             },
             {
-                field: 'state',
+                field: 'status',
                 headerName: 'Estado',
-                flex: 1,
-                valueFormatter: (value) => {
-                    return value === 'ACTIVE' ? 'Activo' : 'Inactivo';
+                flex: 2,
+                renderCell: (params) => {
+                    const value = params.value;
+                    return <UserStatusChip value={value} />;
                 },
             },
             {
@@ -142,21 +150,7 @@ export default function UsersTable({ users }) {
                 field: 'createdAt',
                 headerName: 'Fecha de Creación',
                 flex: 3,
-                valueFormatter: (value) => {
-                    const date = new Date(value);
-                    const now = new Date();
-                    const isToday =
-                        date.getDate() === now.getDate() &&
-                        date.getMonth() === now.getMonth() &&
-                        date.getFullYear() === now.getFullYear();
-
-                    return isToday
-                        ? date.toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                          })
-                        : date.toLocaleDateString('es-ES');
-                },
+                valueFormatter: (value) => formatCreatedAt(value),
             },
             {
                 field: 'actions',
@@ -177,6 +171,8 @@ export default function UsersTable({ users }) {
                 handleConfirm={() => handleConfirmReactivateDialog(userToReactivate)}
                 title={`¿Reactivar la cuenta de ${!!userToReactivate && userToReactivate.name + ' ' + userToReactivate.surname}?`}
                 content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
+                error={error}
+                onErrorClose={()=>setError(null)}
             />
             <AlertDialog
                 open={!!userToDelete}
@@ -185,14 +181,19 @@ export default function UsersTable({ users }) {
                 title={`¿Dar de baja a ${!!userToDelete && userToDelete.name + ' ' + userToDelete.surname}?`}
                 content='Esta acción es reversible. Si el usuario tiene alguna dependencia activa en el sistema
                 se cancelará el proceso. En caso contrario, el usuario será dado de baja. '
+                error={error}
+                onErrorClose={()=>setError(null)}
             />
-            <ContentLayout error={error} onErrorClose={() => setError(null)}>
+            <ContentLayout error={!userToDelete && !userToReactivate ? error : null} onErrorClose={() => setError(null)}>
                 <BasicTableLayout
                     rows={filteredUsers}
                     columns={columns}
                     searchValue={searchText}
                     onSearchChange={(e) => setSearchText(e.target.value)}
                     searchPlaceholder='Busca por ID, nombre, apellidos, correo'
+                    onRowClick={(params) => {
+                        navigate(`/users/${params.row.uuid}`);
+                    }}
                     actions={
                         <>
                             <Button

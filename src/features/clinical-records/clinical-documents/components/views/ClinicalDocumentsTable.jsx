@@ -20,10 +20,10 @@ import { useSearchFilter } from '@/hooks/useSearchFilter';
 
 import { ClinicalDocumentTypeChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
 
-import { ClinicalDocumentStateChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
+import { ClinicalDocumentStatusChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
 import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
 
-function ActionsCell({ row, onUpdateState, onUpdateRecordState, onViewAttachmentsDocument, ...gridParams }) {
+function ActionsCell({ row, onUpdateStatus, onUpdateRecordStatus, onViewAttachmentsDocument, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             <GridActionsCellItem
@@ -40,13 +40,13 @@ function ActionsCell({ row, onUpdateState, onUpdateRecordState, onViewAttachment
                 showInMenu
                 icon={<SyncAltIcon />}
                 label='Actualizar estado'
-                onClick={() => onUpdateState(row)}
+                onClick={() => onUpdateStatus(row)}
             ></GridActionsCellItem>
             <GridActionsCellItem
                 showInMenu
                 icon={<AutorenewIcon />}
                 label='Actualizar estado del registro'
-                onClick={() => onUpdateRecordState(row)}
+                onClick={() => onUpdateRecordStatus(row)}
             ></GridActionsCellItem>
         </GridActionsCell>
     );
@@ -58,8 +58,8 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
 
     const filteredClinicalDocuments = useSearchFilter(clinicalDocuments, searchText, ['id', 'title']);
 
-    const [updateClinicalDocumentStateRow, setUpdateClinicalDocumentStateRow] = useState(null);
-    const [updateClinicalDocumentRecordStateRow, setUpdateClinicalDocumentRecordStateRow] = useState(null);
+    const [updateClinicalDocumentStatusRow, setUpdateClinicalDocumentStatusRow] = useState(null);
+    const [updateClinicalDocumentRecordStatusRow, setUpdateClinicalDocumentRecordStatusRow] = useState(null);
     const [viewClinicalAttachmentsDocument, setViewClinicalAttachmentsDocument] = useState(null);
 
     const handleImportDocument = async (event) => {
@@ -101,12 +101,12 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
                 },
             },
             {
-                field: 'state',
+                field: 'status',
                 headerName: 'Estado',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
-                    return <ClinicalDocumentStateChip value={value} />;
+                    return <ClinicalDocumentStatusChip value={value} />;
                 },
             },
             {
@@ -122,7 +122,7 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
                 type: 'actions',
                 flex: 3,
                 renderCell: (params) => (
-                    <ActionsCell {...params} onUpdateState={() => {}} onUpdateRecordState={() => {}} />
+                    <ActionsCell {...params} onUpdateStatus={() => {}} onUpdateRecordStatus={() => {}} />
                 ),
             },
         ];

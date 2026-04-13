@@ -13,7 +13,7 @@ import { BasicFormLayout } from '@/components/forms/index';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
-import { createDiagnosis } from '@diagnoses/api/diagnosis-api';
+import { createDiagnosis } from '@diagnoses/api/diagnosis.api';
 import { DiagnosisProfessionalsField } from '@diagnoses/components/ui/DiagnosisProfessionals';
 import { ErrorAlert } from '@/components/ui';
 
@@ -28,7 +28,7 @@ export default function CreateDiagnosisForm() {
         mode: 'onBlur',
         defaultValues: {
             severity: '',
-            state: '',
+            clinicalStatus: '',
         },
     });
 
@@ -47,7 +47,7 @@ export default function CreateDiagnosisForm() {
     };
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '720px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>
@@ -100,7 +100,7 @@ export default function CreateDiagnosisForm() {
                             <SelectInput
                                 control={control}
                                 errors={errors}
-                                name='state'
+                                name='clinicalStatus'
                                 label='Estado'
                                 rules={{ required: 'El estado es obligatorio' }}
                                 items={{

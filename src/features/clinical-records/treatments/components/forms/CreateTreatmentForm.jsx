@@ -3,18 +3,24 @@ import { Link, useNavigate } from 'react-router';
 import { useState } from 'react';
 import { Grid, Paper, Button, Typography } from '@mui/material';
 
-import { PatientAutocomplete, AppointmentAutocomplete } from '@/components/forms/autocompletes/index';
-import {RHFDateTimePicker} from '@/components/forms/pickers/index';
-import {SelectInput, BasicTextInput} from '@/components/forms/inputs/index';
-import {BasicFormLayout} from '@/components/forms/index';
+import {
+    PatientAutocomplete,
+    AppointmentAutocomplete,
+    DiagnosisAutocomplete,
+} from '@/components/forms/autocompletes/index';
+import { RHFDateTimePicker } from '@/components/forms/pickers/index';
+import { SelectInput, BasicTextInput } from '@/components/forms/inputs/index';
+import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
 
 import { useTreatments } from '@treatments/hooks/useTreatments';
-import { createTreatment } from '@treatments/api/treatment-api';
+import { createTreatment } from '@treatments/api/treatment.api';
 
 import { TreatmentProfessionalsField } from '@treatments/components/ui/TreatmentProfessionals';
 import { TreatmentDiagnoses } from '@treatments/components/ui/TreatmentDiagnoses';
 import { handleApiError } from '@/utils/handle-errors';
+
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateAppointmentForm() {
     const {
@@ -27,26 +33,28 @@ export default function CreateAppointmentForm() {
         mode: 'onBlur',
         defaultValues: {
             severity: '',
-            state: '',
+            clinicalStatus: '',
         },
     });
 
     const navigate = useNavigate();
     const { refetch } = useTreatments();
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
+    const queryClient = useQueryClient();
 
     const onSubmit = async (data) => {
         try {
             await createTreatment(data);
             refetch();
+            await queryClient.invalidateQueries({ queryKey: ['treatments', {diagnosisUuid: data.diagnosis.uuid}] });
             navigate('/clinical-records/treatments');
         } catch (err) {
-            handleApiError(err, setError, setFormError); 
+            handleApiError(err, setError, setFormError);
         }
     };
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '720px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>
@@ -54,7 +62,7 @@ export default function CreateAppointmentForm() {
                             <Typography variant='h2'>Crear nuevo tratamiento</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
 
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -84,13 +92,13 @@ export default function CreateAppointmentForm() {
                             <SelectInput
                                 control={control}
                                 errors={errors}
-                                name='state'
+                                name='clinicalStatus'
                                 label='Estado'
                                 rules={{ required: 'El estado es obligatorio' }}
                                 items={{
                                     PLANNED: 'Planificado',
                                     ONGOING: 'En curso',
-                                    GIVEN: 'Dado'
+                                    GIVEN: 'Dado',
                                 }}
                             />
                         </Grid>
@@ -118,19 +126,16 @@ export default function CreateAppointmentForm() {
                                 Contexto
                             </Typography>
                         </Grid>
-                            <RHFDateTimePicker
-                                name='devisedAt'
-                                control={control}
-                                label='Fecha y hora de creación del tratamiento'
-                            />
+                        <RHFDateTimePicker
+                            name='devisedAt'
+                            control={control}
+                            label='Fecha y hora de creación del tratamiento'
+                        />
                         <Grid size={12}>
-                            <AppointmentAutocomplete
-                                control={control}
-                                errors={errors}
-                            />
+                            <AppointmentAutocomplete control={control} errors={errors} />
                         </Grid>
                         <Grid size={12}>
-                                <TreatmentDiagnoses control={control}/>
+                            <DiagnosisAutocomplete control={control}/>
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -138,7 +143,7 @@ export default function CreateAppointmentForm() {
                             </Typography>
                         </Grid>
                         <Grid size={12}>
-                            <TreatmentProfessionalsField control={control}  />
+                            <TreatmentProfessionalsField control={control} />
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>

@@ -31,7 +31,7 @@ export function TreatmentProfessionalsField({ control }) {
                             control={control}
                             name={`users.${index}.role`}
                             rules={{ required: 'El rol del profesional en el tratamiento es obligatorio' }}
-                            label='Rol en el diagnóstico'
+                            label='Rol en el tratamiento'
                             items={{
                                 AUTHOR: 'Autoría',
                                 REVIEWER: 'Revisión',

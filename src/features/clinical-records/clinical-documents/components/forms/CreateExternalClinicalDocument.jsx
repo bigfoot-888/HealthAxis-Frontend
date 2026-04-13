@@ -25,7 +25,7 @@ export default function CreateExternalClinicalDocument() {
         mode: 'onBlur',
         defaultValues: {
             severity: '',
-            state: '',
+            status: '',
         },
     });
 
@@ -73,7 +73,7 @@ const onSubmit = async (data) => {
 };
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '720px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>

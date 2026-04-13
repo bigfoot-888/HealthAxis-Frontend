@@ -35,10 +35,6 @@ export default function DrawerMainOptions({open}) {
             <CustomListItem text='Registros clínicos' link='/clinical-records/clinical-documents' open={open}>
                 <TextSnippetIcon />
             </CustomListItem>
-            
-            <CustomListItem text='Flujos de Paciente' link='/patient-flows' open={open}>
-                <TransferWithinAStationIcon />
-            </CustomListItem>
         </List>
     );
 }

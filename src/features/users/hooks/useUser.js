@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getUser } from '@users/api/user-api';
+import { getUser } from '@users/api/user.api';
 
 export function useUser(uuid) {
     return useQuery({

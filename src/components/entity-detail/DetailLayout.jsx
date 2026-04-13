@@ -9,6 +9,7 @@ export default function DetailLayout({children}) {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'start',
+                    width: '100%'
                 }}
             >
                 {children}

@@ -1,24 +1,17 @@
-// AuthContext.jsx
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+export function AuthProvider({ children, initialUser }) {
+    const [user, setUser] = useState(initialUser);
 
-  // e.g., check session on mount
-  useEffect(() => {
-    fetch("/api/auth/me") // endpoint that returns current user if logged in
-      .then(res => res.json())
-      .then(data => setUser(data.user || null))
-      .catch(() => setUser(null));
-  }, []);
-
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={{ user, setUser }}>
+            {children}
+        </AuthContext.Provider>
+    );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+    return useContext(AuthContext);
+}

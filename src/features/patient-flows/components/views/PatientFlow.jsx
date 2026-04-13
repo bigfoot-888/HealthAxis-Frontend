@@ -94,7 +94,9 @@ export default function PatientFlow({ flow }) {
     };
 
     return (
-        <ContentLayout>
+        <ContentLayout
+            drawer={false}
+        >
             <Box sx={{ display: 'flex', gap: 2, height: '600px', width: '100%' }}>
                 <Box sx={{ flexGrow: 1, border: '1px solid black', position: 'relative' }}>
                     <Button 

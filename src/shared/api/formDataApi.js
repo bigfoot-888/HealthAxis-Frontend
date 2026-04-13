@@ -52,7 +52,6 @@ export async function getAgendas({ query = '', limit = 20 } = {}) {
     }
 }
 
-
 export async function getDiagnoses({ query = '', limit = 20 } = {}) {
     try {
         const response = await axios.get('/diagnoses/filtered', {
@@ -62,6 +61,16 @@ export async function getDiagnoses({ query = '', limit = 20 } = {}) {
         return response.data;
     } catch (err) {
         console.error('Error fetching diagnosis data:', err);
+        throw err;
+    }
+}
+
+export async function getRoles() {
+    try {
+        const response = await axios.get('/roles');
+        return response.data;
+    } catch (err) {
+        console.error('Error fetching role data:', err);
         throw err;
     }
 }

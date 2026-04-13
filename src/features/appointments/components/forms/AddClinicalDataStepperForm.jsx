@@ -1,31 +1,40 @@
 import HorizontalStepperDialog from '@/components/dialogs/HorizontalStepperDialog';
 import { useState } from 'react';
-import { Box } from '@mui/material';
-import { TextField } from '@mui/material';
-import DiagnosisStepForm from '@appointments/components/forms/DiagnosisStepForm';
+import DiagnosisStep from '@appointments/components/forms/DiagnosisStep';
 import { useForm } from 'react-hook-form';
 import { FormProvider } from 'react-hook-form';
-import TreatmentStepForm from '@appointments/components/forms/TreatmentStepForm';
+import TreatmentStep from '@appointments/components/forms/TreatmentStep';
 import SummaryStep from '@appointments/components/forms/SummaryStep';
+import { handleApiError } from '@/utils/handle-errors';
+import {completeAppointmentWithClinicalData} from '@appointments/api/appointment.api'
+import { useAppointments } from '@appointments/hooks/useAppointments';
 
-export default function AddClinicalDataStepperForm({ open, handleClose }) {
+export default function AddClinicalDataStepperForm({ appointment, open, handleClose }) {
     const [error, setError] = useState(null);
-    const onSubmit = () => {
-        console.log('FORMULARIO STEPPER ENVIADO');
+    const { refetch } = useAppointments();
+
+    const onSubmit = async (data) => {
+        try {
+            await completeAppointmentWithClinicalData(appointment.uuid, data);
+            refetch();
+            handleClose(); 
+        } catch (err) {
+            handleApiError(err, setError, null);
+        }
     };
     const methods = useForm({
         defaultValues: {
             diagnosis: {
                 name: '',
                 severity: '',
-                state: '',
+                clinicalStatus: '',
                 description: '',
                 notes: '',
             },
             treatments: [
                 {
                     name: '',
-                    state: '',
+                    clinicalStatus: '',
                     description: '',
                     duration: '',
                     notes: '',
@@ -33,7 +42,7 @@ export default function AddClinicalDataStepperForm({ open, handleClose }) {
             ],
         },
     });
-    // Define our steps array. Notice how we pass the isValid condition!
+
     const steps = [
         {
             label: 'Añadir diagnóstico',
@@ -41,7 +50,7 @@ export default function AddClinicalDataStepperForm({ open, handleClose }) {
             isValid: async () => {
                 return true;
             },
-            content: <DiagnosisStepForm />,
+            content: <DiagnosisStep />,
         },
         {
             label: 'Añadir tratamiento',
@@ -56,7 +65,7 @@ export default function AddClinicalDataStepperForm({ open, handleClose }) {
                 // );
                 return true; 
             },
-            content: <TreatmentStepForm />,
+            content: <TreatmentStep />,
         },
         {
             label: 'Resumen',
@@ -71,7 +80,7 @@ export default function AddClinicalDataStepperForm({ open, handleClose }) {
             <HorizontalStepperDialog
                 open={open}
                 handleClose={handleClose}
-                handleSubmit={onSubmit}
+                handleSubmit={methods.handleSubmit(onSubmit)} 
                 error={error}
                 setError={() => setError}
                 steps={steps}

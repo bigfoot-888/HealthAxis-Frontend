@@ -1,4 +1,4 @@
-export const CLINICAL_DOCUMENT_STATE_COLORS = {
+export const CLINICAL_DOCUMENT_STATUS_COLORS = {
     DRAFTED: 'info',   
     FINAL: 'success',  
     AMENDED: 'warning',
@@ -14,7 +14,7 @@ export const CLINICAL_ATTACHMENT_COLORS = {
 };
 
 
-export const CLINICAL_DOCUMENT_STATE_LABELS = {
+export const CLINICAL_DOCUMENT_STATUS_LABELS = {
     DRAFTED: 'Borrador',
     FINAL: 'Finalizado',
     AMENDED: 'Enmendado',
@@ -23,7 +23,7 @@ export const CLINICAL_DOCUMENT_STATE_LABELS = {
 };
 
 
-export const CLINICAL_ATTACHMENT_STATE_LABELS = {
+export const CLINICAL_ATTACHMENT_STATUS_LABELS = {
     ACTIVE: 'Activo',
     INACTIVE: 'Inactivo',
     DELETED: 'Eliminado',

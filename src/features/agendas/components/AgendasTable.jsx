@@ -23,25 +23,29 @@ import { useAgendas } from '@agendas/hooks/useAgendas';
 import { deactivateAgenda, reactivateAgenda } from '@agendas/api/agenda-api';
 import { formatCreatedAt } from '@/utils/date-formatters';
 
+import { AgendaStatusChip } from '@agendas/components/ui/AgendaChips';
+import { AgendaPeriodStatusChip } from '@agendas/components/ui/AgendaChips';
+import { useNavigate } from 'react-router';
+
 function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             <GridActionsCellItem
                 icon={<EditCalendarIcon />}
-                disabled={row.state === 'INACTIVE'}
+                disabled={row.status === 'INACTIVE'}
                 label='Create period'
                 onClick={() => onCreatePeriod(row)}
             />
             <GridActionsCellItem
                 icon={<EditIcon />}
-                disabled={row.state === 'INACTIVE'}
+                disabled={row.status === 'INACTIVE'}
                 label='Edit'
                 onClick={() => onEdit(row)}
             ></GridActionsCellItem>
-            {row.state === 'ACTIVE' && (
+            {row.status === 'ACTIVE' && (
                 <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={() => onDelete(row)} />
             )}
-            {row.state === 'INACTIVE' && (
+            {row.status === 'INACTIVE' && (
                 <GridActionsCellItem icon={<RestoreIcon />} label='Restore' onClick={() => onReactivate(row)} />
             )}
         </GridActionsCell>
@@ -59,12 +63,14 @@ export default function AgendasTable({ agendas }) {
     const [agendaToDelete, setAgendaToDelete] = useState(null);
     const [agendaToReactivate, setAgendaToReactivate] = useState(null);
 
+    const navigate = useNavigate(); 
+
     const filteredAgendas = useSearchFilter(agendas, searchText, ["id", "name"])
     
     const handleConfirmAlertDialog = async (row) => {
         try {
             if (row) {
-                await deactivateAgenda(Number(row.id));
+                await deactivateAgenda(row.uuid);
                 refetch();
                 setAgendaToDelete(null);
             }
@@ -76,7 +82,7 @@ export default function AgendasTable({ agendas }) {
     const handleConfirmReactivateDialog = async (row) => {
         try {
             if (row) {
-                await reactivateAgenda(Number(row.id));
+                await reactivateAgenda(row.uuid);
                 refetch();
             }
             setAgendaToReactivate(null);
@@ -91,37 +97,37 @@ export default function AgendasTable({ agendas }) {
         return [
             { field: 'id', headerName: 'ID', flex: 1 },
             {
-                field: 'state',
-                headerName: 'Estado',
-                flex: 1,
-                valueFormatter: (value) => {
-                    return value === 'ACTIVE' ? 'Activa' : 'Inactiva';
+                field: 'status',
+                headerName: 'Estado Agenda',
+                flex: 2,
+                renderCell: (params) => {
+                    const value = params.value;
+                    return <AgendaStatusChip value={value} />;
                 },
             },
             { field: 'name', headerName: 'Nombre', flex: 2 },
             {
-                field: 'opening_date',
-                headerName: 'Apertura Programada',
+                field: 'openingDate',
+                headerName: 'Apertura',
                 type: 'date',
                 flex: 2,
-                valueGetter: (value, row) => new Date(row.activePeriod?.opening_date),
+                valueGetter: (value, row) => new Date(row.activePeriod?.openingDate),
             },
             {
-                field: 'closing_date',
-                headerName: 'Cierre Programado',
+                field: 'closingDate',
+                headerName: 'Cierre',
                 type: 'date',
                 flex: 2,
-                valueGetter: (value, row) => new Date(row.activePeriod?.closing_date),
+                valueGetter: (value, row) => new Date(row.activePeriod?.closingDate),
             },
             {
-                field: 'agenda_state',
-                headerName: 'Estado del Periodo Actual',
+                field: 'status',
+                headerName: 'Estado del periodo',
                 flex: 2,
-                valueGetter: (value, row) => row.activePeriod?.agenda_state,
-                valueFormatter: (value) => {
-                    if (value === 'OPEN') return 'Abierta';
-                    else if (value === 'CLOSED') return 'Cerrada';
-                    else return 'Cancelada';
+                valueGetter: (value, row) => row.activePeriod?.agendaStatus,
+                renderCell: (params) => {
+                    const value = params.value;
+                    return <AgendaPeriodStatusChip value={value} />;
                 },
             },
             {
@@ -183,6 +189,9 @@ export default function AgendasTable({ agendas }) {
                     searchValue={searchText}
                     searchPlaceholder={'Busca por ID, nombre'}
                     onSearchChange={(e) => setSearchText(e.target.value)}
+                    onRowClick={(params) => {
+                        navigate(`/agendas/${params.row.uuid}`);
+                    }}
                     actions={
                         <Button
                             variant='contained'

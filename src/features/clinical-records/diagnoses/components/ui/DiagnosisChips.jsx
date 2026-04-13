@@ -1,10 +1,10 @@
 import {
     DIAGNOSIS_SEVERITY_LABELS,
     DIAGNOSIS_SEVERITY_COLORS,
-    DIAGNOSIS_STATE_LABELS,
-    DIAGNOSIS_STATE_COLORS,
-    DIAGNOSIS_RECORD_STATE_LABELS,
-    DIAGNOSIS_RECORD_STATE_COLORS,
+    DIAGNOSIS_CLINICAL_STATUS_LABELS,
+    DIAGNOSIS_CLINICAL_STATUS_COLORS,
+    DIAGNOSIS_STATUS_LABELS,
+    DIAGNOSIS_STATUS_COLORS,
 } from '@diagnoses/utils/chip-values';
 import { Chip } from '@mui/material';
 
@@ -18,21 +18,21 @@ export function DiagnosisSeverityChip({ value }) {
     );
 }
 
-export function DiagnosisStateChip({ value }) {
+export function DiagnosisClinicalStatusChip({ value }) {
     return (
         <Chip
-            label={DIAGNOSIS_STATE_LABELS[value] || value}
-            color={DIAGNOSIS_STATE_COLORS[value] || 'default'}
+            label={DIAGNOSIS_CLINICAL_STATUS_LABELS[value] || value}
+            color={DIAGNOSIS_CLINICAL_STATUS_COLORS[value] || 'default'}
             size='small'
         />
     );
 }
 
-export function DiagnosisRecordStateChip({ value }) {
+export function DiagnosisStatusChip({ value }) {
     return (
         <Chip
-            label={DIAGNOSIS_RECORD_STATE_LABELS[value] || value}
-            color={DIAGNOSIS_RECORD_STATE_COLORS[value] || 'default'}
+            label={DIAGNOSIS_STATUS_LABELS[value] || value}
+            color={DIAGNOSIS_STATUS_COLORS[value] || 'default'}
             size='small'
         />
     );

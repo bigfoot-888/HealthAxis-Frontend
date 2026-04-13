@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import MiniDrawer from './drawer/MiniDrawer';
 import Header from './Header';
 export default function AppShell({ children }) {
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(true);
 
     const handleDrawerOpen = () => {
         setDrawerOpen(true);

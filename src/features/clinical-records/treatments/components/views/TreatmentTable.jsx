@@ -6,31 +6,32 @@ import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import BasicTableLayout from '@/components/tables/BasicTableLayout';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 
-import { TreatmentStateChip, TreatmentRecordStateChip } from '@treatments/components/ui/TreatmentChips';
-import UpdateTreatmentStateForm from '@treatments/components/forms/UpdateTreatmentStateForm';
-import UpdateTreatmentRecordStateForm from '@treatments/components/forms/UpdateTreatmentRecordStateForm';
+import { TreatmentClinicalStatusChip, TreatmentStatusChip } from '@treatments/components/ui/TreatmentChips';
 
-function ActionsCell({ row, onUpdateState, onUpdateRecordState, ...gridParams }) {
+import UpdateTreatmentClinicalStatusForm from '@treatments/components/forms/UpdateTreatmentClinicalStatusForm';
+import UpdateTreatmentStatusForm from '@treatments/components/forms/UpdateTreatmentStatusForm';
+
+function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             <GridActionsCellItem
                 showInMenu
                 icon={<SyncAltIcon />}
                 label='Actualizar estado'
-                onClick={() => onUpdateState(row)}
+                onClick={() => onUpdateClinicalStatus(row)}
             ></GridActionsCellItem>
             <GridActionsCellItem
                 showInMenu
                 icon={<AutorenewIcon />}
                 label='Actualizar estado del registro'
-                onClick={() => onUpdateRecordState(row)}
+                onClick={() => onUpdateStatus(row)}
             ></GridActionsCellItem>
         </GridActionsCell>
     );
@@ -40,9 +41,9 @@ export default function TreatmentsTable({ treatments }) {
     const [searchText, setSearchText] = useState(''); // Searchbar text
 
     const filteredTreatments = useSearchFilter(treatments, searchText, ['id', 'name']);
-
-    const [treatmentToUpdateState, setTreatmentToUpdateState] = useState(null);
-    const [treatmentToUpdateRecordState, setTreatmentToUpdateRecordState] = useState(null);
+    const navigate = useNavigate();
+    const [treatmentToUpdateClinicalStatus, setTreatmentToUpdateClinicalStatus] = useState(null);
+    const [treatmentToUpdateStatus, setTreatmentToUpdateStatus] = useState(null);
 
     const columns = useMemo(() => {
         return [
@@ -79,21 +80,21 @@ export default function TreatmentsTable({ treatments }) {
                 valueFormatter: (value) => formatDateTimeUTC(value),
             },
             {
-                field: 'state',
+                field: 'clinicalStatus',
                 headerName: 'Estado',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
-                    return <TreatmentStateChip value={value} />;
+                    return <TreatmentClinicalStatusChip value={value} />;
                 },
             },
             {
-                field: 'recordState',
+                field: 'status',
                 headerName: 'Estado del registro',
                 flex: 3,
                 renderCell: (params) => {
                     const value = params.value;
-                    return <TreatmentRecordStateChip value={value} />;
+                    return <TreatmentStatusChip value={value} />;
                 },
             },
             {
@@ -111,8 +112,8 @@ export default function TreatmentsTable({ treatments }) {
                 renderCell: (params) => (
                     <ActionsCell
                         {...params}
-                        onUpdateState={setTreatmentToUpdateState}
-                        onUpdateRecordState={setTreatmentToUpdateRecordState}
+                        onUpdateClinicalStatus={setTreatmentToUpdateClinicalStatus}
+                        onUpdateStatus={setTreatmentToUpdateStatus}
                     />
                 ),
             },
@@ -121,16 +122,16 @@ export default function TreatmentsTable({ treatments }) {
 
     return (
         <>
-            {treatmentToUpdateState && (
-                <UpdateTreatmentStateForm
-                    treatment={treatmentToUpdateState}
-                    handleClose={() => setTreatmentToUpdateState(null)}
+            {treatmentToUpdateClinicalStatus && (
+                <UpdateTreatmentClinicalStatusForm
+                    treatment={treatmentToUpdateClinicalStatus}
+                    handleClose={() => setTreatmentToUpdateClinicalStatus(null)}
                 />
             )}
-            {treatmentToUpdateRecordState && (
-                <UpdateTreatmentRecordStateForm
-                    treatment={treatmentToUpdateRecordState}
-                    handleClose={() => setTreatmentToUpdateRecordState(null)}
+            {treatmentToUpdateStatus && (
+                <UpdateTreatmentStatusForm
+                    treatment={treatmentToUpdateStatus}
+                    handleClose={() => setTreatmentToUpdateStatus(null)}
                 />
             )}
             <BasicTableLayout
@@ -139,6 +140,9 @@ export default function TreatmentsTable({ treatments }) {
                 searchValue={searchText}
                 searchPlaceholder={'Busca por ID, nombre'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                onRowClick={(params) => {
+                    navigate(`/clinical-records/treatments/${params.row.uuid}`);
+                }}
                 actions={
                     <Button
                         variant='contained'

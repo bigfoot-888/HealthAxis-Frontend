@@ -7,5 +7,5 @@ export default function EditUserManagement() {
     if (isLoading) return <p>Loading users…</p>;
     if (error) return <p>Failed to load users</p>;
     if (!user) return <p>vaya</p>;
-    return <EditUserForm user={user} uuid={iuuidd} />;
+    return <EditUserForm user={user} uuid={uuid} />;
 }

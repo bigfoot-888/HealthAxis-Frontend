@@ -10,8 +10,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import FullLogo from '../../ui/FullLogo';
 
-import DrawerMainOptions from './DrawerMainOptions'; 
-import DrawerSecondaryOptions from './DrawerSecondaryOptions'; 
+import DrawerMainOptions from './DrawerMainOptions';
+import DrawerSecondaryOptions from './DrawerSecondaryOptions';
 
 const drawerWidth = 240;
 
@@ -74,26 +74,14 @@ export default function MiniDrawer({ open, setOpen, setClose }) {
     const theme = useTheme();
 
     return (
-        <Box sx={{ display: 'flex'}}>
+        <Box sx={{ display: 'flex' }}>
             <Drawer variant='permanent' open={open}>
                 <DrawerHeader>
-                    <Box
-                        sx={[
-                            { mr: 'auto', ml: 'auto' },
-                            !open && { display: 'none' },
-                        ]}
-                    >
+                    <Box sx={[{ mr: 'auto', ml: 'auto' }, !open && { display: 'none' }]}>
                         <FullLogo />
                     </Box>
-                    <IconButton
-                        onClick={setClose}
-                        sx={!open && { display: 'none' }}
-                    >
-                        {theme.direction === 'rtl' ? (
-                            <ChevronRightIcon />
-                        ) : (
-                            <ChevronLeftIcon />
-                        )}
+                    <IconButton onClick={setClose} sx={!open && { display: 'none' }}>
+                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                     </IconButton>
 
                     <IconButton
@@ -113,9 +101,9 @@ export default function MiniDrawer({ open, setOpen, setClose }) {
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
-                <DrawerMainOptions open={open}/>
+                <DrawerMainOptions open={open} />
                 <Divider />
-                <DrawerSecondaryOptions open={open}/>
+                <DrawerSecondaryOptions open={open} />
             </Drawer>
         </Box>
     );

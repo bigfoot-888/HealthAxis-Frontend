@@ -10,7 +10,7 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
@@ -19,7 +19,7 @@ import AlertDialog from '@/components/dialogs/AlertDialog';
 import BasicTableLayout from '@/components/tables/BasicTableLayout';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
-import { updateAppointmentState } from '@appointments//api/appointment-api';
+import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
 import AppointmentChip from '@appointments/components/ui/AppointmentChip';
@@ -27,11 +27,19 @@ import { handleApiError } from '@/utils/handle-errors';
 import AddClinicalDataStepperForm from '@appointments/components/forms/AddClinicalDataStepperForm';
 
 function isCompleted(row) {
-    return row.state === 'COMPLETED';
+    return row.status === 'COMPLETED';
 }
 
-function isCheckedIn(row){
-    return row.state === 'CHECKED_IN'; 
+function isCheckedIn(row) {
+    return row.status === 'CHECKED_IN';
+}
+
+function isScheduled(row) {
+    return row.status === 'SCHEDULED';
+}
+
+function isCancelled(row) {
+    return row.status === 'NO_SHOW' || row.status !== 'CANCELLED';
 }
 
 function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, ...gridParams }) {
@@ -48,7 +56,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                     onClick={() => onComplete(row)}
                 />
             )}
-            {!isCompleted(row) && !isCheckedIn(row) && (
+            {isScheduled(row) && (
                 <GridActionsCellItem
                     icon={
                         <Tooltip title='Validar check-in'>
@@ -59,7 +67,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                     onClick={() => onCheckIn(row)}
                 />
             )}
-            {!isCompleted(row) && isCheckedIn(row) && (
+            {/* {!isCompleted(row) && isCheckedIn(row) && (
                 <GridActionsCellItem
                     icon={
                         <Tooltip title='Registrar diagnóstico y tratamiento'>
@@ -69,7 +77,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                     label='Registrar resultado clínico'
                     onClick={() => onAddClinicalData(row)}
                 />
-            )}
+            )} */}
             <GridActionsCellItem
                 showInMenu
                 icon={<VisibilityIcon />}
@@ -82,8 +90,9 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                 label='Editar cita'
                 component={Link}
                 to={`/appointments/edit/${row.uuid}`}
+                state={{ from: `/appointments` }}
             />
-            {!isCompleted(row) && (
+            {isCancelled(row) && (
                 <GridActionsCellItem
                     showInMenu
                     icon={<HighlightOffIcon />}
@@ -97,7 +106,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
 
 export default function AppointmentsTable({ appointments, setError }) {
     const [searchText, setSearchText] = useState('');
-
+    const navigate = useNavigate();
     const filteredAppointments = useSearchFilter(appointments, searchText, [
         'id',
         'reason',
@@ -109,12 +118,12 @@ export default function AppointmentsTable({ appointments, setError }) {
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
-    const [appointmentToAddClinicalData, setAppointmentToAddClinicalData] = useState(null); 
+    const [appointmentToAddClinicalData, setAppointmentToAddClinicalData] = useState(null);
 
     const handleCompleteAppointment = async (row) => {
         try {
             if (row) {
-                await updateAppointmentState(row.uuid, 'COMPLETED');
+                await updateAppointmentStatus(row.uuid, 'COMPLETED');
                 refetch();
             }
             setAppointmentToComplete(null);
@@ -126,7 +135,7 @@ export default function AppointmentsTable({ appointments, setError }) {
     const handleCheckInAppointment = async (row) => {
         try {
             if (row) {
-                await updateAppointmentState(row.uuid, 'CHECKED_IN');
+                await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
                 refetch();
             }
             setAppointmentToCheckIn(null);
@@ -137,6 +146,24 @@ export default function AppointmentsTable({ appointments, setError }) {
 
     // https://stackoverflow.com/questions/79546439/why-are-params-undefined-in-valuegetter-but-not-in-rendercell-when-using-mui-dat
 
+    const computedAppointments = useMemo(() => {
+        if (!filteredAppointments) return [];
+
+        const now = new Date();
+
+        const getPriority = (row) => {
+            if (row.status === 'CHECKED_IN') return 0;
+            if (row.status === 'SCHEDULED') return 1;
+            if (new Date(row.startTime) >= now) return 2;
+            return 3;
+        };
+
+        return filteredAppointments.map((row) => ({
+            ...row,
+            priority: getPriority(row),
+        }));
+    }, [filteredAppointments]);
+
     const columns = useMemo(() => {
         return [
             {
@@ -145,7 +172,7 @@ export default function AppointmentsTable({ appointments, setError }) {
                 flex: 3,
             },
             {
-                field: 'start_time',
+                field: 'startTime',
                 headerName: 'Fecha y hora de inicio',
                 type: 'date',
                 flex: 3,
@@ -168,23 +195,16 @@ export default function AppointmentsTable({ appointments, setError }) {
             {
                 field: 'location',
                 headerName: 'Lugar',
-                flex: 1,
+                flex: 2,
             },
             {
-                field: 'state',
+                field: 'status',
                 headerName: 'Estado',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
                     return <AppointmentChip value={value} />;
                 },
-            },
-            {
-                field: 'end_time',
-                headerName: 'Hora de fin',
-                type: 'date',
-                flex: 2,
-                valueFormatter: (value) => (value ? new Date(value) : null),
             },
             {
                 type: 'date',
@@ -195,6 +215,11 @@ export default function AppointmentsTable({ appointments, setError }) {
                 valueFormatter: (value) => {
                     return formatCreatedAt(value);
                 },
+            },
+            {
+                field: 'priority',
+                headerName: 'Priority',
+                hide: true,
             },
             {
                 field: 'actions',
@@ -237,22 +262,31 @@ export default function AppointmentsTable({ appointments, setError }) {
                 <CancelAppointmentForm
                     appointment={appointmentToCancel}
                     handleClose={() => setAppointmentToCancel(null)}
+                    refetch={refetch}
                 />
             )}
 
             {appointmentToAddClinicalData && (
                 <AddClinicalDataStepperForm
+                    appointment={appointmentToAddClinicalData}
                     open={!!appointmentToAddClinicalData}
-                    handleClose={()=> setAppointmentToAddClinicalData(null)}
+                    handleClose={() => setAppointmentToAddClinicalData(null)}
                 />
             )}
 
             <BasicTableLayout
-                rows={filteredAppointments}
+                rows={computedAppointments}
                 columns={columns}
                 searchValue={searchText}
                 searchPlaceholder={'Busca por ID, motivo, paciente, profesional'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                sorting={{
+                    sortModel: [{ field: 'priority', sort: 'asc' }],
+                }}
+                tableSpecificVisibility={{ priority: false }}
+                onRowClick={(params) => {
+                    navigate(`/appointments/${params.row.uuid}`);
+                }}
                 actions={
                     <Button
                         variant='contained'

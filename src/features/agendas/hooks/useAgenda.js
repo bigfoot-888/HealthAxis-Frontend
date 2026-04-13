@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAgenda } from '@agendas/api/agenda-api';
 
-export function useAgendas() {
+export function useAgenda(uuid) {
     return useQuery({
         queryKey: ['agenda', uuid],
         queryFn: () => getAgenda(uuid),

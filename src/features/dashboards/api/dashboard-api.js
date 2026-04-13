@@ -2,7 +2,7 @@ import { axios } from '@/lib/axios';
 
 export async function getDashboard(uuid){
     try {
-        const response = await axios.get(`/dashboards/${uuid}`);
+        const response = await axios.get(`/dashboards`);
         return response.data;
     } catch (err) {
         console.error('Error getting dashboard:', err);
