@@ -12,6 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { calculateAge, translateSex } from '@patients/utils/patient.utils';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
+import { Link } from 'react-router';
 
 export default function PatientDetail() {
     const { setError, patient, uuid } = usePatientContext();
@@ -130,7 +131,7 @@ export default function PatientDetail() {
                                     >
                                         Nueva Cita
                                     </Button>
-                                    <Button variant='text' startIcon={<EditIcon />} color='inherit'>
+                                    <Button variant='text' startIcon={<EditIcon />} color='inherit' component={Link} to={`/patients/edit/${uuid}`} state={{ from: `/patients/${uuid}` }}>
                                         Editar
                                     </Button>
                                 </Stack>

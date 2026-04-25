@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 
 import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
-import { createClinicalDocument, createClinicalAttachment } from '@clinical-documents/api/clinical-document-api';
+import { createClinicalDocument, createClinicalAttachment } from '@clinical-documents/api/clinical-document.api';
 import {SelectInput, BasicTextInput} from '@/components/forms/inputs/index';
 import {BasicFormLayout} from '@/components/forms/index';
 

@@ -5,6 +5,7 @@ import SearchBar from '../ui/SearchBar';
 import DrawerHeader from '../layout/drawer/DrawerHeader';
 import { Alert } from '@mui/material';
 import ContentLayout from '../layout/ContentLayout';
+import { TableTopBar } from '.';
 
 export default function BasicTableLayout({
     rows,
@@ -22,17 +23,17 @@ export default function BasicTableLayout({
 }) {
     const baseVisibility = {
         createdAt: false,
-    }
+    };
     return (
         <>
-            <Box sx={{ marginBottom: 2, display: 'flex' }}>
-                <Box sx={{ mr: 'auto' }}>
-                    <SearchBar value={searchValue} onChange={onSearchChange} placeholder={searchPlaceholder} />
-                </Box>
-                <Box>{actions}</Box>
-            </Box>
+            {onSearchChange && (
+                <TableTopBar
+                    left={<SearchBar value={searchValue} onChange={onSearchChange} placeholder={searchPlaceholder} />}
+                    right={actions}
+                />
+            )}
 
-            <div style={{ height: 600, width: '100%' }}>
+            <Box sx={{ mt: 1, height: 600, width: '100%' }}>
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -41,7 +42,7 @@ export default function BasicTableLayout({
                     loading={loading}
                     columnVisibilityModel={{
                         ...baseVisibility,
-                        ...tableSpecificVisibility
+                        ...tableSpecificVisibility,
                     }}
                     initialState={{
                         sorting,
@@ -76,7 +77,7 @@ export default function BasicTableLayout({
                         },
                     })}
                 />
-            </div>
+            </Box>
         </>
     );
 }

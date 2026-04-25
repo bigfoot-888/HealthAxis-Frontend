@@ -41,6 +41,7 @@ export async function getClinicalDocument(uuid) {
 }
 
 export async function getFilteredClinicalDocuments(query, limit = 20) {
+    console.log(query)
     const response = await axios.get('/clinical-documents/filtered', {
         params: { query, limit },
     });

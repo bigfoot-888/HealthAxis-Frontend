@@ -1,73 +1,72 @@
-import { useState, useCallback, useEffect } from 'react';
-import { 
-    ReactFlow, 
-    useNodesState,
-    useEdgesState,
-    addEdge,
-    Background, 
-    Controls 
-} from '@xyflow/react';
-import { Box, Button, TextField, Typography, Stack } from '@mui/material';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { ReactFlow, useNodesState, useEdgesState, Background, Controls } from '@xyflow/react';
+import { Box } from '@mui/material';
+import FlowEventDetail from '@patient-flows/components/ui/FlowEventDetail';
 import '@xyflow/react/dist/style.css';
-import { ContentLayout } from '@/components/layout';
 
-import ExampleCustomNode from '@patient-flows/components/ui/ExampleCustomNode';
-import {RegistrationNode, ReactivationNode, DeactivationNode} from '@patient-flows/components/ui/LifecycleNodes';
-import { DiagnosisNode, TreatmentNode, AppointmentNode, ClinicalDocumentNode} from '@patient-flows/components/ui/ClinicalEventNode';
+import { ContentLayout } from '@/components/layout';
+import { PatientNode } from '@patient-flows/components/ui/PatientNode';
+import BaseFlowNode from '../ui/BaseFlowNode';
+import { useReactFlow } from '@xyflow/react';
+import CreateSecondaryNodeForm from '@patient-flows/components/forms/CreateSecondaryNodeForm';
+import { usePatientFlow } from '../../hooks/usePatientFlow';
+import DeleteSecondaryNodeDialog from '../dialogs/DeleteSecondaryNodeDialog';
+import { handleApiError } from '@/utils/handle-errors';
+
+import { deleteFlowEvent } from '@patient-flows/api/patient-flow-api';
+
 const nodeTypes = {
-  textUpdater: ExampleCustomNode, 
-  REGISTRATION: RegistrationNode,
-  DEACTIVATION: DeactivationNode,
-  REACTIVATION: ReactivationNode,
-  DIAGNOSIS: DiagnosisNode,
-  TREATMENT: TreatmentNode,
-  APPOINTMENT: AppointmentNode,
-  CLINICAL_DOCUMENT: ClinicalDocumentNode,
+    PATIENT: BaseFlowNode,
+    DIAGNOSIS: BaseFlowNode,
+    TREATMENT: BaseFlowNode,
+    APPOINTMENT: BaseFlowNode,
+    CLINICAL_DOCUMENT: BaseFlowNode,
+    OTHER: BaseFlowNode,
 };
 
-const initialNodes = [
-  {
-    id: 'node-1',
-    type: 'textUpdater',
-    position: { x: 0, y: 0 },
-    data: { value: 123 },
-  },
-];
+function FlowViewportSync({ selectedNode }) {
+    const { setCenter } = useReactFlow();
 
-export default function PatientFlow({ flow }) {
-    const [nodes, setNodes, onNodesChange] = useNodesState(flow?.nodes || []);
-    const [edges, setEdges, onEdgesChange] = useEdgesState(flow?.edges || []);
-    
-    // We only store the ID of the selected node, and derive the rest from the `nodes` array.
-    // This prevents our sidebar state from falling out of sync with the canvas state
-
-    const [selectedNodeId, setSelectedNodeId] = useState(null);
-    const selectedNode = nodes.find(n => n.id === selectedNodeId) || null;
     useEffect(() => {
-        setNodes((nds)=>
-            nds.map(
-                (nd) => {
-                    return {
-                        ...nd,
-                        data: {
-                            title: "asdfjpaoisdfj"
-                        }
-                    }
-                }
-            )
-        )
-        if (flow) {
-            setNodes(flow.nodes);
-            setEdges(flow.edges || []);
-        }
+        if (!selectedNode) return;
+
+        const x = (selectedNode.positionAbsoluteX ?? selectedNode.position.x) + 90;
+        const y = (selectedNode.positionAbsoluteY ?? selectedNode.position.y) + 40;
+
+        setCenter(x, y, {
+            zoom: 1,
+            duration: 300,
+        });
+    }, [selectedNode, setCenter]);
+
+    return null;
+}
+
+export default function PatientFlow({ flow, refetch, patientUuid }) {
+    const initialNodes = useMemo(() => flow?.nodes ?? [], [flow]);
+    const initialEdges = useMemo(() => flow?.edges ?? [], [flow]);
+
+    const [error, setError] = useState(null); 
+
+    const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+    const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+    const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+    const [openDialog, setOpenDialog] = useState(false);
+    const [nodeToDelete, setNodeToDelete] = useState(null); 
+
+    useEffect(() => {
+        setNodes(flow?.nodes ?? []);
+        setEdges(flow?.edges ?? []);
+        setSelectedNodeId(null);
     }, [flow, setNodes, setEdges]);
 
-    const onConnect = useCallback(
-        (params) => setEdges((eds) => addEdge(params, eds)),
-        [setEdges]
+    const selectedNode = useMemo(
+        () => nodes.find((node) => node.id === selectedNodeId) ?? null,
+        [nodes, selectedNodeId],
     );
 
-    const onNodeClick = useCallback((event, node) => {
+    const onNodeClick = useCallback((_, node) => {
         setSelectedNodeId(node.id);
     }, []);
 
@@ -75,73 +74,74 @@ export default function PatientFlow({ flow }) {
         setSelectedNodeId(null);
     }, []);
 
-    const handleLabelChange = (e) => {
-        const newLabel = e.target.value;
-        
-        setNodes((nds) =>
-            nds.map((node) => {
-                if (node.id === selectedNodeId) {
-                    return { ...node, data: { ...node.data, label: newLabel } };
-                }
-                return node;
-            })
-        );
+    const handleDeleteNode = async () => {
+        try {
+            await deleteFlowEvent(nodeToDelete.id, patientUuid); 
+            refetch();
+            setNodeToDelete(null);
+        } catch (err) {
+            handleApiError(err, setError, null); 
+        }
     };
 
-    const handleSave = () => {
-        console.log("Ready to save to backend:", { nodes, edges });
-        // TODO: save changes 
-    };
 
     return (
-        <ContentLayout
-            drawer={false}
-        >
-            <Box sx={{ display: 'flex', gap: 2, height: '600px', width: '100%' }}>
-                <Box sx={{ flexGrow: 1, border: '1px solid black', position: 'relative' }}>
-                    <Button 
-                        onClick={handleSave} 
-                        variant="contained" 
-                        sx={{ position: 'absolute', top: 10, right: 10, zIndex: 4 }}
-                    >
-                        Guardar Flujo
-                    </Button>
-                    
+        <ContentLayout drawer={false}>
+            {openDialog && (
+                <CreateSecondaryNodeForm
+                    open={openDialog}
+                    handleClose={() => setOpenDialog(false)}
+                    parentNode={selectedNode}
+                    refetch={refetch}
+                    patientUuid={patientUuid}
+                />
+            )}
+
+            {nodeToDelete && (
+                <DeleteSecondaryNodeDialog
+                    open={!!nodeToDelete}
+                    handleClose={() => setNodeToDelete(null)}
+                    handleConfirm={handleDeleteNode}
+                />
+            )}
+
+            <Box sx={{ display: 'flex', gap: 2, height: 500, width: '100%' }}>
+                <Box
+                    sx={(theme) => ({
+                        flexGrow: 1,
+                        position: 'relative',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        backgroundColor: theme.palette.background.paper,
+                    })}
+                >
                     <ReactFlow
                         nodes={nodes}
                         edges={edges}
                         onNodesChange={onNodesChange}
                         onEdgesChange={onEdgesChange}
-                        onConnect={onConnect}
                         onNodeClick={onNodeClick}
                         onPaneClick={onPaneClick}
                         nodeTypes={nodeTypes}
                         fitView
+                        nodesDraggable={true}
+                        nodesConnectable={false}
+                        elementsSelectable
+                        panOnDrag
                     >
-                        <Background color="#ccc" gap={16} />
-                        <Controls />
+                        <Background gap={16} />
+                        <Controls showInteractive={false} />
+                        <FlowViewportSync selectedNode={selectedNode} />
                     </ReactFlow>
                 </Box>
 
-                {selectedNode && (
-                    <Box sx={{ width: '300px', border: '1px solid #ccc', p: 2, borderRadius: 1, bgcolor: 'background.paper' }}>
-                        <Typography variant="h6" gutterBottom>
-                            Edit Step
-                        </Typography>
-                        <Stack spacing={2}>
-                            <Typography variant="body2" color="text.secondary">
-                                Node ID: {selectedNode.id}
-                            </Typography>
-                            <TextField
-                                label="Step Name (Label)"
-                                value={selectedNode.data?.label || ''}
-                                onChange={handleLabelChange}
-                                fullWidth
-                                size="small"
-                            />
-                        </Stack>
-                    </Box>
-                )}
+                <FlowEventDetail
+                    node={selectedNode}
+                    onAddSecondaryNode={() => setOpenDialog(true)}
+                    onDeleteSecondaryNode={() => setNodeToDelete(selectedNode)}
+                />
             </Box>
         </ContentLayout>
     );

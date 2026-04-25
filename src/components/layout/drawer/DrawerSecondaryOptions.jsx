@@ -16,13 +16,13 @@ export default function DrawerSecondaryOptions({open}) {
     }
     return (
         <List>
-            <CustomListItem text='Ajustes' open={open}>
+            {/* <CustomListItem text='Ajustes' open={open}>
                 <SettingsIcon />
             </CustomListItem>
 
             <CustomListItem text='Ayuda' open={open}>
                 <HelpIcon />
-            </CustomListItem>
+            </CustomListItem> */}
 
             <CustomListItem text='Cerrar Sesión' handleClick={handleLogout} open={open}>
                 <LogoutIcon />

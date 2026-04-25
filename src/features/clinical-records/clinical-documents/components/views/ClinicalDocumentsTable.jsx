@@ -22,8 +22,9 @@ import { ClinicalDocumentTypeChip } from '@clinical-documents/components/ui/Clin
 
 import { ClinicalDocumentStatusChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
 import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
+import UpdateClinicalDocumentStatusForm from '@clinical-documents/components/forms/UpdateClinicalDocumentStatusForm';
 
-function ActionsCell({ row, onUpdateStatus, onUpdateRecordStatus, onViewAttachmentsDocument, ...gridParams }) {
+function ActionsCell({ row, onUpdateStatus, onViewAttachmentsDocument, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             <GridActionsCellItem
@@ -41,12 +42,6 @@ function ActionsCell({ row, onUpdateStatus, onUpdateRecordStatus, onViewAttachme
                 icon={<SyncAltIcon />}
                 label='Actualizar estado'
                 onClick={() => onUpdateStatus(row)}
-            ></GridActionsCellItem>
-            <GridActionsCellItem
-                showInMenu
-                icon={<AutorenewIcon />}
-                label='Actualizar estado del registro'
-                onClick={() => onUpdateRecordStatus(row)}
             ></GridActionsCellItem>
         </GridActionsCell>
     );
@@ -122,7 +117,7 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
                 type: 'actions',
                 flex: 3,
                 renderCell: (params) => (
-                    <ActionsCell {...params} onUpdateStatus={() => {}} onUpdateRecordStatus={() => {}} />
+                    <ActionsCell {...params} onUpdateStatus={setUpdateClinicalDocumentStatusRow}/>
                 ),
             },
         ];
@@ -130,18 +125,12 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
 
     return (
         <>
-            {/* {updateDiagnosisStateRow && (
-                <UpdateDiagnosisStateForm
-                    clinicalDocument={updateDiagnosisStateRow}
-                    handleClose={() => setUpdateDiagnosisStateRow(null)}
+            {updateClinicalDocumentStatusRow && (
+                <UpdateClinicalDocumentStatusForm
+                    clinicalDocument={updateClinicalDocumentStatusRow}
+                    handleClose={() => setUpdateClinicalDocumentStatusRow(null)}
                 />
             )}
-            {updateDiagnosisRecordStateRow && (
-                <UpdateDiagnosisRecordStateForm
-                    clinicalDocument={updateDiagnosisRecordStateRow}
-                    handleClose={() => setUpdateDiagnosisRecordStateRow(null)}
-                />
-            )} */}
             <BasicTableLayout
                 rows={filteredClinicalDocuments}
                 columns={columns}
@@ -158,11 +147,7 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
                             loadingPosition='start'
                             sx={{ mr: 2 }}
                         >
-                            Crear nuevo documento externo
-                        </Button>
-                        <Button component='label' variant='outlined' startIcon={<GroupAddIcon />}>
-                            Importar documento PDF
-                            <input type='file' hidden accept='application/json' onChange={handleImportDocument} />
+                            Crear documento
                         </Button>
                     </>
                 }

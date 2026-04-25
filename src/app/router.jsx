@@ -1,7 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import Layout from '../components/layout/Layout';
 
-
 import UsersPage from './pages/user-pages/UsersPage';
 import UserDetailPage from '@/app/pages/user-pages/UserDetailPage';
 
@@ -9,10 +8,10 @@ import LoginPage from './pages/auth-pages/LoginPage';
 import NotFoundPage from './pages/error-pages/NotFoundPage';
 import ProfilePage from './pages/user-pages/ProfilePage';
 import CreateUserPage from './pages/user-pages/CreateUserPage';
-import UpdateUserPage from './pages/user-pages/UpdateUserPage';
+import EditUserPage from './pages/user-pages/EditUserPage';
 import PatientsPage from './pages/patient-pages/PatientsPage';
 import CreatePatientPage from './pages/patient-pages/CreatePatientPage';
-import UpdatePatientPage from './pages/patient-pages/UpdatePatientPage';
+import EditPatientPage from './pages/patient-pages/EditPatientPage';
 import AppointmentsPage from './pages/appointment-pages/AppointmentsPage';
 import AgendasPage from './pages/agenda-pages/AgendasPage';
 import CreateAppointmentPage from './pages/appointment-pages/CreateAppointmentPage';
@@ -29,18 +28,18 @@ import TreatmentDetailPage from '@/app/pages/treatment-pages/TreatmentDetailPage
 
 import ClinicalDocumentsPage from './pages/clinical-document-pages/ClinicalDocumentsPage';
 import CreateExternalClinicalDocumentForm from '@/app/pages/clinical-document-pages/CreateExternalClinicalDocumentPage';
-import ViewClinicalAttachmentsDocumentManagement from '@/features/clinical-records/clinical-documents/components/wrappers/ViewClinicalAttachmentsDocumentManagement';
-
+import ClinicalDocumentViewPage from '@/app/pages/clinical-document-pages/ClinicalDocumentViewPage';
 import PatientDetailPage from '@/app/pages/patient-pages/PatientDetailPage';
 import PatientDetailProfilePage from '@/app/pages/patient-pages/PatientDetailProfilePage';
-import PatientDetailAppointmentsPage from '@/app/pages/patient-pages/PatientDetailAppointmentsPage'; 
-import PatientDetailDiagnosesPage from '@/app/pages/patient-pages/PatientDetailDiagnosesPage'; 
-import PatientDetailTreatmentsPage from '@/app/pages/patient-pages/PatientDetailTreatmentsPage'; 
+import PatientDetailAppointmentsPage from '@/app/pages/patient-pages/PatientDetailAppointmentsPage';
+import PatientDetailDiagnosesPage from '@/app/pages/patient-pages/PatientDetailDiagnosesPage';
+import PatientDetailTreatmentsPage from '@/app/pages/patient-pages/PatientDetailTreatmentsPage';
+import PatientHistoryPage from '@/app/pages/patient-pages/PatientHistoryPage';
 
 import AppointmentDetailPage from '@/app/pages/appointment-pages/AppointmentDetailPage';
 
 import AgendaDetailWrapper from '@/app/pages/agenda-pages/AgendaDetailWrapper';
-import AgendaDetailPage from '@/app/pages/agenda-pages/AgendaDetailPage' 
+import AgendaDetailPage from '@/app/pages/agenda-pages/AgendaDetailPage';
 import AgendaUsersPage from '@/app/pages/agenda-pages/AgendaUsersPage';
 
 import PatientFlowPage from '@/app/pages/patient-pages/PatientFlowPage';
@@ -98,7 +97,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/users/edit/:uuid',
-                Component: UpdateUserPage,
+                Component: EditUserPage,
                 handle: { title: 'Editar Usuario' },
             },
             {
@@ -156,6 +155,11 @@ export const router = createBrowserRouter([
                         Component: PatientFlowPage,
                         handle: { title: 'Flujo del paciente' },
                     },
+                    {
+                        path: 'history',
+                        Component: PatientHistoryPage,
+                        handle: { title: 'Historial del paciente' },
+                    },
                 ],
             },
             {
@@ -165,7 +169,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/patients/edit/:uuid',
-                Component: UpdatePatientPage,
+                Component: EditPatientPage,
                 handle: { title: 'Editar Paciente' },
             },
             {
@@ -222,7 +226,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: 'clinical-documents/:uuid',
-                        Component: ViewClinicalAttachmentsDocumentManagement,
+                        Component: ClinicalDocumentViewPage,
                         handle: { title: 'Ver documento clínico' },
                     },
                     {

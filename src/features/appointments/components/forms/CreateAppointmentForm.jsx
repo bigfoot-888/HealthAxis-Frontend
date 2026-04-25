@@ -2,7 +2,7 @@ import { Grid, Paper, Stack, Box } from '@mui/material';
 import { Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useLocation } from 'react-router';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
 import { createAppointment } from '@appointments/api/appointment.api';
@@ -30,25 +30,25 @@ export default function CreateAppointmentForm() {
     });
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const from = location.state?.from || '/appointments';
     const { refetch } = useAppointments();
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
     const queryClient = useQueryClient();
 
     const onSubmit = async (data) => {
         try {
             await createAppointment(data);
             refetch();
-            console.log(data)
-            await queryClient.invalidateQueries({ queryKey: ['appointments', {userUuid: data.user.uuid}] });
-
-            navigate('/appointments');
+            await queryClient.invalidateQueries({ queryKey: ['appointments', { userUuid: data.user.uuid }] });
+            navigate(from);
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }
     };
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '720px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>
@@ -56,7 +56,7 @@ export default function CreateAppointmentForm() {
                             <Typography variant='h2'>Crear Nueva Cita</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
 
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -99,7 +99,13 @@ export default function CreateAppointmentForm() {
                             <RHFDateTimePicker
                                 name='startTime'
                                 control={control}
-                                rules={{ required: 'La fecha y hora de inicio es obligatoria' }}
+                                rules={{
+                                    required: 'La fecha y hora de inicio es obligatoria',
+                                    validate: (value) => {
+                                        const date = new Date(value);
+                                        return !isNaN(date) || 'Fecha inválida';
+                                    },
+                                }}
                                 label='Fecha y hora de inicio'
                             />
                         </Grid>
@@ -110,7 +116,10 @@ export default function CreateAppointmentForm() {
                                 type='text'
                                 register={register}
                                 rules={{
-                                    required: 'El lugar es obligatorio',
+                                    maxLength: {
+                                        value: 100,
+                                        message: 'Máximo 100 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -128,6 +137,10 @@ export default function CreateAppointmentForm() {
                                 register={register}
                                 rules={{
                                     required: 'El motivo es obligatorio',
+                                    maxLength: {
+                                        value: 255,
+                                        message: 'Máximo 255 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -138,7 +151,12 @@ export default function CreateAppointmentForm() {
                                 name='notes'
                                 type='text'
                                 register={register}
-                                rules={{}}
+                                rules={{
+                                    maxLength: {
+                                        value: 2000,
+                                        message: 'Máximo 2000 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                                 others={{ multiline: true, rows: 4 }}
                             />
@@ -150,7 +168,7 @@ export default function CreateAppointmentForm() {
                                 </Button>
                             </Grid>
                             <Grid>
-                                <Button variant='outlined' size='large' component={Link} to='/appointments'>
+                                <Button variant='outlined' size='large' component={Link} to={from}>
                                     Cancelar
                                 </Button>
                             </Grid>

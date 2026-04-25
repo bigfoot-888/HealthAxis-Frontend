@@ -5,8 +5,8 @@ import { CustomCircularProgress } from '@/components/feedback';
 
 export default function PatientFlowPage() {
     const { uuid } = useParams(); 
-    const { data: flow, isLoading, error } = usePatientFlow(uuid);
+    const { data: flow, isLoading, error, refetch } = usePatientFlow(uuid);
     if (error) return <p>Failed to load flow</p>;
     if (isLoading) return <CustomCircularProgress />;
-    return <PatientFlow flow={flow} />;
+    return <PatientFlow flow={flow} refetch={refetch} patientUuid={uuid} />;
 }

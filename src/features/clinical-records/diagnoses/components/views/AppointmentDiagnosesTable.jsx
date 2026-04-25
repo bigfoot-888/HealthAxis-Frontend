@@ -113,7 +113,6 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                 appointment={appointment}
             />
 
-            {/* Update dialogs */}
             {updateDiagnosisClinicalStatusRow && (
                 <UpdateDiagnosisClinicalStatusForm
                     diagnosis={updateDiagnosisClinicalStatusRow}

@@ -43,7 +43,7 @@ export default function AppointmentAutocomplete({ control, errors, rules }) {
                     disablePortal
                     isOptionEqualToValue={(option, value) => option.id === value?.id}
                     getOptionLabel={(option) =>
-                        `${option.user.name} ${option.user.surname} — ${option.patient.name} ${option.patient.surname} - ${new Date(option.start_time).toLocaleString(
+                        `${option.user.name} ${option.user.surname} — ${option.patient.name} ${option.patient.surname} - ${new Date(option.startTime).toLocaleString(
                             'es-ES',
                             {
                                 timeZone: 'UTC',

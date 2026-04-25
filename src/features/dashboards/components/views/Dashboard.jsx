@@ -4,56 +4,101 @@ import 'react-resizable/css/styles.css';
 import { ContentLayout } from '@/components/layout';
 import { Responsive, useContainerWidth } from 'react-grid-layout';
 import DashboardComponentRenderer from '@dashboards/components/ui/DashboardComponentRenderer';
-
-
+import DashboardToolbar from '@dashboards/components/ui/DashboardToolbar';
+import { useState } from 'react';
+import { updateLayout, createDashboardWidget } from '@dashboards/api/dashboard-api';
+import AddKpiWidgetDialog from '../dialogs/AddKpiWidgetDialog';
+import { useDashboard } from '@dashboards/hooks/useDashboard';
 
 export default function Dashboard({ dashboard }) {
-    // This hook measures the wrapper div to provide an accurate width
     const { width, containerRef, mounted } = useContainerWidth();
+    const [layout, setLayout] = useState([]);
+    const [openAddDialog, setOpenAddDialog] = useState(false);
+    const { refetch } = useDashboard();
 
-    console.log(dashboard)
-
-    // Define layouts for different breakpoints. 
-    // I mapped your original layout to the 'lg' breakpoint.
     const layouts = {
-        lg: [
-            { i: '1', x: 0, y: 0, w: 2, h: 2 },
-            { i: '2', x: 2, y: 0, w: 2, h: 2 },
-            { i: '3', x: 0, y: 2, w: 4, h: 3 },
-            { i: '4', x: 0, y: 5, w: 4, h: 3 },
-            { i: '5', x: 4, y: 0, w: 2, h: 4 },
-            { i: '6', x: 4, y: 4, w: 2, h: 4 },
-        ]
-        // Add 'md', 'sm', etc., here to reposition items on smaller screens
+        lg: (dashboard?.components || []).map((component, index) => ({
+            i: String(component.id ?? index),
+            x: component.position?.x ?? 0,
+            y: component.position?.y ?? 0,
+            w: component.position?.w ?? 2,
+            h: component.position?.h ?? 2,
+        })),
+    };
+
+    const handleSaveLayout = async () => {
+        try {
+            const formattedLayout = layout.map((item) => ({
+                id: item.i,
+                x: item.x,
+                y: item.y,
+                w: item.w,
+                h: item.h,
+            }));
+
+            await updateLayout(formattedLayout);
+            console.log('Layout guardado');
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleCreateWidget = async (widgetData) => {
+        try {
+            await createDashboardWidget(widgetData);
+            setOpenAddDialog(false);
+            refetch();
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     return (
         <ContentLayout>
-            {/* The ref goes here so it measures the full space of ContentLayout */}
-            <div 
-                ref={containerRef} 
-                style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
+            <DashboardToolbar onSave={handleSaveLayout} onAddWidget={() => setOpenAddDialog(true)} />
+            {openAddDialog && (
+                <AddKpiWidgetDialog
+                    open={openAddDialog}
+                    onClose={() => setOpenAddDialog(false)}
+                    onSubmit={handleCreateWidget}
+                />
+            )}
+            <div
+                ref={containerRef}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                }}
             >
                 {mounted && (
                     <Responsive
-                        className="layout"
+                        className='layout'
                         layouts={layouts}
                         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-                        // Note: I set 'lg' to 6 columns so your original layout fits perfectly.
-                        // If you use 12, your items will only take up half the screen horizontally.
-                        cols={{ lg: 6, md: 4, sm: 2, xs: 1, xxs: 1 }}
+                        cols={{ lg: 8, md: 8, sm: 8, xs: 1, xxs: 1 }}
                         rowHeight={100}
                         width={width}
                         isDraggable={true}
                         isResizable={true}
+                        onLayoutChange={(newLayout) => {
+                            setLayout(newLayout);
+                        }}
                         style={{ flex: 1 }}
                     >
                         {dashboard.components.map((component, index) => {
-                            // Important: Keys must still match the 'i' property in layouts
-                            const itemKey = component.id || String(index + 1);
+                            const itemKey = String(component.id ?? index);
 
                             return (
-                                <div key={itemKey} style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+                                <div
+                                    key={itemKey}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        overflow: 'hidden',
+                                    }}
+                                >
                                     <DashboardComponentRenderer component={component} />
                                 </div>
                             );

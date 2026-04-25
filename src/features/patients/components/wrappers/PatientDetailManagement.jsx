@@ -23,11 +23,12 @@ export default function PatientDetailManagement() {
                 />
             )}
             <Tabs value={currentTab}>
-                <Tab label='Perfil' value='profile' component={Link} to='' />
+                <Tab label='Perfil' value={patient?.uuid} component={Link} to='' />
                 <Tab label='Citas' value='appointments' component={Link} to='appointments' />
                 <Tab label='Diagnósticos' value='diagnoses' component={Link} to='diagnoses' />
                 <Tab label='Tratamientos' value='treatments' component={Link} to='treatments' />
-                <Tab label='Evolución' value='patient-flow' component={Link} to='flow'/>
+                <Tab label='Evolución' value='flow' component={Link} to='flow'/>
+                <Tab label='Historial' value='history' component={Link} to='history'/>
             </Tabs>
 
             <Box sx={{ mt: 2 }}>

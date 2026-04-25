@@ -1,14 +1,14 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router';
-import { useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 
 import { Grid, Paper, Alert } from '@mui/material';
 import { Button, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
-import {BasicTextInput, SelectInput} from '@/components/forms/inputs/index';
-import {BasicFormLayout} from '@/components/forms/index';
-import {RHFDateTimePicker} from '@/components/forms/pickers/index';
+import { BasicTextInput, SelectInput } from '@/components/forms/inputs/index';
+import { BasicFormLayout } from '@/components/forms/index';
+import { RHFDateTimePicker } from '@/components/forms/pickers/index';
 
 import { ErrorAlert } from '@/components/ui';
 import { handleApiError } from '@/utils/handle-errors';
@@ -16,7 +16,7 @@ import { handleApiError } from '@/utils/handle-errors';
 import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointment } from '@appointments/api/appointment.api';
 
-export default function EditAppointmentForm({appointment, uuid}) {
+export default function EditAppointmentForm({ appointment, uuid }) {
     const {
         register,
         handleSubmit,
@@ -31,12 +31,12 @@ export default function EditAppointmentForm({appointment, uuid}) {
             notes: appointment?.notes || '',
             startTime: appointment?.startTime ? new Date(appointment.startTime) : null,
             location: appointment?.location || '',
-            type: appointment?.type || ''
+            type: appointment?.type || '',
         },
     });
 
     const navigate = useNavigate();
-    const location = useLocation(); 
+    const location = useLocation();
     const from = location.state?.from || '/appointments';
 
     const { refetch } = useAppointments();
@@ -50,7 +50,7 @@ export default function EditAppointmentForm({appointment, uuid}) {
             refetch();
             navigate(from);
         } catch (err) {
-            handleApiError(err, setError, setFormError)
+            handleApiError(err, setError, setFormError);
         }
     };
 
@@ -62,13 +62,13 @@ export default function EditAppointmentForm({appointment, uuid}) {
                 notes: appointment?.notes || '',
                 startTime: appointment?.startTime ? new Date(appointment.startTime) : null,
                 location: appointment?.location || '',
-                type: appointment?.type || ''
+                type: appointment?.type || '',
             });
         }
     }, [appointment, reset]);
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '720px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>
@@ -76,8 +76,8 @@ export default function EditAppointmentForm({appointment, uuid}) {
                             <Typography variant='h2'>Editar datos de cita</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
-                            
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
                                 Información básica
@@ -104,7 +104,13 @@ export default function EditAppointmentForm({appointment, uuid}) {
                             <RHFDateTimePicker
                                 name='startTime'
                                 control={control}
-                                rules={{ required: 'La fecha y hora de inicio es obligatoria' }}
+                                rules={{
+                                    required: 'La fecha y hora de inicio es obligatoria',
+                                    validate: (value) => {
+                                        const date = new Date(value);
+                                        return !isNaN(date) || 'Fecha inválida';
+                                    },
+                                }}
                                 label='Fecha y hora de inicio'
                             />
                         </Grid>
@@ -115,7 +121,10 @@ export default function EditAppointmentForm({appointment, uuid}) {
                                 type='text'
                                 register={register}
                                 rules={{
-                                    required: 'El lugar es obligatorio',
+                                    maxLength: {
+                                        value: 100,
+                                        message: 'Máximo 100 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -133,6 +142,10 @@ export default function EditAppointmentForm({appointment, uuid}) {
                                 register={register}
                                 rules={{
                                     required: 'El motivo es obligatorio',
+                                    maxLength: {
+                                        value: 255,
+                                        message: 'Máximo 255 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -143,7 +156,12 @@ export default function EditAppointmentForm({appointment, uuid}) {
                                 name='notes'
                                 type='text'
                                 register={register}
-                                rules={{}}
+                                rules={{
+                                    maxLength: {
+                                        value: 2000,
+                                        message: 'Máximo 2000 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                                 others={{ multiline: true, rows: 4 }}
                             />

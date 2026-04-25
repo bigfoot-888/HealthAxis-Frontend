@@ -1,18 +1,27 @@
-import { useFieldArray } from 'react-hook-form';
-import { Button, Box, Grid } from '@mui/material';
+import { useFieldArray, useController } from 'react-hook-form';
+import { Button, Box, Grid, Typography } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { UserAutocomplete } from '@/components/forms/autocompletes/index';
-import {SelectInput} from '@/components/forms/inputs/index';
 
-export function TreatmentProfessionalsField({ control }) {
+import { UserAutocomplete } from '@/components/forms/autocompletes';
+import { SelectInput } from '@/components/forms/inputs';
+
+export function TreatmentProfessionalsField({ control, errors, rules }) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'users', // This will be the array in your form data
+        name: 'users',
+    });
+
+    const {
+        fieldState: usersState,
+    } = useController({
+        name: 'users',
+        control,
+        rules,
     });
 
     const handleAddProfessional = () => {
-        append({ user: "", role: "" }); // Add empty row
+        append({ user: null, role: '' }); 
     };
 
     return (
@@ -26,11 +35,12 @@ export function TreatmentProfessionalsField({ control }) {
                             rules={{ required: 'El profesional es obligatorio' }}
                         />
                     </Grid>
+
                     <Grid size={5}>
                         <SelectInput
                             control={control}
                             name={`users.${index}.role`}
-                            rules={{ required: 'El rol del profesional en el tratamiento es obligatorio' }}
+                            rules={{ required: 'El rol es obligatorio' }}
                             label='Rol en el tratamiento'
                             items={{
                                 AUTHOR: 'Autoría',
@@ -40,24 +50,41 @@ export function TreatmentProfessionalsField({ control }) {
                             }}
                         />
                     </Grid>
+
                     <Grid
                         size={2}
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            pb: 2
+                            pb: 2,
                         }}
                     >
-                        <IconButton color='error' onClick={() => remove(index)} size='small'>
+                        <IconButton
+                            color='error'
+                            onClick={() => remove(index)}
+                            size='small'
+                            disabled={fields.length === 1} 
+                        >
                             <DeleteIcon />
                         </IconButton>
                     </Grid>
                 </Grid>
             ))}
 
-            <Button startIcon={<AddIcon />} onClick={handleAddProfessional} variant='outlined' sx={{mb: 2}}>
+            <Button
+                startIcon={<AddIcon />}
+                onClick={handleAddProfessional}
+                variant='outlined'
+                sx={{ mb: 1 }}
+            >
                 Añadir profesional involucrado
             </Button>
+
+            {usersState.error && (
+                <Typography variant='caption' color='error'>
+                    {usersState.error.message}
+                </Typography>
+            )}
         </Box>
     );
 }

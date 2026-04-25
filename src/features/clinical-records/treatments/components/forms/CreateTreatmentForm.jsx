@@ -22,7 +22,7 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { useQueryClient } from '@tanstack/react-query';
 
-export default function CreateAppointmentForm() {
+export default function CreateTreatmentForm() {
     const {
         register,
         handleSubmit,
@@ -32,7 +32,6 @@ export default function CreateAppointmentForm() {
     } = useForm({
         mode: 'onBlur',
         defaultValues: {
-            severity: '',
             clinicalStatus: '',
         },
     });
@@ -46,7 +45,7 @@ export default function CreateAppointmentForm() {
         try {
             await createTreatment(data);
             refetch();
-            await queryClient.invalidateQueries({ queryKey: ['treatments', {diagnosisUuid: data.diagnosis.uuid}] });
+            await queryClient.invalidateQueries({ queryKey: ['treatments', { diagnosisUuid: data.diagnosis.uuid }] });
             navigate('/clinical-records/treatments');
         } catch (err) {
             handleApiError(err, setError, setFormError);
@@ -83,7 +82,11 @@ export default function CreateAppointmentForm() {
                                 type='text'
                                 register={register}
                                 rules={{
-                                    required: 'El nombre del tratamiento es obligatorio',
+                                    required: 'El nombre es obligatorio',
+                                    maxLength: {
+                                        value: 100,
+                                        message: 'Máximo 100 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -104,20 +107,32 @@ export default function CreateAppointmentForm() {
                         </Grid>
                         <Grid size={12}>
                             <BasicTextInput
-                                label='Descripción'
+                                label='Descripción (opcional)'
                                 name='description'
                                 type='text'
                                 register={register}
+                                rules={{
+                                    maxLength: {
+                                        value: 1000,
+                                        message: 'Máximo 1000 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                                 others={{ multiline: true, rows: 3 }}
                             />
                         </Grid>
                         <Grid size={12}>
                             <BasicTextInput
-                                label='Duración'
+                                label='Duración (opcional)'
                                 name='duration'
                                 type='text'
                                 register={register}
+                                rules={{
+                                    maxLength: {
+                                        value: 80,
+                                        message: 'Máximo 80 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                             />
                         </Grid>
@@ -130,12 +145,19 @@ export default function CreateAppointmentForm() {
                             name='devisedAt'
                             control={control}
                             label='Fecha y hora de creación del tratamiento'
+                            rules={{
+                                validate: (value) => {
+                                    if (!value) return true;
+                                    const date = new Date(value);
+                                    return !isNaN(date) || 'Fecha inválida';
+                                },
+                            }}
                         />
                         <Grid size={12}>
                             <AppointmentAutocomplete control={control} errors={errors} />
                         </Grid>
                         <Grid size={12}>
-                            <DiagnosisAutocomplete control={control}/>
+                            <DiagnosisAutocomplete control={control} />
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -143,7 +165,14 @@ export default function CreateAppointmentForm() {
                             </Typography>
                         </Grid>
                         <Grid size={12}>
-                            <TreatmentProfessionalsField control={control} />
+                            <TreatmentProfessionalsField
+                                control={control}
+                                errors={errors}
+                                rules={{
+                                    validate: (value) =>
+                                        (value && value.length > 0) || 'Debe haber al menos un profesional',
+                                }}
+                            />
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -156,7 +185,12 @@ export default function CreateAppointmentForm() {
                                 name='notes'
                                 type='text'
                                 register={register}
-                                rules={{}}
+                                rules={{
+                                    maxLength: {
+                                        value: 2000,
+                                        message: 'Máximo 2000 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                                 others={{ multiline: true, rows: 4 }}
                             />

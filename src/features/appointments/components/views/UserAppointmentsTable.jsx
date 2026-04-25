@@ -24,7 +24,7 @@ import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
 import AppointmentChip from '@appointments/components/ui/AppointmentChip';
 import { handleApiError } from '@/utils/handle-errors';
-import AddClinicalDataStepperForm from '@appointments/components/forms/AddClinicalDataStepperForm';
+import CreateUserAppointmentForm from '../forms/CreateUserAppointmentForm';
 
 function isCompleted(row) {
     return row.status === 'COMPLETED';
@@ -38,7 +38,7 @@ function isScheduled(row) {
     return row.status === 'SCHEDULED';
 }
 
-function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, ...gridParams }) {
+function ActionsCell({ row, onCancel, onComplete, onCheckIn, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             {!isCompleted(row) && isCheckedIn(row) && (
@@ -62,18 +62,6 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                     }
                     label='Validar check-in'
                     onClick={() => onCheckIn(row)}
-                />
-            )}
-
-            {!isCompleted(row) && isCheckedIn(row) && (
-                <GridActionsCellItem
-                    icon={
-                        <Tooltip title='Registrar diagnóstico y tratamiento'>
-                            <MedicalInformationIcon color='success' />
-                        </Tooltip>
-                    }
-                    label='Registrar resultado clínico'
-                    onClick={() => onAddClinicalData(row)}
                 />
             )}
 
@@ -105,7 +93,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
     );
 }
 
-export default function UserAppointmentsTable({ appointments, setError, refetch}) {
+export default function UserAppointmentsTable({ user, appointments, setError, refetch }) {
     const [searchText, setSearchText] = useState('');
 
     const filteredAppointments = useSearchFilter(appointments, searchText, ['id', 'reason', 'patient.fullName']);
@@ -113,7 +101,8 @@ export default function UserAppointmentsTable({ appointments, setError, refetch}
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
-    const [appointmentToAddClinicalData, setAppointmentToAddClinicalData] = useState(null);
+
+    const [createAppointment, setCreateAppointment] = useState(false);
 
     const handleCompleteAppointment = async (row) => {
         try {
@@ -188,7 +177,6 @@ export default function UserAppointmentsTable({ appointments, setError, refetch}
                         onCancel={setAppointmentToCancel}
                         onComplete={setAppointmentToComplete}
                         onCheckIn={setAppointmentToCheckIn}
-                        onAddClinicalData={setAppointmentToAddClinicalData}
                     />
                 ),
             },
@@ -197,6 +185,14 @@ export default function UserAppointmentsTable({ appointments, setError, refetch}
 
     return (
         <>
+            {createAppointment && (
+                <CreateUserAppointmentForm
+                    open={createAppointment}
+                    handleClose={() => setCreateAppointment(false)}
+                    user={user}
+                    refetch={refetch}
+                />
+            )}
             {appointmentToComplete && (
                 <AlertDialog
                     open
@@ -233,8 +229,7 @@ export default function UserAppointmentsTable({ appointments, setError, refetch}
                 actions={
                     <Button
                         variant='contained'
-                        component={Link}
-                        to='/appointments/new'
+                        onClick={() => setCreateAppointment(true)}
                         startIcon={<PersonAddAltIcon />}
                         sx={{ mr: 2 }}
                     >

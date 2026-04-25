@@ -75,9 +75,13 @@ export default function CreateDiagnosisForm() {
                                 name='name'
                                 type='text'
                                 register={register}
-                                rules={{
-                                    required: 'El nombre del diagnóstico es obligatorio',
-                                }}
+rules={{
+    required: 'El nombre es obligatorio',
+    maxLength: {
+        value: 100,
+        message: 'Máximo 100 caracteres',
+    },
+}}
                                 errors={errors}
                             />
                         </Grid>
@@ -116,6 +120,12 @@ export default function CreateDiagnosisForm() {
                                 type='text'
                                 register={register}
                                 errors={errors}
+                                rules={{
+    maxLength: {
+        value: 1000,
+        message: 'Máximo 1000 caracteres',
+    },
+}}
                                 others={{ multiline: true, rows: 3 }}
                             />
                         </Grid>
@@ -129,8 +139,12 @@ export default function CreateDiagnosisForm() {
                                 name='diagnosedAt'
                                 control={control}
                                 rules={{
-                                    required: 'La fecha y hora en la que se realizó el diagnóstico es obligatoria',
-                                }}
+    required: 'La fecha es obligatoria',
+    validate: (value) => {
+        const date = new Date(value);
+        return !isNaN(date) || 'Fecha inválida';
+    },
+}}
                                 label='Fecha y hora de diagnóstico'
                             />
                         </Grid>
@@ -143,7 +157,10 @@ export default function CreateDiagnosisForm() {
                             </Typography>
                         </Grid>
                         <Grid size={12}>
-                            <DiagnosisProfessionalsField control={control} errors={errors} />
+                            <DiagnosisProfessionalsField control={control} errors={errors} rules={{
+    validate: (value) =>
+        value && value.length > 0 || 'Debe haber al menos un profesional',
+}}/>
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -156,7 +173,12 @@ export default function CreateDiagnosisForm() {
                                 name='notes'
                                 type='text'
                                 register={register}
-                                rules={{}}
+                                rules={{
+    maxLength: {
+        value: 2000,
+        message: 'Máximo 2000 caracteres',
+    },
+}}
                                 errors={errors}
                                 others={{ multiline: true, rows: 4 }}
                             />
@@ -168,7 +190,7 @@ export default function CreateDiagnosisForm() {
                                 </Button>
                             </Grid>
                             <Grid>
-                                <Button variant='outlined' size='large' component={Link} to='/appointments'>
+                                <Button variant='outlined' size='large' component={Link} to='/clinical-records/diagnoses'>
                                     Cancelar
                                 </Button>
                             </Grid>

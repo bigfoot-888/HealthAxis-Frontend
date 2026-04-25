@@ -2,7 +2,7 @@ import DiagnosisInfoCard from '@diagnoses/components/ui/DiagnosisInfoCard';
 import PatientSummaryCard from '@patients/components/ui/PatientSummaryCard';
 import AppointmentSummaryCard from '@appointments/components/ui/AppointmentSummaryCard';
 import DiagnosisTreatmentsTable from '@treatments/components/views/DiagnosisTreatmentsTable';
-      
+
 import { useDiagnosis } from '@diagnoses/hooks/useDiagnosis';
 import { useTreatmentsByDiagnosis } from '@treatments/hooks/useTreatmentsByDiagnosis';
 
@@ -18,11 +18,7 @@ import { Grid } from '@mui/material';
 export default function DiagnosisDetailPage() {
     const { uuid } = useParams();
 
-    const {
-        data: diagnosis,
-        isLoading: diagnosisIsLoading,
-        error: diagnosisFetchError,
-    } = useDiagnosis(uuid);
+    const { data: diagnosis, isLoading: diagnosisIsLoading, error: diagnosisFetchError } = useDiagnosis(uuid);
     const {
         data: treatments,
         isLoading: treatmentsIsLoading,
@@ -36,26 +32,15 @@ export default function DiagnosisDetailPage() {
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)} drawer={false}>
-            <AppBreadcrumbs
-                items={[
-                    { label: 'Diagnósticos', to: '/clinical-records/diagnoses' },
-                    { label: diagnosis.name },
-                ]}
-            />
-
             <Grid container spacing={2}>
-
-                {/* Top: Diagnosis Info */}
                 <Grid size={12}>
                     <DiagnosisInfoCard diagnosis={diagnosis} />
                 </Grid>
 
-                {/* Middle: Context */}
                 <Grid size={{ xs: 12, md: 6 }}>
                     <PatientSummaryCard patient={diagnosis.patient} />
                 </Grid>
 
-                {/* Appointment (optional) */}
                 {diagnosis.appointment && (
                     <Grid size={{ xs: 12, md: 6 }}>
                         <AppointmentSummaryCard appointment={diagnosis.appointment} />
@@ -64,11 +49,8 @@ export default function DiagnosisDetailPage() {
 
                 <Grid size={12}>
                     <DiagnosisTreatmentsTable treatments={treatments} />
-                </Grid> 
-               
-
+                </Grid>
             </Grid>
         </ContentLayout>
     );
 }
-

@@ -30,11 +30,9 @@ export default function AppointmentDetailPage() {
 
     const appointmentUuid = appointment?.uuid;
 
-    const { data: diagnoses = [], refetch: refetchDiagnoses } =
-        useDiagnosesByAppointment(appointmentUuid);
+    const { data: diagnoses = [], refetch: refetchDiagnoses } = useDiagnosesByAppointment(appointmentUuid);
 
-    const { data: treatments = [], refetch: refetchTreatments } =
-        useTreatmentsByAppointment(appointmentUuid);
+    const { data: treatments = [], refetch: refetchTreatments } = useTreatmentsByAppointment(appointmentUuid);
 
     const [error, setError] = useState(null);
 
@@ -58,7 +56,7 @@ export default function AppointmentDetailPage() {
         try {
             if (row) {
                 await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-                refetchAppointment(); 
+                refetchAppointment();
             }
             setAppointmentToCheckIn(null);
         } catch (err) {
@@ -71,12 +69,7 @@ export default function AppointmentDetailPage() {
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
-            <AppBreadcrumbs
-                items={[
-                    { label: 'Citas', to: '/appointments' },
-                    { label: `${appointment.reason}` },
-                ]}
-            />
+            <AppBreadcrumbs items={[{ label: 'Citas', to: '/appointments' }, { label: `${appointment.reason}` }]} />
 
             {appointmentToComplete && (
                 <AlertDialog
@@ -108,7 +101,6 @@ export default function AppointmentDetailPage() {
 
             {/* Layout */}
             <Grid container spacing={2}>
-                
                 {/* Top: Appointment Info */}
                 <Grid size={12}>
                     <AppointmentInfoCard
@@ -137,13 +129,9 @@ export default function AppointmentDetailPage() {
                             refetch={refetchDiagnoses}
                         />
 
-                        <AppointmentTreatmentsTable
-                            treatments={treatments}
-                            refetch={refetchTreatments}
-                        />
+                        <AppointmentTreatmentsTable treatments={treatments} refetch={refetchTreatments} />
                     </Stack>
                 </Grid>
-
             </Grid>
         </ContentLayout>
     );

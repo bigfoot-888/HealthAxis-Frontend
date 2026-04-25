@@ -79,7 +79,7 @@ export default function AppointmentInfoCard({
                                 {appointment.reason}
                             </Typography>
 
-                            <AppointmentChip/>
+                            <AppointmentChip value={appointment.status}/>
                         </Stack>
 
                         <Stack direction='row' spacing={3} mb={2} flexWrap='wrap'>
@@ -112,7 +112,7 @@ export default function AppointmentInfoCard({
                                 </Typography>
                             </Grid>
 
-                            <Grid size={{ xs: 12, sm: 6 }}>
+                            {/* <Grid size={{ xs: 12, sm: 6 }}>
                                 <Typography variant='body2'>
                                     <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
                                         Fin:{' '}
@@ -121,7 +121,7 @@ export default function AppointmentInfoCard({
                                         ? formatDateTimeUTC(appointment.endTime)
                                         : '—'}
                                 </Typography>
-                            </Grid>
+                            </Grid> */}
 
                             {appointment.notes && (
                                 <Grid size={12}>
@@ -168,7 +168,7 @@ export default function AppointmentInfoCard({
                                     Cancelar
                                 </Button>
                             )}
-                            <Button
+                            {(isCheckedIn(appointment) || isScheduled(appointment)) && <Button
                                 variant='text'
                                 startIcon={<EditIcon />}
                                 component={Link}
@@ -176,7 +176,7 @@ export default function AppointmentInfoCard({
                                 state={{ from: `/appointments/${appointment.uuid}` }}
                             >
                                 Editar
-                            </Button>
+                            </Button>}
                         </Stack>
                     </Grid>
                 </Grid>

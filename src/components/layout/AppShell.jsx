@@ -20,7 +20,7 @@ export default function AppShell({ children }) {
                 setOpen={handleDrawerOpen}
                 setClose={handleDrawerClose}
             />
-            <Stack sx={{ width: '100%', height: '100%' }}>
+            <Stack sx={{ width: '100%', height: '100%', pb: 2 }}>
                 <Header open={drawerOpen} />
 
                 {/* Main content of the site, dynamically added */}

@@ -67,23 +67,6 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                     onClick={() => onCheckIn(row)}
                 />
             )}
-            {/* {!isCompleted(row) && isCheckedIn(row) && (
-                <GridActionsCellItem
-                    icon={
-                        <Tooltip title='Registrar diagnóstico y tratamiento'>
-                            <MedicalInformationIcon color='success' />
-                        </Tooltip>
-                    }
-                    label='Registrar resultado clínico'
-                    onClick={() => onAddClinicalData(row)}
-                />
-            )} */}
-            <GridActionsCellItem
-                showInMenu
-                icon={<VisibilityIcon />}
-                label='Ver cita en detalle'
-                onClick={() => onCheckIn(row)}
-            ></GridActionsCellItem>
             <GridActionsCellItem
                 showInMenu
                 icon={<EditIcon />}
@@ -104,8 +87,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
     );
 }
 
-export default function AppointmentsTable({ appointments, setError }) {
-    const [searchText, setSearchText] = useState('');
+export default function AppointmentsTable({ appointments, setError, searchText }) {
     const navigate = useNavigate();
     const filteredAppointments = useSearchFilter(appointments, searchText, [
         'id',
@@ -277,9 +259,6 @@ export default function AppointmentsTable({ appointments, setError }) {
             <BasicTableLayout
                 rows={computedAppointments}
                 columns={columns}
-                searchValue={searchText}
-                searchPlaceholder={'Busca por ID, motivo, paciente, profesional'}
-                onSearchChange={(e) => setSearchText(e.target.value)}
                 sorting={{
                     sortModel: [{ field: 'priority', sort: 'asc' }],
                 }}
@@ -287,18 +266,6 @@ export default function AppointmentsTable({ appointments, setError }) {
                 onRowClick={(params) => {
                     navigate(`/appointments/${params.row.uuid}`);
                 }}
-                actions={
-                    <Button
-                        variant='contained'
-                        component={Link}
-                        to='/appointments/new'
-                        startIcon={<PersonAddAltIcon />}
-                        loadingPosition='start'
-                        sx={{ mr: 2 }}
-                    >
-                        Añadir cita
-                    </Button>
-                }
             />
         </>
     );

@@ -31,7 +31,7 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
     });
 
     const [error, setError] = useState(null);
-    const {refetch} = useDiagnosesByAppointment(appointment.uuid);
+    const { refetch } = useDiagnosesByAppointment(appointment.uuid);
 
     const onSubmit = async (data) => {
         try {
@@ -49,7 +49,7 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                         user: {
                             id: appointment.userId,
                         },
-                        role: "AUTHOR"
+                        role: 'AUTHOR',
                     },
                 ],
 
@@ -58,15 +58,14 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                 },
 
                 appointment: {
-                    id: appointment.id
-                }
+                    id: appointment.id,
+                },
             });
 
             reset();
             refetch();
             handleClose();
         } catch (err) {
-            console.log(err)
             handleApiError(err, setError, setFormError);
         }
     };
@@ -86,7 +85,13 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                         label='Nombre del diagnóstico'
                         name='diagnosis.name'
                         register={register}
-                        rules={{ required: 'El nombre es obligatorio' }}
+                        rules={{
+                            required: 'El nombre es obligatorio',
+                            maxLength: {
+                                value: 100,
+                                message: 'Máximo 100 caracteres',
+                            },
+                        }}
                         errors={errors}
                     />
                 </Grid>
@@ -126,6 +131,12 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                         label='Descripción'
                         name='diagnosis.description'
                         register={register}
+                        rules={{
+                            maxLength: {
+                                value: 1000,
+                                message: 'Máximo 1000 caracteres',
+                            },
+                        }}
                         errors={errors}
                         others={{ multiline: true, rows: 3 }}
                     />
@@ -137,6 +148,12 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                         name='diagnosis.notes'
                         register={register}
                         errors={errors}
+                        rules={{
+                            maxLength: {
+                                value: 2000,
+                                message: 'Máximo 2000 caracteres',
+                            },
+                        }}
                         others={{ multiline: true, rows: 4 }}
                     />
                 </Grid>

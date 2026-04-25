@@ -41,6 +41,11 @@ export async function getFilteredPatients(query, limit = 20) {
     return response.data;
 }
 
+export async function getPatientHistory(uuid) {
+    const response = await axios.get(`/patients/${uuid}/history`)
+    return response.data; 
+}
+
 // ===== UPDATE =====
 
 export async function updatePatient(uuid, patientData) {

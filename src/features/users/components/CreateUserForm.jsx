@@ -14,6 +14,8 @@ import { handleApiError } from '@/utils/handle-errors';
 import { ErrorAlert } from '@/components/ui/index';
 
 import { useQueryClient } from '@tanstack/react-query';
+import { ContentLayout } from '@/components/layout';
+import { AppBreadcrumbs } from '@/components/navigation';
 
 export default function CreateUserForm() {
     const {
@@ -33,7 +35,7 @@ export default function CreateUserForm() {
         try {
             await createUser(data);
             refetchUsers();
-            await queryClient.invalidateQueries({ queryKey: ['users', {agendaUuid: data.agenda.uuid}] });
+            await queryClient.invalidateQueries({ queryKey: ['users', { agendaUuid: data.agenda.uuid }] });
             navigate('/users');
         } catch (err) {
             handleApiError(err, setError, setFormError);
@@ -41,7 +43,7 @@ export default function CreateUserForm() {
     };
 
     return (
-        <BasicFormLayout>
+        <BasicFormLayout drawer={false}>
             <Paper variant='surface-form-outlined' sx={{ width: '480px', p: 4 }}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <Grid container spacing={1} sx={{ p: 1 }}>
@@ -58,6 +60,10 @@ export default function CreateUserForm() {
                                 register={register}
                                 rules={{
                                     required: 'El nombre es obligatorio',
+                                    maxLength: {
+                                        value: 50,
+                                        message: 'Máximo 50 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -70,6 +76,10 @@ export default function CreateUserForm() {
                                 register={register}
                                 rules={{
                                     required: 'Los apellidos son obligatorios',
+                                    maxLength: {
+                                        value: 60,
+                                        message: 'Máximo 60 caracteres',
+                                    },
                                 }}
                                 errors={errors}
                             />
@@ -82,19 +92,51 @@ export default function CreateUserForm() {
                                 register={register}
                                 rules={{
                                     required: 'El correo es obligatorio',
+                                    maxLength: {
+                                        value: 100,
+                                        message: 'Máximo 100 caracteres',
+                                    },
+                                    pattern: {
+                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                        message: 'Formato inválido. Ejemplo: nombre@ejemplo.com',
+                                    },
                                 }}
                                 errors={errors}
                             />
                         </Grid>
                         <Grid size={12}>
-                            <PasswordInput register={register} errors={errors} />
+                            <PasswordInput
+                                register={register}
+                                errors={errors}
+                                rules={{
+                                    required: 'La contraseña es obligatoria',
+                                    minLength: {
+                                        value: 6,
+                                        message: 'Mínimo 6 caracteres',
+                                    },
+                                    maxLength: {
+                                        value: 255,
+                                        message: 'Máximo 255 caracteres',
+                                    },
+                                }}
+                            />
                         </Grid>
                         <Grid size={12}>
                             <BasicTextInput
                                 label='Teléfono'
                                 name='phone'
                                 register={register}
-                                rules={{ required: 'El teléfono es obligatorio' }}
+                                rules={{
+                                    required: 'El teléfono es obligatorio',
+                                    maxLength: {
+                                        value: 20,
+                                        message: 'Máximo 20 caracteres',
+                                    },
+                                    pattern: {
+                                        value: /^[0-9+()\s-]+$/,
+                                        message: 'Formato inválido. Ejemplo: 612345678 o +34 612 345 678',
+                                    },
+                                }}
                                 placeholder='999999999'
                                 type='tel'
                                 errors={errors}
@@ -108,7 +150,7 @@ export default function CreateUserForm() {
                             />
                         </Grid>
                         <Grid size={12}>
-                            <RoleAutocomplete control={control} rules={{required: "El rol es obligatorio."}} />
+                            <RoleAutocomplete control={control} rules={{ required: 'El rol es obligatorio.' }} />
                         </Grid>
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>

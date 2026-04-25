@@ -4,6 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
+import { translate } from '@/utils/translation.utils';
 
 export default function UserAutocomplete({ control, name, rules, multiple = false }) {
     const [options, setOptions] = useState([]);
@@ -45,7 +46,7 @@ export default function UserAutocomplete({ control, name, rules, multiple = fals
                     isOptionEqualToValue={(option, value) => option.id === value?.id}
                     getOptionLabel={(option) => {
                         if (!option) return ''; 
-                        const roles = option.roles?.map((r) => r.name).join(', ') ?? '';
+                        const roles = option.roles?.map((r) => translate(r.name)).join(', ') ?? '';
                         return `${option.name ?? ''} ${option.surname ?? ''}${roles ? ` — ${roles}` : ''}`;
                     }}
                     onInputChange={(_, value) => fetchUsers(value)}

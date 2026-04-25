@@ -4,3 +4,4 @@ export {default as AgendaAutocomplete} from '@/components/forms/autocompletes/Ag
 export {default as AppointmentAutocomplete} from '@/components/forms/autocompletes/AppointmentAutocomplete'; 
 export {default as DiagnosisAutocomplete} from '@/components/forms/autocompletes/DiagnosisAutocomplete'; 
 export {default as RoleAutocomplete} from '@/components/forms/autocompletes/RoleAutocomplete'; 
+export {default as ClinicalDocumentAutocomplete} from '@/components/forms/autocompletes/ClinicalDocumentAutocomplete'; 

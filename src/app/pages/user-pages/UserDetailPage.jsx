@@ -30,7 +30,7 @@ export default function UserDetailPage() {
             <DetailLayout>
                 <Stack sx={{ p: { xs: 2, md: 3 }, width: '100%' }} spacing={3}>
                     <UserInfoCard user={user} />
-                    <UserAppointmentsTable appointments={appointments} setError={setError} refetch={refetchAppointments} />
+                    <UserAppointmentsTable user={user} appointments={appointments} setError={setError} refetch={refetchAppointments} />
                 </Stack>
             </DetailLayout>
         </ContentLayout>

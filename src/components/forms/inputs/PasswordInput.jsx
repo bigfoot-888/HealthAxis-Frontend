@@ -11,7 +11,7 @@ import { IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 
-export default function PasswordInput({errors, register}) {
+export default function PasswordInput({errors, register, rules}) {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -39,9 +39,7 @@ export default function PasswordInput({errors, register}) {
                     </InputAdornment>
                 }
                 label='Contraseña'
-                {...register('password', {
-                    required: 'La contraseña es obligatoria',
-                })}
+                {...register('password', rules)}
             />
             <FormHelperText>{errors.password?.message || ' '}</FormHelperText>
         </FormControl>

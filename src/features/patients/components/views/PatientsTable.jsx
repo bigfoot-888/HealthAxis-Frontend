@@ -25,16 +25,6 @@ import { formatCreatedAt } from '@/utils/date-formatters';
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
-            {/* <GridActionsCellItem
-                icon={
-                    <Tooltip title='Ver paciente'>
-                        <VisibilityIcon color='primary' />
-                    </Tooltip>
-                }
-                label='Ver paciente'
-                component={Link}
-                to={`/patients/${row.uuid}/detail`}
-            ></GridActionsCellItem> */}
             {row.status === 'ACTIVE' && (
                 <GridActionsCellItem
                     icon={<DeleteIcon />}

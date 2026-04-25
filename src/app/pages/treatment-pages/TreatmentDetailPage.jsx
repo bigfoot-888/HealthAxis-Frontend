@@ -26,29 +26,21 @@ export default function TreatmentDetailPage() {
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)} drawer={false}>
-            <AppBreadcrumbs
-                items={[{ label: 'Tratamientos', to: '/clinical-records/treatments' }, { label: treatment.name }]}
-            />
-
             <Grid container spacing={2}>
-                {/* Top: Treatment Info */}
                 <Grid size={12}>
                     <TreatmentInfoCard treatment={treatment} />
                 </Grid>
 
-                {/* Patient */}
                 <Grid size={{ xs: 12, md: 6 }}>
                     <PatientSummaryCard patient={treatment.patient} />
                 </Grid>
 
-                {/* Diagnosis (key difference vs diagnosis view) */}
                 {treatment.diagnosis && (
                     <Grid size={{ xs: 12, md: 6 }}>
                         <DiagnosisSummaryCard diagnosis={treatment.diagnosis} />
                     </Grid>
                 )}
 
-                {/* Appointment (optional) */}
                 {treatment.appointment && (
                     <Grid size={{ xs: 12, md: 6 }}>
                         <AppointmentSummaryCard appointment={treatment.appointment} />

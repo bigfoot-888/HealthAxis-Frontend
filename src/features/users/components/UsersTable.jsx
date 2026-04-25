@@ -18,7 +18,7 @@ import { ContentLayout } from '@/components/layout/index';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
 
-import { ROLE_LABELS } from '@/config/roles'; 
+import { ROLE_LABELS } from '@/config/roles';
 import { UserStatusChip } from '@users/components/ui/UserChips';
 import { formatCreatedAt } from '@/utils/date-formatters';
 
@@ -26,17 +26,24 @@ function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             {row.status === 'ACTIVE' && (
-                <GridActionsCellItem icon={<DeleteIcon />} label='Delete' onClick={() => onDelete(row)} />
+                <GridActionsCellItem icon={<DeleteIcon />} showInMenu label='Delete' onClick={() => onDelete(row)} />
             )}
             {row.status === 'INACTIVE' && (
-                <GridActionsCellItem icon={<RestoreIcon />} label='Restore' onClick={() => onReactivate(row)} />
+                <GridActionsCellItem
+                    icon={<RestoreIcon />}
+                    showInMenu
+                    label='Restore'
+                    onClick={() => onReactivate(row)}
+                />
             )}
 
             <GridActionsCellItem
                 icon={<EditIcon />}
+                showInMenu
                 label='Edit'
                 component={Link}
                 to={`/users/edit/${row.uuid}`}
+                state={{ from: `/users` }}
             ></GridActionsCellItem>
         </GridActionsCell>
     );
@@ -48,7 +55,7 @@ export default function UsersTable({ users }) {
 
     const filteredUsers = useSearchFilter(users, searchText, ['id', 'name', 'surname', 'email']);
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const { refetch } = useUsers();
     const [userToDelete, setUserToDelete] = useState(null);
     const [userToReactivate, setUserToReactivate] = useState(null);
@@ -68,7 +75,7 @@ export default function UsersTable({ users }) {
     };
 
     const handleCloseAlertDialog = (e) => {
-        setError(null); 
+        setError(null);
         setUserToDelete(null);
     };
 
@@ -85,7 +92,7 @@ export default function UsersTable({ users }) {
     };
 
     const handleCloseReactivateDialog = (e) => {
-        setError(null); 
+        setError(null);
         setUserToReactivate(null);
     };
 
@@ -172,7 +179,7 @@ export default function UsersTable({ users }) {
                 title={`¿Reactivar la cuenta de ${!!userToReactivate && userToReactivate.name + ' ' + userToReactivate.surname}?`}
                 content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
                 error={error}
-                onErrorClose={()=>setError(null)}
+                onErrorClose={() => setError(null)}
             />
             <AlertDialog
                 open={!!userToDelete}
@@ -182,9 +189,12 @@ export default function UsersTable({ users }) {
                 content='Esta acción es reversible. Si el usuario tiene alguna dependencia activa en el sistema
                 se cancelará el proceso. En caso contrario, el usuario será dado de baja. '
                 error={error}
-                onErrorClose={()=>setError(null)}
+                onErrorClose={() => setError(null)}
             />
-            <ContentLayout error={!userToDelete && !userToReactivate ? error : null} onErrorClose={() => setError(null)}>
+            <ContentLayout
+                error={!userToDelete && !userToReactivate ? error : null}
+                onErrorClose={() => setError(null)}
+            >
                 <BasicTableLayout
                     rows={filteredUsers}
                     columns={columns}
