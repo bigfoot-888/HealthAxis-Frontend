@@ -6,23 +6,49 @@ import AgendaPeriodsTable from '@agendas/components/views/AgendaPeriodsTable';
 import EditAgendaForm from '@agendas/components/EditAgendaForm';
 import CreateAgendaPeriodForm from '@agendas/components/CreatePeriodForm';
 
-import { useAgendaContext } from '@agendas/hooks/useAgendaContext';
+import { ContentLayout } from '@/components/layout';
+import { Box } from '@mui/material';
+import { useParams } from 'react-router';
 
+import { useAgenda } from '@agendas/hooks/useAgenda';
+
+import { DetailSectionHeader } from '@/components/ui';
+import { AppBreadcrumbs } from '@/components/navigation';
+import { useUsersByAgenda } from '@users/hooks/useUsersByAgenda';
+
+import AgendaUsersTable from '@/features/users/components/views/AgendaUsersTable';
+import { CustomCircularProgress } from '@/components/feedback';
 import { DetailLayout } from '@/components/entity-detail';
-import { Stack } from '@mui/material';
 
 export default function AgendaDetailPage() {
-    const { setError, agenda } = useAgendaContext();
-
+    const { uuid } = useParams();
+    const {
+        data: agenda,
+        isLoading: agendaIsLoading,
+        error: agendaFetchError,
+        refetch: refetchAgenda,
+    } = useAgenda(uuid);
+    const {
+        data: users,
+        isLoading: usersIsLoading,
+        error: usersFetchError,
+        refetch: refetchUsers,
+    } = useUsersByAgenda(uuid);
     const [agendaToEdit, setAgendaToEdit] = useState(null);
     const [agendaForNewPeriod, setAgendaForNewPeriod] = useState(null);
 
-    if (!agenda) return null;
+    if (agendaIsLoading || usersIsLoading) return <CustomCircularProgress />;
+    if (agendaFetchError || usersFetchError) return <p>Error al cargar la agenda.</p>;
 
     return (
         <>
             {agendaToEdit && (
-                <EditAgendaForm agenda={agendaToEdit} handleClose={() => setAgendaToEdit(null)} setError={setError} />
+                <EditAgendaForm
+                    agenda={agendaToEdit}
+                    handleClose={() => setAgendaToEdit(null)}
+                    setError={setError}
+                    refetch={refetchAgenda}
+                />
             )}
 
             {agendaForNewPeriod && (
@@ -30,16 +56,31 @@ export default function AgendaDetailPage() {
                     agenda={agendaForNewPeriod}
                     handleClose={() => setAgendaForNewPeriod(null)}
                     setError={setError}
+                    refetch={refetchAgenda}
                 />
             )}
 
-            <DetailLayout>
-                <Stack sx={{ p: { xs: 2, md: 3 }, width: '100%' }} spacing={3}>
-                    <AgendaInfoCard agenda={agenda} onEdit={setAgendaToEdit} onCreatePeriod={setAgendaForNewPeriod} />
-
-                    <AgendaPeriodsTable periods={agenda.periods || []} />
-                </Stack>
-            </DetailLayout>
+            <ContentLayout>
+                <DetailLayout>
+                    <AppBreadcrumbs items={[{ label: 'Agendas', to: '/agendas' }, { label: `${agenda.name}` }]} />
+                    <Box>
+                        <DetailSectionHeader label='Información de la Agenda' marginTop={false} />
+                        <AgendaInfoCard
+                            agenda={agenda}
+                            onEdit={setAgendaToEdit}
+                            onCreatePeriod={setAgendaForNewPeriod}
+                        />
+                    </Box>
+                    <Box>
+                        <DetailSectionHeader label='Periodos asociados' />
+                        <AgendaPeriodsTable periods={agenda.periods || []} />
+                    </Box>
+                    <Box>
+                        <DetailSectionHeader label='Usuarios asociados' />
+                        <AgendaUsersTable users={users} />
+                    </Box>
+                </DetailLayout>
+            </ContentLayout>
         </>
     );
 }

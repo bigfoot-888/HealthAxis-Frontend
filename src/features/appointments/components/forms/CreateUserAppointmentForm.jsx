@@ -9,7 +9,7 @@ import { FormDialog } from '@/components/dialogs';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { createAppointment } from '@appointments/api/appointment.api';
-import { useAppointments } from '@appointments/hooks/useAppointments';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CreateUserAppointmentForm({ open, handleClose, user, refetch }) {
     const {
@@ -27,19 +27,15 @@ export default function CreateUserAppointmentForm({ open, handleClose, user, ref
     });
 
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
-            await createAppointment({
-                ...data,
-                user: {
-                    id: user.id,
-                },
-            });
-
+            await createAppointment({ ...data, user: { id: user.id } });
             reset();
             refetch();
             handleClose();
+            showSnackbar({ message: 'Cita creada correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

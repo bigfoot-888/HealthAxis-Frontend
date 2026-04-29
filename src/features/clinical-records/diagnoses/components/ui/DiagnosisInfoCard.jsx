@@ -1,108 +1,137 @@
-import { Card, CardContent, Grid, Typography, Divider, Box, Stack } from '@mui/material';
-
+import { Grid, Card, CardContent, Typography, Divider, Box, Stack } from '@mui/material';
 import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 
 import { formatDateTimeUTC } from '@/utils/date-formatters';
-
 import { DiagnosisClinicalStatusChip, DiagnosisSeverityChip } from '@diagnoses/components/ui/DiagnosisChips';
+import { DataItem, PrimaryInfoCard } from '@/components/ui';
+import { DiagnosisStatusChip } from './DiagnosisChips';
 
 export default function DiagnosisInfoCard({ diagnosis }) {
     if (!diagnosis) return null;
 
     return (
-        <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+        <PrimaryInfoCard>
             <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                <Grid container spacing={3} alignItems='flex-start'>
-                    {/* Icon */}
-                    <Grid>
+                <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent='space-between'
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    spacing={3}
+                >
+                    <Box display='flex' gap={2} alignItems='flex-start' flex={1}>
                         <Box
                             sx={{
-                                width: 80,
-                                height: 80,
+                                width: 56,
+                                height: 56,
+                                flexShrink: 0,
                                 borderRadius: 2,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                bgcolor: 'grey.300',
-                                color: 'grey.800',
+                                bgcolor: 'primary.container',
+                                color: 'primary.onContainer',
                             }}
                         >
-                            <MedicalInformationIcon sx={{ fontSize: '2rem' }} />
+                            <MedicalInformationIcon sx={{ fontSize: '1.75rem' }} />
                         </Box>
-                    </Grid>
 
-                    {/* Main info */}
-                    <Grid size={{ xs: 12, sm: 'grow' }}>
-                        {/* Title */}
-                        <Typography variant='h4' sx={{ fontWeight: 600 }} mb={1}>
-                            {diagnosis.name}
-                        </Typography>
-
-                        {/* Description */}
-                        {diagnosis.description && (
-                            <Typography variant='body1' color='text.secondary' mb={2}>
-                                {diagnosis.description}
+                        <Box>
+                            <Typography variant='h5' sx={{ fontWeight: 600, color: 'onSurface', mb: 0.5 }}>
+                                {diagnosis.name}
                             </Typography>
-                        )}
 
-                        <Divider sx={{ my: 1.5 }} />
-
-                        <Grid container spacing={2}>
-                            {/* Severity */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Stack direction='row' spacing={1} alignItems='center'>
-                                    <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Gravedad:
-                                    </Typography>
-                                    <DiagnosisSeverityChip value={diagnosis.severity} />
-                                </Stack>
-                            </Grid>
-
-                            {/* Clinical status */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Stack direction='row' spacing={1} alignItems='center'>
-                                    <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Estado clínico:
-                                    </Typography>
-                                    <DiagnosisClinicalStatusChip value={diagnosis.clinicalStatus} />
-                                </Stack>
-                            </Grid>
-
-                            {/* Diagnosed at */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant='body2'>
-                                    <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Diagnosticado el:{' '}
-                                    </Box>
-                                    {formatDateTimeUTC(diagnosis.diagnosedAt)}
+                            {diagnosis.description && (
+                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant' }}>
+                                    {diagnosis.description}
                                 </Typography>
-                            </Grid>
-
-                            {/* Resolved at */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant='body2'>
-                                    <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Resuelto el:{' '}
-                                    </Box>
-                                    {diagnosis.resolvedAt ? formatDateTimeUTC(diagnosis.resolvedAt) : '—'}
-                                </Typography>
-                            </Grid>
-
-                            {/* Notes */}
-                            {diagnosis.notes && (
-                                <Grid size={12}>
-                                    <Typography variant='body2'>
-                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                            Notas:{' '}
-                                        </Box>
-                                        {diagnosis.notes}
-                                    </Typography>
-                                </Grid>
                             )}
-                        </Grid>
+                        </Box>
+                    </Box>
+
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={2}
+                        alignItems={{ xs: 'flex-start', sm: 'flex-end' }}
+                        sx={{ flexShrink: 0 }}
+                    >
+                        <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
+                            <Typography
+                                variant='caption'
+                                sx={{
+                                    color: 'onSurfaceVariant',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 0.5,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Gravedad
+                            </Typography>
+                            <DiagnosisSeverityChip value={diagnosis.severity} />
+                        </Stack>
+
+                        <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
+                            <Typography
+                                variant='caption'
+                                sx={{
+                                    color: 'onSurfaceVariant',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 0.5,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Estado clínico
+                            </Typography>
+                            <DiagnosisClinicalStatusChip value={diagnosis.clinicalStatus} />
+                        </Stack>
+
+                        <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
+                            <Typography
+                                variant='caption'
+                                sx={{
+                                    color: 'onSurfaceVariant',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 0.5,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Estado
+                            </Typography>
+                            <DiagnosisStatusChip value={diagnosis.status} />
+                        </Stack>
+                    </Stack>
+                </Stack>
+
+                <Divider sx={{ my: 3, borderColor: 'outlineVariant' }} />
+
+                <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem label='Diagnosticado el' value={formatDateTimeUTC(diagnosis.diagnosedAt)} />
                     </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem
+                            label='Resuelto el'
+                            value={diagnosis.resolvedAt ? formatDateTimeUTC(diagnosis.resolvedAt) : null}
+                        />
+                    </Grid>
+
+                    {diagnosis.notes && (
+                        <Grid size={12}>
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    bgcolor: 'surfaceContainerLowest',
+                                    border: '1px solid',
+                                    borderColor: 'outlineVariant',
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <DataItem label='Notas adicionales' value={diagnosis.notes} />
+                            </Box>
+                        </Grid>
+                    )}
                 </Grid>
             </CardContent>
-        </Card>
+        </PrimaryInfoCard>
     );
 }

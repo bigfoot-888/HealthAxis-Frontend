@@ -3,9 +3,11 @@ import { Autocomplete, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getRoles } from '../../../shared/api/formDataApi';
 import { ROLE_LABELS } from '../../../config/roles';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function RoleAutocomplete({ control, rules }) {
     const [roles, setRoles] = useState([]);
+    const { showSnackbar } = useSnackbar();
 
     useEffect(() => {
         async function fetchRoles() {
@@ -13,7 +15,7 @@ export default function RoleAutocomplete({ control, rules }) {
                 const res = await getRoles();
                 setRoles(res);
             } catch (err) {
-                console.error('Error fetching roles:', err);
+                showSnackbar({ message: 'Error al obtener roles', severity: 'error' });
             }
         }
 

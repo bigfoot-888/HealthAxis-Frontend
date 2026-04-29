@@ -3,10 +3,12 @@ import { useState, useRef } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Controller } from 'react-hook-form';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function ClinicalDocumentAutocomplete({ control, rules = {}, multiple = false }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null);
+    const { showSnackbar } = useSnackbar();
 
     const fetchDocuments = (query) => {
         if (debounceTimeout.current) {
@@ -21,10 +23,9 @@ export default function ClinicalDocumentAutocomplete({ control, rules = {}, mult
         debounceTimeout.current = setTimeout(async () => {
             try {
                 const res = await getFilteredClinicalDocuments(query, 20);
-                console.log(res)
                 setOptions(res);
             } catch (err) {
-                console.error('Error fetching clinical documents:', err);
+                showSnackbar({ message: 'Error al obtener documentos', severity: 'error' });
             }
         }, 200);
     };

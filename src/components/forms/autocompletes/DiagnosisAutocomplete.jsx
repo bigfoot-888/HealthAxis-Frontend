@@ -4,10 +4,12 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function DiagnosisAutocomplete({ control, rules={}, multiple = false }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null);
+    const { showSnackbar } = useSnackbar();
 
     const fetchDiagnoses = (query) => {
         if (debounceTimeout.current) {
@@ -24,7 +26,7 @@ export default function DiagnosisAutocomplete({ control, rules={}, multiple = fa
                 const res = await getDiagnoses({ query, limit: 20 });
                 setOptions(res);
             } catch (err) {
-                console.error('Error fetching users:', err);
+                showSnackbar({ message: 'Error al obtener diagnósticos', severity: 'error' });
             }
         }, 200);
     };

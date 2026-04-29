@@ -16,25 +16,28 @@ import { useState } from 'react';
 import { ContentLayout } from '@/components/layout';
 import { AppBreadcrumbs } from '@/components/navigation';
 
-import { Grid, Stack } from '@mui/material';
+import { Grid, Stack, Box, Typography } from '@mui/material';
 
 import AlertDialog from '@/components/dialogs/AlertDialog';
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
 
 import { handleApiError } from '@/utils/handle-errors';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
+import { DetailSectionHeader, RelatedEntityContainer } from '@/components/ui';
+import { DetailLayout } from '@/components/entity-detail';
+
 export default function AppointmentDetailPage() {
     const { uuid } = useParams();
-
     const { data: appointment, isLoading, error: fetchError, refetch: refetchAppointment } = useAppointment(uuid);
 
     const appointmentUuid = appointment?.uuid;
-
     const { data: diagnoses = [], refetch: refetchDiagnoses } = useDiagnosesByAppointment(appointmentUuid);
-
     const { data: treatments = [], refetch: refetchTreatments } = useTreatmentsByAppointment(appointmentUuid);
 
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
@@ -47,6 +50,7 @@ export default function AppointmentDetailPage() {
                 refetchAppointment();
             }
             setAppointmentToComplete(null);
+            showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -59,18 +63,17 @@ export default function AppointmentDetailPage() {
                 refetchAppointment();
             }
             setAppointmentToCheckIn(null);
+            showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
     };
 
-    if (fetchError) return <p>Failed to load appointment</p>;
+    if (fetchError) return <p>Error al cargar citas</p>;
     if (isLoading || !appointment) return <CustomCircularProgress />;
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
-            <AppBreadcrumbs items={[{ label: 'Citas', to: '/appointments' }, { label: `${appointment.reason}` }]} />
-
             {appointmentToComplete && (
                 <AlertDialog
                     open
@@ -98,41 +101,57 @@ export default function AppointmentDetailPage() {
                     refetch={refetchAppointment}
                 />
             )}
+            <DetailLayout>
+                <AppBreadcrumbs items={[{ label: 'Citas', to: '/appointments' }, { label: `${appointment.reason}` }]} />
 
-            {/* Layout */}
-            <Grid container spacing={2}>
-                {/* Top: Appointment Info */}
-                <Grid size={12}>
+                <Box>
+                    <DetailSectionHeader label='Información de la Cita' marginTop={false} />
                     <AppointmentInfoCard
                         appointment={appointment}
                         onCheckIn={setAppointmentToCheckIn}
                         onComplete={setAppointmentToComplete}
                         onCancel={setAppointmentToCancel}
                     />
-                </Grid>
+                </Box>
 
-                {/* Middle: Summary Cards */}
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <PatientSummaryCard patient={appointment.patient} />
-                </Grid>
+                {/* Patient and user */}
+                <Box>
+                    <DetailSectionHeader label='Contexto de la Visita' />
+                    <Grid container spacing={3}>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <RelatedEntityContainer label='Paciente'>
+                                <PatientSummaryCard patient={appointment.patient} />
+                            </RelatedEntityContainer>
+                        </Grid>
 
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <UserSummaryCard user={appointment.user} />
-                </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <RelatedEntityContainer label='Profesional asignado'>
+                                <UserSummaryCard user={appointment.user} />
+                            </RelatedEntityContainer>
+                        </Grid>
+                    </Grid>
+                </Box>
 
-                {/* Bottom: Tables */}
-                <Grid size={12}>
-                    <Stack spacing={2}>
+                {/* Diagnoses */}
+                <Box>
+                    <DetailSectionHeader label='Diagnósticos Realizados' />
+                    <Box sx={{ px: 1 }}>
                         <AppointmentDiagnosesTable
                             diagnoses={diagnoses}
                             appointment={appointment}
                             refetch={refetchDiagnoses}
                         />
+                    </Box>
+                </Box>
 
+                {/* Treatments */}
+                <Box>
+                    <DetailSectionHeader label='Tratamientos Prescritos' />
+                    <Box sx={{ px: 1 }}>
                         <AppointmentTreatmentsTable treatments={treatments} refetch={refetchTreatments} />
-                    </Stack>
-                </Grid>
-            </Grid>
+                    </Box>
+                </Box>
+            </DetailLayout>
         </ContentLayout>
     );
 }

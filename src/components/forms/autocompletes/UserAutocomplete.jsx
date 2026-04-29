@@ -5,10 +5,12 @@ import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { translate } from '@/utils/translation.utils';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function UserAutocomplete({ control, name, rules, multiple = false }) {
     const [options, setOptions] = useState([]);
     const debounceTimeout = useRef(null);
+    const { showSnackbar } = useSnackbar();
 
     const fetchUsers = (query) => {
         if (debounceTimeout.current) {
@@ -25,7 +27,7 @@ export default function UserAutocomplete({ control, name, rules, multiple = fals
                 const res = await getUsers({ query, limit: 20 });
                 setOptions(res);
             } catch (err) {
-                console.error('Error fetching users:', err);
+                showSnackbar({ message: 'Error al obtener usuarios', severity: 'error' });
             }
         }, 200);
     };

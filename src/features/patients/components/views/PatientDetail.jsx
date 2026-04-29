@@ -13,7 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { calculateAge, translateSex } from '@patients/utils/patient.utils';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { Link } from 'react-router';
-
+import PatientInfoCard from '@patients/components/ui/PatientInfoCard';
 export default function PatientDetail() {
     const { setError, patient, uuid } = usePatientContext();
 
@@ -27,118 +27,8 @@ export default function PatientDetail() {
 
     return (
         <DetailLayout>
-            <Stack sx={{ p: { xs: 2, md: 3 } }} spacing={3}>
-                <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-                    <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                        <Grid container spacing={3} alignItems='flex-start'>
-                            <Grid>
-                                <Avatar
-                                    sx={{
-                                        width: 80,
-                                        height: 80,
-                                        fontSize: '2rem',
-                                        bgcolor: 'grey.300',
-                                        color: 'grey.800',
-                                    }}
-                                >
-                                    {initials}
-                                </Avatar>
-                            </Grid>
-
-                            <Grid size={{ xs: 12, sm: 'grow' }}>
-                                <Stack direction='row' spacing={2} alignItems='center' mb={1} flexWrap='wrap'>
-                                    <Typography variant='h4' sx={{ fontWeight: 600, color: 'text.primary' }}>
-                                        {patientSurname}, {patientName}
-                                    </Typography>
-                                    <Chip
-                                        label={patient.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
-                                        color={patient.status === 'ACTIVE' ? 'success' : 'default'}
-                                        size='small'
-                                        variant='outlined'
-                                    />
-                                </Stack>
-
-                                <Stack direction='row' spacing={3} mb={2}>
-                                    <Typography variant='body1'>
-                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                            NHC:{' '}
-                                        </Box>
-                                        {patient.nhc}
-                                    </Typography>
-                                    <Typography variant='body1'>
-                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                            DNI:{' '}
-                                        </Box>
-                                        {patient.dni}
-                                    </Typography>
-                                </Stack>
-
-                                <Divider sx={{ my: 1.5 }} />
-
-                                <Grid container spacing={2}>
-                                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Edad:{' '}
-                                            </Box>
-                                            {age} años
-                                        </Typography>
-                                    </Grid>
-                                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Sexo:{' '}
-                                            </Box>
-                                            {translateSex(patient.sex)}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Teléfono:{' '}
-                                            </Box>
-                                            {patient.phone}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Email:{' '}
-                                            </Box>
-                                            {patient.email}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid size={12}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Dirección:{' '}
-                                            </Box>
-                                            {patient.addressLine1 +
-                                                (patient.addressLine2 ? ', ' + patient.addressLine2 : '')}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-
-                            <Grid size={{ xs: 12, md: 'auto' }}>
-                                <Stack direction={{ xs: 'column', sm: 'row', md: 'column' }} spacing={1.5}>
-                                    <Button
-                                        variant='contained'
-                                        startIcon={<AddIcon />}
-                                        disableElevation
-                                        size='large'
-                                        sx={{ px: 3 }}
-                                    >
-                                        Nueva Cita
-                                    </Button>
-                                    <Button variant='text' startIcon={<EditIcon />} color='inherit' component={Link} to={`/patients/edit/${uuid}`} state={{ from: `/patients/${uuid}` }}>
-                                        Editar
-                                    </Button>
-                                </Stack>
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
+            <Stack sx={{ p: { xs: 2, md: 3 }, width: '100%' }} spacing={3}>
+                <PatientInfoCard patient={patient}/>
 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 4 }}>

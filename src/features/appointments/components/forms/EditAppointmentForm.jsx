@@ -16,6 +16,8 @@ import { handleApiError } from '@/utils/handle-errors';
 import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointment } from '@appointments/api/appointment.api';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function EditAppointmentForm({ appointment, uuid }) {
     const {
         register,
@@ -35,6 +37,7 @@ export default function EditAppointmentForm({ appointment, uuid }) {
         },
     });
 
+    const { showSnackbar } = useSnackbar();
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from || '/appointments';
@@ -49,6 +52,7 @@ export default function EditAppointmentForm({ appointment, uuid }) {
             queryClient.invalidateQueries(['appointment_plain', uuid]);
             refetch();
             navigate(from);
+            showSnackbar({ message: 'Cita editada correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

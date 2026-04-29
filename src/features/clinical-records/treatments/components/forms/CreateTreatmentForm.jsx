@@ -17,10 +17,11 @@ import { useTreatments } from '@treatments/hooks/useTreatments';
 import { createTreatment } from '@treatments/api/treatment.api';
 
 import { TreatmentProfessionalsField } from '@treatments/components/ui/TreatmentProfessionals';
-import { TreatmentDiagnoses } from '@treatments/components/ui/TreatmentDiagnoses';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useQueryClient } from '@tanstack/react-query';
+
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CreateTreatmentForm() {
     const {
@@ -40,6 +41,7 @@ export default function CreateTreatmentForm() {
     const { refetch } = useTreatments();
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
@@ -47,6 +49,7 @@ export default function CreateTreatmentForm() {
             refetch();
             await queryClient.invalidateQueries({ queryKey: ['treatments', { diagnosisUuid: data.diagnosis.uuid }] });
             navigate('/clinical-records/treatments');
+            showSnackbar({ message: 'Tratamiento creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

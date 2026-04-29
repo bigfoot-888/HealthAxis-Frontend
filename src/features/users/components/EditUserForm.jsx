@@ -14,6 +14,7 @@ import { ErrorAlert } from '@/components/ui/index';
 import { BasicTextInput } from '@/components/forms/inputs/index';
 import { handleApiError } from '@/utils/handle-errors';
 import { RoleAutocomplete } from '@/components/forms/autocompletes';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function EditUserForm({ user, uuid }) {
     const {
@@ -41,12 +42,15 @@ export default function EditUserForm({ user, uuid }) {
     const { refetch } = useUsers();
     const queryClient = useQueryClient();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
+
     const onSubmit = async (data) => {
         try {
             await updateUser(uuid, data);
             queryClient.invalidateQueries(['user', uuid]);
             refetch();
             navigate(from);
+            showSnackbar({ message: 'Usuario editado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

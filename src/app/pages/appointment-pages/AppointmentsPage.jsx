@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Tabs, Box, Tab } from '@mui/material';
 
-import { BasicTableSkeleton, TableTopBar } from '@/components/tables/index';
+import { TableTopBar } from '@/components/tables/index';
 import { ContentLayout } from '@/components/layout/index';
 
 import { useAppointments } from '@appointments/hooks/useAppointments';
 import AppointmentsTable from '@appointments/components/views/AppointmentsTable';
 import AppointmentsCalendar from '@appointments/components/views/AppointmentsCalendar';
 import AppointmentsTableToolbar from '@/features/appointments/components/ui/AppointmentsTableToolBar';
+import { CustomCircularProgress } from '@/components/feedback';
 
 export default function AppointmentsPage() {
     const { data: appointments, isLoading, error: fetchError, refetch } = useAppointments();
@@ -21,6 +22,7 @@ export default function AppointmentsPage() {
         const t = setTimeout(() => setDebouncedSearch(searchText), 300);
         return () => clearTimeout(t);
     }, [searchText]);
+    
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
             <TableTopBar
@@ -34,7 +36,7 @@ export default function AppointmentsPage() {
             />
 
             {isLoading ? (
-                <BasicTableSkeleton />
+                <CustomCircularProgress />
             ) : (
                 <Box sx={{ mt: 0 }}>
                     {viewMode === 'table' ? (

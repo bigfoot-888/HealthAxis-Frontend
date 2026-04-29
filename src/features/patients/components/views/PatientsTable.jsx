@@ -16,11 +16,11 @@ import { PatientStatusChip } from '@patients/components/ui/PatientChips';
 import { AlertDialog } from '@/components/dialogs/index';
 import { BasicTableLayout, NestedTableLayout } from '@/components/tables/index';
 import { ContentLayout } from '@/components/layout/index';
-import { AppBreadcrumbs } from '@/components/navigation/index';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
 import { formatCreatedAt } from '@/utils/date-formatters';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
@@ -67,6 +67,7 @@ export default function PatientsTable({ patients }) {
     const { refetch } = usePatients();
     const [patientToDelete, setPatientToDelete] = useState(null);
     const [patientToReactivate, setPatientToReactivate] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const handlePatientsFileSelect = async (event) => {
         const file = event.target.files[0];
@@ -76,6 +77,7 @@ export default function PatientsTable({ patients }) {
             const patients = JSON.parse(text);
             await importPatients(patients);
             refetch();
+            showSnackbar({ message: 'Pacientes creados correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -94,6 +96,7 @@ export default function PatientsTable({ patients }) {
                 refetch();
             }
             setPatientToDelete(null);
+            showSnackbar({ message: 'Paciente dado de baja correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -111,6 +114,7 @@ export default function PatientsTable({ patients }) {
                 refetch();
             }
             handleCloseReactivateDialog();
+            showSnackbar({ message: 'Paciente reactivado correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }

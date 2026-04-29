@@ -17,6 +17,8 @@ import { createDiagnosis } from '@diagnoses/api/diagnosis.api';
 import { DiagnosisProfessionalsField } from '@diagnoses/components/ui/DiagnosisProfessionals';
 import { ErrorAlert } from '@/components/ui';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function CreateDiagnosisForm() {
     const {
         register,
@@ -34,13 +36,15 @@ export default function CreateDiagnosisForm() {
 
     const navigate = useNavigate();
     const { refetch } = useDiagnoses();
-    const [error, setError] = useState(); 
+    const [error, setError] = useState();
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await createDiagnosis(data);
             refetch();
             navigate('/clinical-records/diagnoses');
+            showSnackbar({ message: 'Diagnóstico creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }
@@ -55,7 +59,7 @@ export default function CreateDiagnosisForm() {
                             <Typography variant='h2'>Crear nuevo diagnóstico</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
 
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -75,13 +79,13 @@ export default function CreateDiagnosisForm() {
                                 name='name'
                                 type='text'
                                 register={register}
-rules={{
-    required: 'El nombre es obligatorio',
-    maxLength: {
-        value: 100,
-        message: 'Máximo 100 caracteres',
-    },
-}}
+                                rules={{
+                                    required: 'El nombre es obligatorio',
+                                    maxLength: {
+                                        value: 100,
+                                        message: 'Máximo 100 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                             />
                         </Grid>
@@ -121,11 +125,11 @@ rules={{
                                 register={register}
                                 errors={errors}
                                 rules={{
-    maxLength: {
-        value: 1000,
-        message: 'Máximo 1000 caracteres',
-    },
-}}
+                                    maxLength: {
+                                        value: 1000,
+                                        message: 'Máximo 1000 caracteres',
+                                    },
+                                }}
                                 others={{ multiline: true, rows: 3 }}
                             />
                         </Grid>
@@ -139,12 +143,12 @@ rules={{
                                 name='diagnosedAt'
                                 control={control}
                                 rules={{
-    required: 'La fecha es obligatoria',
-    validate: (value) => {
-        const date = new Date(value);
-        return !isNaN(date) || 'Fecha inválida';
-    },
-}}
+                                    required: 'La fecha es obligatoria',
+                                    validate: (value) => {
+                                        const date = new Date(value);
+                                        return !isNaN(date) || 'Fecha inválida';
+                                    },
+                                }}
                                 label='Fecha y hora de diagnóstico'
                             />
                         </Grid>
@@ -157,10 +161,14 @@ rules={{
                             </Typography>
                         </Grid>
                         <Grid size={12}>
-                            <DiagnosisProfessionalsField control={control} errors={errors} rules={{
-    validate: (value) =>
-        value && value.length > 0 || 'Debe haber al menos un profesional',
-}}/>
+                            <DiagnosisProfessionalsField
+                                control={control}
+                                errors={errors}
+                                rules={{
+                                    validate: (value) =>
+                                        (value && value.length > 0) || 'Debe haber al menos un profesional',
+                                }}
+                            />
                         </Grid>
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
@@ -174,11 +182,11 @@ rules={{
                                 type='text'
                                 register={register}
                                 rules={{
-    maxLength: {
-        value: 2000,
-        message: 'Máximo 2000 caracteres',
-    },
-}}
+                                    maxLength: {
+                                        value: 2000,
+                                        message: 'Máximo 2000 caracteres',
+                                    },
+                                }}
                                 errors={errors}
                                 others={{ multiline: true, rows: 4 }}
                             />
@@ -190,7 +198,12 @@ rules={{
                                 </Button>
                             </Grid>
                             <Grid>
-                                <Button variant='outlined' size='large' component={Link} to='/clinical-records/diagnoses'>
+                                <Button
+                                    variant='outlined'
+                                    size='large'
+                                    component={Link}
+                                    to='/clinical-records/diagnoses'
+                                >
                                     Cancelar
                                 </Button>
                             </Grid>

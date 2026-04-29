@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 dayjs.locale('es');
 
+import '@/assets/css/calendar.css'
+
 import { AppProvider } from './app/Provider.jsx';
 
 createRoot(document.getElementById('root')).render(

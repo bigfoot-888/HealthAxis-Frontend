@@ -11,6 +11,8 @@ import { DIAGNOSIS_CLINICAL_STATUS_LABELS } from '@diagnoses/utils/chip-values';
 import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
 import { updateDiagnosisClinicalStatus} from '@diagnoses/api/diagnosis.api';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function UpdateDiagnosisClinicalStatusForm({ diagnosis, handleClose }) {
     const {
         register,
@@ -21,12 +23,14 @@ export default function UpdateDiagnosisClinicalStatusForm({ diagnosis, handleClo
     } = useForm({ mode: 'onBlur', defaultValues: { clinicalStatus: '' } });
     const { refetch } = useDiagnoses();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await updateDiagnosisClinicalStatus(diagnosis.uuid, data.clinicalStatus);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Estado clínico del diagnóstico actualizado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

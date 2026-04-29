@@ -3,40 +3,18 @@ import { Typography, Stack, Chip } from '@mui/material';
 import { formatCreatedAt } from '@/utils/date-formatters';
 import DashboardWidget from '@dashboards/components/ui/DashboardWidget';
 import { List, ListItem, ListItemText } from '@mui/material';
-import {
-    ResponsiveContainer,
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    Tooltip,
-    CartesianGrid,
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-} from 'recharts';
+import { ResponsiveContainer } from 'recharts';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 import { SubtleChip } from '@/components/ui';
+import { useTheme } from '@mui/material/styles';
+import CustomLineChart from '@dashboards/components/figures/CustomLineChart';
+import CustomBarChart from '@dashboards/components/figures/CustomBarChart';
+import CustomPieChart from '@dashboards/components/figures/CustomPieChart';
 
-export default function DashboardComponentRenderer({ component }) {
+export default function DashboardComponentRenderer({ component, onDelete }) {
+    const theme = useTheme();
     // Destructure the new payload structure
     const { vizType, config = {}, data, title } = component;
-
-    function getStatusColor(status) {
-        switch (status) {
-            case 'SCHEDULED':
-                return 'primary';
-            case 'CHECKED_IN':
-                return 'warning';
-            case 'COMPLETED':
-                return 'success';
-            case 'CANCELLED':
-                return 'error';
-            default:
-                return 'default';
-        }
-    }
 
     const renderContent = () => {
         // Fallback if the query failed or returned no data
@@ -53,64 +31,21 @@ export default function DashboardComponentRenderer({ component }) {
             case 'LINE_CHART':
                 return (
                     <ResponsiveContainer width='100%' height='100%'>
-                        <LineChart data={normalizeData(data)}>
-                            <CartesianGrid strokeDasharray='3 3' stroke='var(--color-border-3)' />
-                            <XAxis dataKey={config.xAxisKey || 'x'} />
-                            <YAxis
-                                label={
-                                    config.yAxisLabel
-                                        ? { value: config.yAxisLabel, angle: -90, position: 'insideLeft' }
-                                        : undefined
-                                }
-                            />
-                            <Tooltip formatter={(value) => [value, config.tooltipLabel || '']} />
-                            <Line
-                                type='monotone'
-                                dataKey={config.yAxisKey || 'y'}
-                                stroke={config.strokeColor || '#1976d2'}
-                                strokeWidth={2}
-                            />
-                        </LineChart>
+                        <CustomLineChart data={normalizeData(data)} config={config} />
                     </ResponsiveContainer>
                 );
 
             case 'BAR_CHART':
                 return (
                     <ResponsiveContainer width='100%' height='100%'>
-                        <BarChart data={normalizeData(data)}>
-                            <CartesianGrid strokeDasharray='3 3' stroke='var(--color-border-3)' vertical={false} />
-                            <XAxis dataKey={config.xAxisKey || 'x'} />
-                            <YAxis
-                                label={
-                                    config.yAxisLabel
-                                        ? { value: config.yAxisLabel, angle: -90, position: 'insideLeft' }
-                                        : undefined
-                                }
-                            />
-                            <Tooltip formatter={(value) => [value, config.tooltipLabel || '']} />
-                            <Bar
-                                dataKey={config.yAxisKey || 'y'}
-                                fill={config.fillColor || '#1976d2'}
-                                radius={[4, 4, 0, 0]} // Optional: nicely rounded top corners for bars
-                            />
-                        </BarChart>
+                        <CustomBarChart data={normalizeData(data)} config={config} />
                     </ResponsiveContainer>
                 );
 
             case 'PIE_CHART':
                 return (
                     <ResponsiveContainer width='100%' height='100%'>
-                        <PieChart>
-                            <Pie
-                                data={normalizeData(data)}
-                                dataKey={config.valueKey || 'y'}
-                                nameKey={config.nameKey || 'x'}
-                                outerRadius={80}
-                                fill={config.fillColor || '#1976d2'}
-                                label
-                            />
-                            <Tooltip formatter={(value) => [value, config.tooltipLabel || '']} />
-                        </PieChart>
+                        <CustomPieChart data={normalizeData(data)} config={config} />
                     </ResponsiveContainer>
                 );
 
@@ -126,7 +61,7 @@ export default function DashboardComponentRenderer({ component }) {
                                         primary={
                                             <Stack direction='row' spacing={1} alignItems='center'>
                                                 <Typography variant='body2'>{item.patientId || 'Paciente'}</Typography>
-                                                <SubtleChip label={APPOINTMENT_STATUS_CONFIG[item.status].label}/>
+                                                <SubtleChip label={APPOINTMENT_STATUS_CONFIG[item.status].label} />
                                             </Stack>
                                         }
                                         secondary={item.startTime ? formatCreatedAt(item.startTime) : ''}
@@ -146,15 +81,11 @@ export default function DashboardComponentRenderer({ component }) {
         <DashboardWidget
             component={component}
             renderContent={renderContent}
-            // We no longer need the translation util because the DB now stores the custom title directly!
             formatTitle={() => title}
+            onDelete={onDelete}
         />
     );
 }
-
-// =========================
-// HELPERS
-// =========================
 
 // Convert backend data into chart-friendly format
 function normalizeData(data) {

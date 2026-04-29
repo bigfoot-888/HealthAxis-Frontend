@@ -8,6 +8,7 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { createDiagnosis } from '@diagnoses/api/diagnosis.api';
 import { useDiagnosesByAppointment } from '@diagnoses/hooks/useDiagnosesByAppointment';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CreateAppointmentDiagnosisForm({ open, handleClose, appointment }) {
     const {
@@ -32,6 +33,7 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
 
     const [error, setError] = useState(null);
     const { refetch } = useDiagnosesByAppointment(appointment.uuid);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
@@ -41,30 +43,16 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                 clinicalStatus: data.diagnosis.clinicalStatus,
                 description: data.diagnosis.description,
                 notes: data.diagnosis.notes,
-
                 diagnosedAt: new Date(),
-
-                users: [
-                    {
-                        user: {
-                            id: appointment.userId,
-                        },
-                        role: 'AUTHOR',
-                    },
-                ],
-
-                patient: {
-                    id: appointment.patientId,
-                },
-
-                appointment: {
-                    id: appointment.id,
-                },
+                users: [{ user: { id: appointment.userId }, role: 'AUTHOR' }],
+                patient: { id: appointment.patientId },
+                appointment: { id: appointment.id },
             });
 
             reset();
             refetch();
             handleClose();
+            showSnackbar({ message: 'Diagnóstico creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

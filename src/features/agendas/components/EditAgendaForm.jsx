@@ -11,8 +11,9 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { useAgendas } from '@agendas/hooks/useAgendas';
 import { updateAgenda } from '@agendas/api/agenda-api';
+import { useSnackbar } from '@/app/SnackBarContext';
 
-export default function EditAgendaForm({ agenda, handleClose, setError }) {
+export default function EditAgendaForm({ agenda, handleClose, setError, refetch}) {
     const {
         register,
         handleSubmit,
@@ -25,8 +26,9 @@ export default function EditAgendaForm({ agenda, handleClose, setError }) {
             name: agenda?.name || '',
         },
     });
-    const { refetch } = useAgendas();
+    
     const queryClient = useQueryClient();
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
@@ -34,6 +36,8 @@ export default function EditAgendaForm({ agenda, handleClose, setError }) {
             queryClient.invalidateQueries(['agenda', agenda.uuid]);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Agenda editada correctamente' });
+
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

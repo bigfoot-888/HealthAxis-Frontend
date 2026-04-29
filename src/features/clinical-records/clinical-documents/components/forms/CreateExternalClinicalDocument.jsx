@@ -6,12 +6,17 @@ import { Link, useNavigate } from 'react-router';
 
 import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
 import { createClinicalDocument, createClinicalAttachment } from '@clinical-documents/api/clinical-document.api';
-import {SelectInput, BasicTextInput} from '@/components/forms/inputs/index';
-import {BasicFormLayout} from '@/components/forms/index';
+import { SelectInput, BasicTextInput } from '@/components/forms/inputs/index';
+import { BasicFormLayout } from '@/components/forms/index';
 
 import { CLINICAL_DOCUMENT_TYPE_LABELS } from '@clinical-documents/utils/chip-values';
 import { ClinicalDocumentAttachmentsField } from '../ui/ClinicalDocumentAttachmentsField';
 import { ClinicalDocumentUsersField } from '../ui/ClinicalDocumentUsersField';
+import { useSnackbar } from '@/app/SnackBarContext';
+
+import { ErrorAlert } from '@/components/ui';
+
+import { useState } from 'react';
 
 export default function CreateExternalClinicalDocument() {
     const {
@@ -19,7 +24,7 @@ export default function CreateExternalClinicalDocument() {
         handleSubmit,
         control,
         setValue,
-        setError,
+        setError: setFormError,
         formState: { errors },
     } = useForm({
         mode: 'onBlur',
@@ -31,46 +36,41 @@ export default function CreateExternalClinicalDocument() {
 
     const navigate = useNavigate();
     const { refetch } = useClinicalDocuments();
+    const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
-const onSubmit = async (data) => {
-    try {
-        const attachmentIds = [];
+    const onSubmit = async (data) => {
+        try {
+            const attachmentIds = [];
 
-        if (data.attachments?.length) {
-            for (const attachment of data.attachments) {
-                if (!attachment.file) continue;
+            if (data.attachments?.length) {
+                for (const attachment of data.attachments) {
+                    if (!attachment.file) continue;
 
-                const formData = new FormData();
-                formData.append('file', attachment.file);
-                formData.append('fileName', attachment.file.name);     // original file name
-                formData.append('fileSize', attachment.file.size);     // size in bytes
+                    const formData = new FormData();
+                    formData.append('file', attachment.file);
+                    formData.append('fileName', attachment.file.name); // original file name
+                    formData.append('fileSize', attachment.file.size); // size in bytes
 
-                const createdAttachment = await createClinicalAttachment(formData);
-                attachmentIds.push(createdAttachment.id);
+                    const createdAttachment = await createClinicalAttachment(formData);
+                    attachmentIds.push(createdAttachment.id);
+                }
             }
-        }
-        await createClinicalDocument({
-            title: data.title,
-            documentType: data.documentType,
-            users: data.users,
-            attachments: attachmentIds,
-        });
-
-        refetch();
-        navigate('/clinical-records/clinical-documents');
-
-    } catch (err) {
-        const { message, details } = err.response.data;
-
-        if (details?.fields) {
-            details.fields.forEach((f) => {
-                setError(f.path, { type: 'server', message: f.msg });
+            await createClinicalDocument({
+                title: data.title,
+                documentType: data.documentType,
+                users: data.users,
+                attachments: attachmentIds,
             });
-        } else {
-            alert(message);
+
+            refetch();
+            navigate('/clinical-records/clinical-documents');
+
+            showSnackbar({ message: 'Documento creado correctamente' });
+        } catch (err) {
+            handleApiError(err, setError, setFormError);
         }
-    }
-};
+    };
 
     return (
         <BasicFormLayout drawer={false}>
@@ -123,6 +123,7 @@ const onSubmit = async (data) => {
                         <Grid size={12}>
                             <ClinicalDocumentUsersField control={control} />
                         </Grid>
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>
                                 <Button variant='contained' size='large' type='submit'>

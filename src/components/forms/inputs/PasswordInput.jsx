@@ -11,26 +11,20 @@ import { IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
 
-export default function PasswordInput({errors, register, rules}) {
+export default function PasswordInput({errors, register, rules, name = "password", label = "Contraseña"}) {
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     return (
         <FormControl fullWidth variant='outlined' error={!!errors.password}>
-            <InputLabel htmlFor='outlined-adornment-password'>
-                Contraseña
-            </InputLabel>
+            <InputLabel htmlFor='outlined-adornment-password'>{label}</InputLabel>
             <OutlinedInput
                 type={showPassword ? 'text' : 'password'}
-                name='password'
+                name={name}
                 endAdornment={
                     <InputAdornment position='end'>
                         <IconButton
-                            aria-label={
-                                showPassword
-                                    ? 'ocultar contraseña'
-                                    : 'mostrar contraseña'
-                            }
+                            aria-label={showPassword ? 'ocultar contraseña' : 'mostrar contraseña'}
                             onClick={handleClickShowPassword}
                             edge='end'
                         >
@@ -38,10 +32,10 @@ export default function PasswordInput({errors, register, rules}) {
                         </IconButton>
                     </InputAdornment>
                 }
-                label='Contraseña'
-                {...register('password', rules)}
+                label={label}
+                {...register(name, rules)}
             />
-            <FormHelperText>{errors.password?.message || ' '}</FormHelperText>
+            <FormHelperText error={!!errors[name]}>{errors[name]?.message || ' '}</FormHelperText>
         </FormControl>
     );
 }

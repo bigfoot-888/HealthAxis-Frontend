@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Grid } from '@mui/material';
 
-import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import {BasicTextInput, RHFRadioInput} from '@/components/forms/inputs/index';
 import {FormDialog} from '@/components/dialogs/index';
 
 import { handleApiError } from '@/utils/handle-errors';
+
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CancelAppointmentForm({ appointment, handleClose, refetch }) {
     const {
@@ -20,11 +21,14 @@ export default function CancelAppointmentForm({ appointment, handleClose, refetc
     } = useForm({ mode: 'onBlur', defaultValues: { status: "NO_SHOW" }, });
     
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
+
     const onSubmit = async (data) => {
         try {
             await updateAppointmentStatus(appointment.uuid, data.status, data.notes);
             refetch(); 
             handleClose();
+            showSnackbar({message: 'Cita cancelada correctamente',});
         } catch (err) {
             handleApiError(err, setError, setFormError)
         }

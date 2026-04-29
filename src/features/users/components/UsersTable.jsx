@@ -21,6 +21,7 @@ import { handleApiError } from '@/utils/handle-errors';
 import { ROLE_LABELS } from '@/config/roles';
 import { UserStatusChip } from '@users/components/ui/UserChips';
 import { formatCreatedAt } from '@/utils/date-formatters';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
@@ -52,6 +53,7 @@ function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
 export default function UsersTable({ users }) {
     const [searchText, setSearchText] = useState('');
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const filteredUsers = useSearchFilter(users, searchText, ['id', 'name', 'surname', 'email']);
 
@@ -68,6 +70,7 @@ export default function UsersTable({ users }) {
             const users = JSON.parse(text);
             await importUsers(users);
             refetch();
+            showSnackbar({ message: 'Usuarios creados correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -86,6 +89,7 @@ export default function UsersTable({ users }) {
                 refetch();
             }
             handleCloseAlertDialog();
+            showSnackbar({ message: 'Usuario dado de baja correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -103,6 +107,7 @@ export default function UsersTable({ users }) {
                 refetch();
             }
             handleCloseReactivateDialog();
+            showSnackbar({ message: 'Usuario reactivado correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }

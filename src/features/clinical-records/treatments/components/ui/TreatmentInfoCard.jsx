@@ -1,104 +1,119 @@
-import { Card, CardContent, Grid, Stack, Typography, Chip, Divider, Box, Button } from '@mui/material';
+import React from 'react';
+import { Card, CardContent, Stack, Typography, Divider, Box, Avatar, Grid } from '@mui/material';
 
 import MedicationIcon from '@mui/icons-material/Medication';
-import EditIcon from '@mui/icons-material/Edit';
+import NotesIcon from '@mui/icons-material/Notes';
 
-import { Link } from 'react-router';
 import { formatDateTimeUTC } from '@/utils/date-formatters';
-
 import { TreatmentClinicalStatusChip } from '@treatments/components/ui/TreatmentChips';
+import { DataItem } from '@/components/ui';
+import { TreatmentStatusChip } from './TreatmentChips';
+import { PrimaryInfoCard } from '@/components/ui';
 
 export default function TreatmentInfoCard({ treatment }) {
     if (!treatment) return null;
+
     return (
-        <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+        <PrimaryInfoCard>
             <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                <Grid container spacing={3} alignItems='flex-start'>
-                    {/* Icon */}
-                    <Grid>
-                        <Box
+                <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent='space-between'
+                    alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+                    spacing={3}
+                >
+                    <Box display='flex' gap={2} alignItems='flex-start' flex={1}>
+                        <Avatar
                             sx={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'grey.300',
-                                color: 'grey.800',
+                                width: 56,
+                                height: 56,
+                                flexShrink: 0,
+                                bgcolor: 'primary.container',
+                                color: 'primary.onContainer',
                             }}
                         >
-                            <MedicationIcon sx={{ fontSize: '2rem' }} />
-                        </Box>
-                    </Grid>
+                            <MedicationIcon sx={{ fontSize: '1.75rem' }} />
+                        </Avatar>
 
-                    {/* Main info */}
-                    <Grid size={{ xs: 12, sm: 'grow' }}>
-                        <Stack direction='row' spacing={2} alignItems='center' mb={1} flexWrap='wrap'>
-                            {/* Title */}
-                            <Typography variant='h4' sx={{ fontWeight: 600 }}>
+                        <Box>
+                            <Typography variant='h5' sx={{ fontWeight: 600, color: 'onSurface', mb: 0.5 }}>
                                 {treatment.name}
                             </Typography>
 
-                            {/* Clinical status */}
-                            <TreatmentClinicalStatusChip value={treatment.clinicalStatus}/>
-                        </Stack>
-
-                        {/* Description */}
-                        {treatment.description && (
-                            <Typography variant='body1' color='text.secondary' mb={2}>
-                                {treatment.description}
-                            </Typography>
-                        )}
-
-                        <Divider sx={{ my: 1.5 }} />
-
-                        <Grid container spacing={2}>
-                            {/* Duration */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant='body2'>
-                                    <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Duración:{' '}
-                                    </Box>
-                                    {treatment.duration || '—'}
+                            {treatment.description && (
+                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant' }}>
+                                    {treatment.description}
                                 </Typography>
-                            </Grid>
-
-                            {/* Devised at */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant='body2'>
-                                    <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Prescrito el:{' '}
-                                    </Box>
-                                    {formatDateTimeUTC(treatment.devisedAt)}
-                                </Typography>
-                            </Grid>
-
-                            {/* Resolved at */}
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Typography variant='body2'>
-                                    <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                        Finalizado el:{' '}
-                                    </Box>
-                                    {treatment.resolvedAt ? formatDateTimeUTC(treatment.resolvedAt) : '—'}
-                                </Typography>
-                            </Grid>
-
-                            {/* Notes */}
-                            {treatment.notes && (
-                                <Grid size={12}>
-                                    <Typography variant='body2'>
-                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                            Notas:{' '}
-                                        </Box>
-                                        {treatment.notes}
-                                    </Typography>
-                                </Grid>
                             )}
-                        </Grid>
+                        </Box>
+                    </Box>
+
+                    <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }} sx={{ flexShrink: 0 }}>
+                        <Typography
+                            variant='caption'
+                            sx={{
+                                color: 'onSurfaceVariant',
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                                fontWeight: 600,
+                            }}
+                        >
+                            Estado clínico
+                        </Typography>
+                        <TreatmentClinicalStatusChip value={treatment.clinicalStatus} />
+                    </Stack>
+
+                    <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }} sx={{ flexShrink: 0 }}>
+                        <Typography
+                            variant='caption'
+                            sx={{
+                                color: 'onSurfaceVariant',
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.5,
+                                fontWeight: 600,
+                            }}
+                        >
+                            Estado
+                        </Typography>
+                        <TreatmentStatusChip value={treatment.status} />
+                    </Stack>
+                </Stack>
+
+                <Divider sx={{ my: 3, borderColor: 'outlineVariant' }} />
+
+                <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem label='Duración' value={treatment.duration || '—'} />
                     </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem label='Prescrito el' value={formatDateTimeUTC(treatment.devisedAt)} />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem
+                            label='Finalizado el'
+                            value={treatment.resolvedAt ? formatDateTimeUTC(treatment.resolvedAt) : null}
+                        />
+                    </Grid>
+
+                    {treatment.notes && (
+                        <Grid size={12}>
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    bgcolor: 'surfaceContainerLowest',
+                                    border: '1px solid',
+                                    borderColor: 'outlineVariant',
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <DataItem label='Notas adicionales' value={treatment.notes} icon={NotesIcon} />
+                            </Box>
+                        </Grid>
+                    )}
                 </Grid>
             </CardContent>
-        </Card>
+        </PrimaryInfoCard>
     );
 }

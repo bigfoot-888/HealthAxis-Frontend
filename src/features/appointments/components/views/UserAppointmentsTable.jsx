@@ -9,7 +9,6 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 import { Link } from 'react-router';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
@@ -18,7 +17,6 @@ import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import AlertDialog from '@/components/dialogs/AlertDialog';
 import { NestedTableLayout } from '@/components/tables';
 
-import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';

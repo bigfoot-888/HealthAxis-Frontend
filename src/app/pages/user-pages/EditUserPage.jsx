@@ -3,6 +3,7 @@ import EditUserForm from '@users/components/EditUserForm';
 import { useParams } from 'react-router';
 import { CustomCircularProgress } from '@/components/feedback';
 import { ContentLayout } from '@/components/layout';
+import { AppBreadcrumbs } from '@/components/navigation';
 
 export default function EditUserPage() {
     const { uuid } = useParams();

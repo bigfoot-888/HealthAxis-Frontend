@@ -73,7 +73,6 @@ export const router = createBrowserRouter([
         Component: Layout,
         // loader: requireAuth, // <- protect all child routes
         errorElement: <NotFoundPage />,
-        // add error boundary as well?
         children: [
             {
                 path: '/',
@@ -179,20 +178,8 @@ export const router = createBrowserRouter([
             },
             {
                 path: '/agendas/:uuid',
-                Component: AgendaDetailWrapper,
+                Component: AgendaDetailPage,
                 handle: { title: 'Vista detallada de la agenda' },
-                children: [
-                    {
-                        path: '',
-                        Component: AgendaDetailPage,
-                        handle: { title: 'Información de la agenda' },
-                    },
-                    {
-                        path: 'users',
-                        Component: AgendaUsersPage,
-                        handle: { title: 'Usuarios de la agenda' },
-                    },
-                ],
             },
             {
                 path: '/appointments',

@@ -8,8 +8,9 @@ import { useAgendas } from '@agendas/hooks/useAgendas';
 import { createAgendaPeriod } from '@agendas/api/agenda-period-api';
 
 import { handleApiError } from '@/utils/handle-errors';
+import { useSnackbar } from '@/app/SnackBarContext';
 
-export default function CreateAgendaForm({ agenda, handleClose, setError }) {
+export default function CreateAgendaPeriodForm({ agenda, handleClose, setError, refetch }) {
     const {
         handleSubmit,
         control,
@@ -17,7 +18,8 @@ export default function CreateAgendaForm({ agenda, handleClose, setError }) {
         formState: { errors },
     } = useForm({ mode: 'onBlur' });
 
-    const { refetch } = useAgendas();
+    const { showSnackbar } = useSnackbar();
+
     const onSubmit = async (data) => {
         try {
             const payload = {
@@ -25,10 +27,10 @@ export default function CreateAgendaForm({ agenda, handleClose, setError }) {
                 openingDate: data.openingDate?.toISOString(),
                 closingDate: data.closingDate?.toISOString(),
             };
-            console.log(payload)
             await createAgendaPeriod(agenda.uuid, payload);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Periodo de agenda creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

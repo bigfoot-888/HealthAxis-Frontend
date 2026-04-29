@@ -29,3 +29,13 @@ export async function createDashboardWidget(payload) {
         throw err;
     }
 }
+
+export async function deleteDashboardWidget(id) {
+    try {
+        await axios.delete(`/dashboards/components/${id}`);
+        return true;
+    } catch (err) {
+        console.error('Error eliminando widget del dashboard:', err);
+        throw err;
+    }
+}

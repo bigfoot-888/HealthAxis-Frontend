@@ -1,150 +1,138 @@
-import {
-    Card,
-    CardContent,
-    Grid,
-    Stack,
-    Typography,
-    Chip,
-    Divider,
-    Box,
-    Button,
-} from '@mui/material';
+import React from 'react';
+import { Card, CardContent, Stack, Typography, Divider, Box, Button, Avatar, Grid } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-
-function getStatusConfig(status) {
-    switch (status) {
-        case 'ACTIVE':
-            return { label: 'Activa', color: 'success' };
-        case 'INACTIVE':
-            return { label: 'Inactiva', color: 'default' };
-        default:
-            return { label: 'Desconocido', color: 'warning' };
-    }
-}
-
-function getPeriodStatusConfig(status) {
-    switch (status) {
-        case 'OPEN':
-            return { label: 'Abierto', color: 'success' };
-        case 'CLOSED':
-            return { label: 'Cerrado', color: 'default' };
-        case 'CANCELLED':
-            return { label: 'Cancelado', color: 'error' };
-        default:
-            return { label: 'Desconocido', color: 'warning' };
-    }
-}
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import { DataItem, PrimaryInfoCard } from '@/components/ui';
+import { AgendaStatusChip, AgendaPeriodStatusChip } from '@agendas/components/ui/AgendaChips';
 
 export default function AgendaInfoCard({ agenda, onEdit, onCreatePeriod }) {
     if (!agenda) return null;
-
-    const status = getStatusConfig(agenda.status);
     const activePeriod = agenda.activePeriod;
-    const periodStatus = activePeriod ? getPeriodStatusConfig(activePeriod.agendaStatus) : null;
-
     return (
-        <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
+        <PrimaryInfoCard>
             <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-                <Grid container spacing={3} alignItems='flex-start'>
-                    <Grid>
-                        <Box
+                <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    justifyContent='space-between'
+                    alignItems={{ xs: 'flex-start', md: 'flex-start' }}
+                    spacing={3}
+                >
+                    <Box display='flex' gap={2} alignItems='flex-start' flex={1}>
+                        <Avatar
                             sx={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'grey.300',
-                                color: 'grey.800',
+                                width: 56,
+                                height: 56,
+                                flexShrink: 0,
+                                bgcolor: 'primary.container',
+                                color: 'primary.onContainer',
                             }}
                         >
-                            <EventNoteIcon sx={{ fontSize: '2rem' }} />
-                        </Box>
-                    </Grid>
+                            <EventNoteIcon sx={{ fontSize: '1.75rem' }} />
+                        </Avatar>
 
-                    <Grid size={{ xs: 12, sm: 'grow' }}>
-                        <Stack direction='row' spacing={2} alignItems='center' mb={1} flexWrap='wrap'>
-                            <Typography variant='h4' sx={{ fontWeight: 600 }}>
+                        <Box>
+                            <Typography variant='h5' sx={{ fontWeight: 600, color: 'onSurface', mb: 0.5 }}>
                                 {agenda.name}
                             </Typography>
 
-                            <Chip label={status.label} color={status.color} size='small' variant='outlined' />
+                            {activePeriod ? (
+                                <Stack direction='row' spacing={1} alignItems='center' sx={{ mt: 1 }}>
+                                    <DateRangeIcon sx={{ fontSize: 16, color: 'onSurfaceVariant' }} />
+                                    <Typography variant='body2' sx={{ color: 'onSurfaceVariant', fontWeight: 500 }}>
+                                        Periodo actual:
+                                    </Typography>
+                                    <AgendaPeriodStatusChip value={agenda.activePeriod.agendaStatus} />
+                                </Stack>
+                            ) : (
+                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant', mt: 1 }}>
+                                    No hay ningún periodo activo
+                                </Typography>
+                            )}
+                        </Box>
+                    </Box>
+
+                    <Stack
+                        direction={{ xs: 'column', md: 'row' }}
+                        spacing={3}
+                        alignItems={{ xs: 'flex-start', md: 'center' }}
+                        sx={{ flexShrink: 0 }}
+                    >
+                        {/* Estado */}
+                        <Stack spacing={0.5} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
+                            <Typography
+                                variant='caption'
+                                sx={{
+                                    color: 'onSurfaceVariant',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 0.5,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Estado
+                            </Typography>
+                            <AgendaStatusChip value={agenda.status} />
                         </Stack>
 
-                        {activePeriod ? (
-                            <>
-                                <Stack direction='row' spacing={2} alignItems='center' mb={2} flexWrap='wrap'>
-                                    <Typography variant='body1'>
-                                        <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                            Periodo activo:{' '}
-                                        </Box>
-                                        {activePeriod.openingDate} — {activePeriod.closingDate}
-                                    </Typography>
-
-                                    <Chip
-                                        label={periodStatus.label}
-                                        color={periodStatus.color}
-                                        size='small'
-                                        variant='outlined'
-                                    />
-                                </Stack>
-
-                                <Divider sx={{ my: 1.5 }} />
-
-                                <Grid container spacing={2}>
-                                    <Grid size={{ xs: 12, sm: 6 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Inicio:{' '}
-                                            </Box>
-                                            {activePeriod.openingDate}
-                                        </Typography>
-                                    </Grid>
-
-                                    <Grid size={{ xs: 12, sm: 6 }}>
-                                        <Typography variant='body2'>
-                                            <Box component='span' sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                                                Fin:{' '}
-                                            </Box>
-                                            {activePeriod.closingDate}
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-                            </>
-                        ) : (
-                            <Typography variant='body2' color='text.secondary'>
-                                No hay periodo activo
-                            </Typography>
-                        )}
-                    </Grid>
-
-                    <Grid size={{ xs: 12, md: 'auto' }}>
-                        <Stack direction={{ xs: 'column', sm: 'row', md: 'column' }} spacing={1.5}>
+                        <Stack
+                            direction='row'
+                            spacing={1.5}
+                            sx={{
+                                mt: { xs: 1, md: 2.5 },
+                            }}
+                        >
                             <Button
-                                variant='contained'
+                                variant='outlined'
+                                color='primary'
                                 startIcon={<EditCalendarIcon />}
                                 disabled={agenda.status === 'INACTIVE'}
                                 onClick={() => onCreatePeriod?.(agenda)}
+                                sx={{ borderRadius: 2 }}
                             >
                                 Nuevo periodo
                             </Button>
 
                             <Button
-                                variant='text'
+                                variant='outlined'
+                                color='primary'
                                 startIcon={<EditIcon />}
                                 disabled={agenda.status === 'INACTIVE'}
                                 onClick={() => onEdit?.(agenda)}
+                                sx={{ borderRadius: 2 }}
                             >
                                 Editar
                             </Button>
                         </Stack>
-                    </Grid>
-                </Grid>
+                    </Stack>
+                </Stack>
+
+                {activePeriod && (
+                    <>
+                        <Divider sx={{ my: 3, borderColor: 'outlineVariant' }} />
+
+                        <Grid container spacing={3}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <DataItem
+                                    label='Inicio del periodo'
+                                    value={activePeriod.openingDate}
+                                    icon={CalendarTodayIcon}
+                                />
+                            </Grid>
+
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                <DataItem
+                                    label='Fin del periodo'
+                                    value={activePeriod.closingDate}
+                                    icon={CalendarTodayIcon}
+                                />
+                            </Grid>
+                        </Grid>
+                    </>
+                )}
             </CardContent>
-        </Card>
+        </PrimaryInfoCard>
     );
 }

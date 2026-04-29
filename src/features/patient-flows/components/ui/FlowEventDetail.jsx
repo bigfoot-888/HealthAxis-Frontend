@@ -6,7 +6,7 @@ import { SubtleChip } from '@/components/ui';
 import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
-import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_SEVERITY_CONFIG} from '@/shared/constants/diagnosis.constants';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_SEVERITY_CONFIG } from '@/shared/constants/diagnosis.constants';
 
 export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSecondaryNode }) {
     const navigate = useNavigate();
@@ -44,29 +44,32 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
                 overflow: 'hidden',
             })}
         >
-            {/* Header Section */}
             <Box sx={{ p: 2, pb: 1.5 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography variant="subtitle2" color="text.secondary" textTransform="uppercase" fontWeight="bold" letterSpacing={0.5}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
+                    <Typography
+                        variant='subtitle2'
+                        color='text.secondary'
+                        textTransform='uppercase'
+                        fontWeight='bold'
+                        letterSpacing={0.5}
+                    >
                         Detalle del evento
                     </Typography>
-                    <Chip 
-                        label={translate(type)} 
-                        size="small" 
-                        color="primary" 
-                        variant="outlined" 
-                        sx={{ fontWeight: 500 }} 
+                    <Chip
+                        label={translate(type)}
+                        size='small'
+                        color='primary'
+                        variant='outlined'
+                        sx={{ fontWeight: 500 }}
                     />
                 </Stack>
 
-                <Typography 
-                    variant="h6" 
-                    sx={{ 
-                        lineHeight: 1.2, 
+                <Typography
+                    variant='h6'
+                    sx={{
+                        lineHeight: 1.2,
                         mb: 1,
-                        // Force the container to always be 2 lines tall (1.2 * 2 = 2.4)
-                        minHeight: '2.4em', 
-                        // Truncate at exactly 2 lines if it happens to be longer
+                        minHeight: '2.4em',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
@@ -77,7 +80,7 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
                 </Typography>
 
                 {data?.date && (
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant='body2' color='text.secondary'>
                         {formatDateTimeUTC(data.date)}
                     </Typography>
                 )}
@@ -85,57 +88,63 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
 
             <Divider />
 
-            {/* Entity Information Section */}
             {entity && (
                 <Box sx={{ p: 2, flexGrow: 1 }}>
-                    <Typography variant="overline" color="text.secondary" display="block" gutterBottom>
+                    <Typography variant='overline' color='text.secondary' display='block' gutterBottom>
                         Información Asociada
                     </Typography>
-                    
+
                     <Box sx={{ pt: 0.5 }}>
-                        
                         {type === 'APPOINTMENT' && (
-                            <Stack spacing={1.5} alignItems="flex-start">
-                                <Typography variant="body1" fontWeight="medium">
+                            <Stack spacing={1.5} alignItems='flex-start'>
+                                <Typography variant='body1' fontWeight='medium'>
                                     {entity.reason}
                                 </Typography>
-                                
+
                                 {entity.startTime && (
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Typography variant="body2" color="text.secondary">Inicio:</Typography>
-                                        <Typography variant="body2">{formatDateTimeUTC(entity.startTime)}</Typography>
+                                    <Stack direction='row' spacing={1} alignItems='center'>
+                                        <Typography variant='body2' color='text.secondary'>
+                                            Inicio:
+                                        </Typography>
+                                        <Typography variant='body2'>{formatDateTimeUTC(entity.startTime)}</Typography>
                                     </Stack>
                                 )}
-                                
+
                                 <SubtleChip label={APPOINTMENT_STATUS_CONFIG[entity.status]?.label} />
                             </Stack>
                         )}
 
                         {type === 'DIAGNOSIS' && (
-                            <Stack spacing={1.5} alignItems="flex-start">
-                                <Typography variant="body1" fontWeight="medium">
+                            <Stack spacing={1.5} alignItems='flex-start'>
+                                <Typography variant='body1' fontWeight='medium'>
                                     {entity.name}
                                 </Typography>
-                                
+
                                 {entity.diagnosedAt && (
-                                    <Stack direction="row" spacing={1} alignItems="center">
-                                        <Typography variant="body2" color="text.secondary">Diagnosticado:</Typography>
-                                        <Typography variant="body2">{formatDateTimeUTC(entity.diagnosedAt)}</Typography>
+                                    <Stack direction='row' spacing={1} alignItems='center'>
+                                        <Typography variant='body2' color='text.secondary'>
+                                            Diagnosticado:
+                                        </Typography>
+                                        <Typography variant='body2'>{formatDateTimeUTC(entity.diagnosedAt)}</Typography>
                                     </Stack>
                                 )}
-                                
-                                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                    <SubtleChip label={DIAGNOSIS_CLINICAL_STATUS_CONFIG[entity.clinicalStatus]?.label} />
+
+                                <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                                    <SubtleChip
+                                        label={DIAGNOSIS_CLINICAL_STATUS_CONFIG[entity.clinicalStatus]?.label}
+                                    />
                                     {entity.severity && (
-                                        <SubtleChip label={`Severidad: ${DIAGNOSIS_SEVERITY_CONFIG[entity.severity].label}`} />
+                                        <SubtleChip
+                                            label={`Severidad: ${DIAGNOSIS_SEVERITY_CONFIG[entity.severity].label}`}
+                                        />
                                     )}
                                 </Stack>
                             </Stack>
                         )}
 
                         {type === 'TREATMENT' && (
-                            <Stack spacing={1.5} alignItems="flex-start">
-                                <Typography variant="body1" fontWeight="medium">
+                            <Stack spacing={1.5} alignItems='flex-start'>
+                                <Typography variant='body1' fontWeight='medium'>
                                     {entity.name}
                                 </Typography>
                                 <SubtleChip label={TREATMENT_CLINICAL_STATUS_CONFIG[entity.clinicalStatus]?.label} />
@@ -143,8 +152,8 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
                         )}
 
                         {type === 'PATIENT' && (
-                            <Stack spacing={1.5} alignItems="flex-start">
-                                <Typography variant="body1" fontWeight="medium">
+                            <Stack spacing={1.5} alignItems='flex-start'>
+                                <Typography variant='body1' fontWeight='medium'>
                                     {entity.name} {entity.surname}
                                 </Typography>
                                 <SubtleChip label={PATIENT_STATUS_CONFIG[entity.status]?.label} />
@@ -154,21 +163,29 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
                 </Box>
             )}
 
-            {/* Footer Action */}
             {entityId && (
                 <Box sx={{ p: 2, pt: 0 }}>
+                    {data.role === 'PRIMARY' && (
+                        <Button variant='outlined' size='small' fullWidth onClick={onAddSecondaryNode} sx={{ mb: 2 }}>
+                            Añadir documento
+                        </Button>
+                    )}
 
-                    {data.role === "PRIMARY" && <Button variant="outlined" size="small" fullWidth onClick={onAddSecondaryNode} sx={{mb: 2}}>
-                        Añadir documento
-                    </Button>}
-
-                    {data.role === "SECONDARY" && <Button variant="outlined" size="small" fullWidth onClick={onDeleteSecondaryNode} sx={{mb: 2}}>
-                        Eliminar nodo
-                    </Button>}
-                    <Button 
-                        variant="outlined" 
-                        fullWidth 
-                        size="small" 
+                    {data.role === 'SECONDARY' && (
+                        <Button
+                            variant='outlined'
+                            size='small'
+                            fullWidth
+                            onClick={onDeleteSecondaryNode}
+                            sx={{ mb: 2 }}
+                        >
+                            Eliminar nodo
+                        </Button>
+                    )}
+                    <Button
+                        variant='outlined'
+                        fullWidth
+                        size='small'
                         onClick={handleNavigate}
                         sx={{ textTransform: 'none', fontWeight: 600 }}
                     >

@@ -1,45 +1,123 @@
 import React from 'react';
-import { Card, CardContent, Typography, Grid, Stack } from '@mui/material';
+import { Card, CardContent, Typography, Stack, Box, Avatar } from '@mui/material';
 import { Link } from 'react-router';
+import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 import { formatDateTimeUTC } from '@/utils/date-formatters';
-
 import { DiagnosisClinicalStatusChip, DiagnosisSeverityChip } from '@diagnoses/components/ui/DiagnosisChips';
 
 export default function DiagnosisSummaryCard({ diagnosis }) {
     if (!diagnosis) return null;
 
     return (
-        <Card elevation={0} sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
-            <CardContent sx={{ p: 2 }}>
-                <Grid container spacing={2} alignItems='center'>
-                    <Grid size={{ xs: 12 }}>
-                        <Stack spacing={0.5}>
-                            <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
-                                <Typography
-                                    variant='subtitle1'
-                                    sx={{ fontWeight: 600 }}
-                                    component={Link}
-                                    to={`/clinical-records/diagnoses/${diagnosis.uuid}`}
-                                    style={{ textDecoration: 'none', color: 'inherit' }}
-                                >
-                                    Diagnóstico: {diagnosis.name}
-                                </Typography>
-                                <DiagnosisClinicalStatusChip value={diagnosis.clinicalStatus} />
-                            </Stack>
+        <Card
+            elevation={0}
+            sx={{
+                borderRadius: 0,
+                border: '1px solid',
+                borderColor: 'outlineVariant',
+                bgcolor: 'surfaceContainerLowest',
+            }}
+        >
+            <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+                <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    justifyContent='space-between'
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    spacing={2}
+                >
+                    <Box display='flex' gap={2} alignItems='flex-start' flex={1}>
+                        <Avatar
+                            sx={{
+                                width: 48,
+                                height: 48,
+                                bgcolor: 'primary.container',
+                                color: 'primary.onContainer',
+                            }}
+                        >
+                            <MedicalInformationIcon sx={{ fontSize: '1.5rem' }} />
+                        </Avatar>
 
-                            <Typography variant='body2' color='text.secondary'>
-                                {formatDateTimeUTC(diagnosis.diagnosedAt)}
+                        <Stack spacing={0.5} sx={{ width: '100%' }}>
+                            <Typography
+                                variant='subtitle1'
+                                component={Link}
+                                to={`/clinical-records/diagnoses/${diagnosis.uuid}`}
+                                sx={{
+                                    fontWeight: 600,
+                                    color: 'onSurface',
+                                    textDecoration: 'none',
+                                    transition: 'color 0.2s',
+                                    '&:hover': {
+                                        color: 'primary.main',
+                                        textDecoration: 'underline',
+                                    },
+                                }}
+                            >
+                                {diagnosis.name}
                             </Typography>
 
+                            <Stack direction='row' spacing={0.5} alignItems='center'>
+                                <CalendarTodayIcon sx={{ fontSize: 16, color: 'onSurfaceVariant' }} />
+                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant' }}>
+                                    {formatDateTimeUTC(diagnosis.diagnosedAt)}
+                                </Typography>
+                            </Stack>
+
                             {diagnosis.description && (
-                                <Typography variant='body2' color='text.secondary'>
+                                <Typography
+                                    variant='body2'
+                                    sx={{
+                                        color: 'onSurfaceVariant',
+                                        mt: 0.5,
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}
+                                >
                                     {diagnosis.description}
                                 </Typography>
                             )}
                         </Stack>
-                    </Grid>
-                </Grid>
+                    </Box>
+
+                    <Stack direction='row' spacing={2} alignItems='center' flexWrap='wrap' useFlexGap>
+                        {diagnosis.severity && (
+                            <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
+                                <Typography
+                                    variant='caption'
+                                    sx={{
+                                        color: 'onSurfaceVariant',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: 0.5,
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    Gravedad
+                                </Typography>
+                                <DiagnosisSeverityChip value={diagnosis.severity} />
+                            </Stack>
+                        )}
+
+                        <Stack spacing={0.5} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
+                            <Typography
+                                variant='caption'
+                                sx={{
+                                    color: 'onSurfaceVariant',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 0.5,
+                                    fontWeight: 600,
+                                }}
+                            >
+                                Estado
+                            </Typography>
+                            <DiagnosisClinicalStatusChip value={diagnosis.clinicalStatus} />
+                        </Stack>
+                    </Stack>
+                </Stack>
             </CardContent>
         </Card>
     );

@@ -4,29 +4,29 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function AppointmentAutocomplete({ control, errors, rules }) {
     const [options, setOptions] = useState([]);
-    const debounceTimeout = useRef(null); // keep track of timeout across renders
+    const debounceTimeout = useRef(null); 
+    const { showSnackbar } = useSnackbar();
 
     const fetchAppointments = (query) => {
-        // Cancel previous timeout
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
-        // Minimum characters check
+
         if (!query || query.length < 2) {
             setOptions([]);
             return;
         }
 
-        // Set new timeout
         debounceTimeout.current = setTimeout(async () => {
             try {
                 const res = await getAppointments({ query, limit: 20 });
                 setOptions(res);
             } catch (err) {
-                console.error('Error fetching appointments:', err);
+                showSnackbar({ message: 'Error al obtener citas', severity: 'error' });
             }
         }, 200);
     };

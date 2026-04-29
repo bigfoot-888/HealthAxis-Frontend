@@ -25,6 +25,8 @@ import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
 import { BasicTextInput } from '@/components/forms/inputs/index';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function CreatePatientForm() {
     const {
         register,
@@ -39,12 +41,14 @@ export default function CreatePatientForm() {
     const navigate = useNavigate();
     const { refetch } = usePatients();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await createPatient(data);
             refetch();
             navigate('/patients');
+            showSnackbar({ message: 'Paciente creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

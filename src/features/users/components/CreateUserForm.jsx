@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
-import { Grid, Paper, TextField, Button, Typography } from '@mui/material';
+import { Grid, Paper, Button, Typography } from '@mui/material';
 
 import { createUser } from '@users//api/user.api';
 import { useUsers } from '@users/hooks/useUsers';
@@ -14,8 +14,7 @@ import { handleApiError } from '@/utils/handle-errors';
 import { ErrorAlert } from '@/components/ui/index';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { ContentLayout } from '@/components/layout';
-import { AppBreadcrumbs } from '@/components/navigation';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CreateUserForm() {
     const {
@@ -30,6 +29,7 @@ export default function CreateUserForm() {
     const { refetch: refetchUsers } = useUsers();
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
@@ -37,6 +37,7 @@ export default function CreateUserForm() {
             refetchUsers();
             await queryClient.invalidateQueries({ queryKey: ['users', { agendaUuid: data.agenda.uuid }] });
             navigate('/users');
+            showSnackbar({ message: 'Usuario creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }
@@ -50,8 +51,6 @@ export default function CreateUserForm() {
                         <Grid container size={12} sx={{ justifyContent: 'start', pb: 2 }}>
                             <Typography variant='h2'>Añadir Usuario</Typography>
                         </Grid>
-
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
                         <Grid size={12}>
                             <BasicTextInput
                                 label='Nombre'
@@ -152,6 +151,9 @@ export default function CreateUserForm() {
                         <Grid size={12}>
                             <RoleAutocomplete control={control} rules={{ required: 'El rol es obligatorio.' }} />
                         </Grid>
+
+                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>
                                 <Button variant='contained' size='large' type='submit'>

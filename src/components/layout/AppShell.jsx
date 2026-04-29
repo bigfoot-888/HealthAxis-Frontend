@@ -15,23 +15,26 @@ export default function AppShell({ children }) {
     };
     return (
         <Box sx={{ display: 'flex', height: '100vh' }}>
-            <MiniDrawer
-                open={drawerOpen}
-                setOpen={handleDrawerOpen}
-                setClose={handleDrawerClose}
-            />
-            <Stack sx={{ width: '100%', height: '100%', pb: 2 }}>
+            <MiniDrawer open={drawerOpen} setOpen={handleDrawerOpen} setClose={handleDrawerClose} />
+            <Stack
+                sx={(theme) => ({
+                    flex: 1,
+                    backgroundColor: 'var(--template-palette-surfaceContainerLowest)',
+                })}
+            >
                 <Header open={drawerOpen} />
 
-                {/* Main content of the site, dynamically added */}
                 <Box
                     component='main'
-                    sx={{
-                        flexGrow: 1,
+                    sx={(theme) => ({
+                        flex: 1,
                         p: 3,
                         width: '100%',
-                        overflow: 'scroll',
-                    }}
+                        overflow: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: 'var(--template-palette-surfaceContainerLowest)',
+                    })}
                 >
                     {children}
                 </Box>

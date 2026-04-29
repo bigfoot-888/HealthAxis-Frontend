@@ -1,1 +1,0 @@
-export {default as PatientSummaryCard} from '@patients/components/ui/PatientSummaryCard'

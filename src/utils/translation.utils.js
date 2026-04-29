@@ -1,7 +1,7 @@
 
 export const TRANSLATE = {
-    PATIENT: "Paciente",
-    PATIENTS: "Pacientes",
+    PATIENT: 'Paciente',
+    PATIENTS: 'Pacientes',
     USER: 'Usuario',
     USERS: 'Usuarios',
     DIAGNOSIS: 'Diagnóstico',
@@ -21,7 +21,13 @@ export const TRANSLATE = {
     STATUS_CHANGED: 'Estado cambiado',
     ADMINISTRATIVE: 'Administrativo',
     CARDIOLOGIST: 'Cardiólogo',
-}
+    VIRTUAL: 'Virtual',
+    IN_PERSON: 'En persona',
+    AUTHOR: 'Autoría',
+    REVIEWER: 'Revisión',
+    VALIDATOR: 'Validación',
+    CONTRIBUTOR: 'Colaboración',
+};
 
 export function translate(value) {
     if (!value || typeof value !== 'string') return value;

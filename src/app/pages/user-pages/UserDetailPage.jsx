@@ -7,8 +7,9 @@ import { useState } from 'react';
 import { ContentLayout } from '@/components/layout';
 import { AppBreadcrumbs } from '@/components/navigation';
 import { DetailLayout } from '@/components/entity-detail';
-import { Stack } from '@mui/material';
+import { Stack, Box } from '@mui/material';
 import { useAppointmentsByUser } from '@appointments/hooks/useAppointmentsByUser';
+import DetailSectionHeader from '@/components/ui/DetailSectionHeader';
 
 export default function UserDetailPage() {
     const { uuid } = useParams();
@@ -19,19 +20,32 @@ export default function UserDetailPage() {
         error: appointmentsFetchError,
         refetch: refetchAppointments,
     } = useAppointmentsByUser(uuid);
-    
+
     const [error, setError] = useState(null);
 
     if (userFetchError || appointmentsFetchError) return <p>Error al cargar usuario</p>;
     if (userIsLoading || appointmentsIsLoading || !user) return <CustomCircularProgress />;
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
-            <AppBreadcrumbs items={[{ label: 'Usuarios', to: '/users' }, { label: `${user.name} ${user.surname}` }]} />
             <DetailLayout>
-                <Stack sx={{ p: { xs: 2, md: 3 }, width: '100%' }} spacing={3}>
+                <AppBreadcrumbs
+                    items={[{ label: 'Usuarios', to: '/users' }, { label: `${user.name} ${user.surname}` }]}
+                />
+                <Box>
+                    <DetailSectionHeader label='Información del Paciente' marginTop={false} />
                     <UserInfoCard user={user} />
-                    <UserAppointmentsTable user={user} appointments={appointments} setError={setError} refetch={refetchAppointments} />
-                </Stack>
+                </Box>
+                <Box>
+                    <DetailSectionHeader label='Citas Asociadas' />
+                    <Box sx={{ px: 1 }}>
+                        <UserAppointmentsTable
+                            user={user}
+                            appointments={appointments}
+                            setError={setError}
+                            refetch={refetchAppointments}
+                        />
+                    </Box>
+                </Box>
             </DetailLayout>
         </ContentLayout>
     );

@@ -7,10 +7,10 @@ import { RHFRadioInput } from '@/components/forms/inputs/index';
 import { useState } from 'react';
 import { TREATMENT_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { handleApiError } from '@/utils/handle-errors';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function UpdateTreatmentStatusForm({ treatment, handleClose }) {
     const {
-        register,
         handleSubmit,
         control,
         setError: setFormError,
@@ -18,12 +18,14 @@ export default function UpdateTreatmentStatusForm({ treatment, handleClose }) {
     } = useForm({ mode: 'onBlur', defaultValues: { status: '' } });
     const { refetch } = useTreatments();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await updateTreatmentStatus(treatment.uuid, data.status);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Estado del tratamiento actualizado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

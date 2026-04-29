@@ -5,13 +5,13 @@ import FlowEventDetail from '@patient-flows/components/ui/FlowEventDetail';
 import '@xyflow/react/dist/style.css';
 
 import { ContentLayout } from '@/components/layout';
-import { PatientNode } from '@patient-flows/components/ui/PatientNode';
 import BaseFlowNode from '../ui/BaseFlowNode';
 import { useReactFlow } from '@xyflow/react';
 import CreateSecondaryNodeForm from '@patient-flows/components/forms/CreateSecondaryNodeForm';
-import { usePatientFlow } from '../../hooks/usePatientFlow';
 import DeleteSecondaryNodeDialog from '../dialogs/DeleteSecondaryNodeDialog';
 import { handleApiError } from '@/utils/handle-errors';
+
+import { useSnackbar } from '@/app/SnackBarContext';
 
 import { deleteFlowEvent } from '@patient-flows/api/patient-flow-api';
 
@@ -47,6 +47,7 @@ export default function PatientFlow({ flow, refetch, patientUuid }) {
     const initialEdges = useMemo(() => flow?.edges ?? [], [flow]);
 
     const [error, setError] = useState(null); 
+    const { showSnackbar } = useSnackbar();
 
     const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -79,14 +80,14 @@ export default function PatientFlow({ flow, refetch, patientUuid }) {
             await deleteFlowEvent(nodeToDelete.id, patientUuid); 
             refetch();
             setNodeToDelete(null);
+            showSnackbar({ message: 'Nodo eliminado correctamente' });
         } catch (err) {
             handleApiError(err, setError, null); 
         }
     };
 
-
     return (
-        <ContentLayout drawer={false}>
+        <ContentLayout drawer={false} error={error} onErrorClose={()=>setError(null)}>
             {openDialog && (
                 <CreateSecondaryNodeForm
                     open={openDialog}

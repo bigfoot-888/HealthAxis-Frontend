@@ -10,6 +10,8 @@ import { handleApiError } from '@/utils/handle-errors';
 import { useAgendas } from '@agendas/hooks/useAgendas';
 import { createAgenda } from '@agendas/api/agenda-api';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
     const {
         register,
@@ -21,12 +23,15 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
 
     const { refetch } = useAgendas();
     const [error, setError] = useState(null); 
-
+    const { showSnackbar } = useSnackbar();
+    
     const onSubmit = async (data) => {
         try {
             await createAgenda(data);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Agenda creada correctamente' });
+
         } catch (err) {
             handleApiError(err, setError, setFormError); 
         }

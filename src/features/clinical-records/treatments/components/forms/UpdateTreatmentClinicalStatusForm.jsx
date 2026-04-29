@@ -8,22 +8,26 @@ import { useState } from 'react';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { handleApiError } from '@/utils/handle-errors';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function UpdateTreatmentClinicalStatusForm({ treatment, handleClose }) {
     const {
-        register,
         handleSubmit,
         control,
         setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur', defaultValues: { clinicalStatus: '' } });
+
     const { refetch } = useTreatments();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await updateTreatmentClinicalStatus(treatment.uuid, data.clinicalStatus);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Estado clínico del tratamiento actualizado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError); 
         }

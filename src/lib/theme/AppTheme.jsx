@@ -27,15 +27,15 @@ function AppTheme(props) {
                                   {
                                       props: { variant: 'surface-form' },
                                       style: ({ theme }) => ({
-                                          backgroundColor: theme.palette.surfaceContainer,
+                                          backgroundColor: 'var(--template-palette-surfaceContainer)',
                                       }),
                                   },
                                   {
                                       props: { variant: 'surface-form-outlined' },
                                       style: ({ theme }) => ({
                                           boxShadow: 'none',
-                                          border: `1px solid ${theme.palette.outlineVariant}`,
-                                          backgroundColor: theme.palette.surfaceContainerLow,
+                                          border: `1px solid ${'var(--template-palette-outlineVariant)'}`,
+                                          backgroundColor: 'var(--template-palette-surfaceContainerLow)',
                                       }),
                                   },
                               ],

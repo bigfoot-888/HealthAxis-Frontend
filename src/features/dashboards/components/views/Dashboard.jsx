@@ -6,15 +6,21 @@ import { Responsive, useContainerWidth } from 'react-grid-layout';
 import DashboardComponentRenderer from '@dashboards/components/ui/DashboardComponentRenderer';
 import DashboardToolbar from '@dashboards/components/ui/DashboardToolbar';
 import { useState } from 'react';
-import { updateLayout, createDashboardWidget } from '@dashboards/api/dashboard-api';
+import { updateLayout, createDashboardWidget, deleteDashboardWidget } from '@dashboards/api/dashboard.api';
 import AddKpiWidgetDialog from '../dialogs/AddKpiWidgetDialog';
 import { useDashboard } from '@dashboards/hooks/useDashboard';
+import { handleApiError } from '@/utils/handle-errors';
+import { AlertDialog } from '@/components/dialogs';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function Dashboard({ dashboard }) {
     const { width, containerRef, mounted } = useContainerWidth();
     const [layout, setLayout] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const { refetch } = useDashboard();
+    const [error, setError] = useState(null); 
+    const [componentToDelete, setComponentToDelete] = useState(null); 
+    const { showSnackbar } = useSnackbar();
 
     const layouts = {
         lg: (dashboard?.components || []).map((component, index) => ({
@@ -35,11 +41,10 @@ export default function Dashboard({ dashboard }) {
                 w: item.w,
                 h: item.h,
             }));
-
             await updateLayout(formattedLayout);
-            console.log('Layout guardado');
+            showSnackbar({ message: 'Distribución de componentes actualizada correctamente' });
         } catch (err) {
-            console.error(err);
+            handleApiError(err, setError, null); 
         }
     };
 
@@ -48,13 +53,36 @@ export default function Dashboard({ dashboard }) {
             await createDashboardWidget(widgetData);
             setOpenAddDialog(false);
             refetch();
+            showSnackbar({ message: 'Componente creado correctamente' });
         } catch (err) {
-            console.error(err);
+            handleApiError(err, setError, null); 
+        }
+    };
+
+    const handleDeleteComponent = async (widgetData) => {
+        try {
+            await deleteDashboardWidget(widgetData.id);
+            setComponentToDelete(null);
+            refetch();
+            showSnackbar({ message: 'Componente eliminado correctamente' });
+        } catch (err) {
+            handleApiError(err, setError, null);
         }
     };
 
     return (
-        <ContentLayout>
+        <ContentLayout error={error} onErrorClose={() => setError(null)}>
+            {!!componentToDelete && (
+                <AlertDialog
+                    open={!!componentToDelete}
+                    handleClose={() => setComponentToDelete(null)}
+                    handleConfirm={() => handleDeleteComponent(componentToDelete)}
+                    title={`Eliminar componente`}
+                    content='Esta acción es irreversible. Al finalizar, el componente será eliminado. '
+                    error={error}
+                    onErrorClose={() => setError(null)}
+                />
+            )}
             <DashboardToolbar onSave={handleSaveLayout} onAddWidget={() => setOpenAddDialog(true)} />
             {openAddDialog && (
                 <AddKpiWidgetDialog
@@ -99,7 +127,7 @@ export default function Dashboard({ dashboard }) {
                                         overflow: 'hidden',
                                     }}
                                 >
-                                    <DashboardComponentRenderer component={component} />
+                                    <DashboardComponentRenderer component={component} onDelete={setComponentToDelete} />
                                 </div>
                             );
                         })}

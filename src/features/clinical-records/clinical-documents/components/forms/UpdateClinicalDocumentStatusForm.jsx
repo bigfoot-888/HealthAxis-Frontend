@@ -11,6 +11,8 @@ import { CLINICAL_DOCUMENT_STATUS_CONFIG } from '@/shared/constants/clinical-doc
 import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
 import { updateClinicalDocumentStatus } from '@clinical-documents/api/clinical-document.api';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function UpdateClinicalDocumentStatusForm({ clinicalDocument, handleClose }) {
     const {
         handleSubmit,
@@ -24,12 +26,14 @@ export default function UpdateClinicalDocumentStatusForm({ clinicalDocument, han
 
     const { refetch } = useClinicalDocuments();
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await updateClinicalDocumentStatus(clinicalDocument.uuid, data.status);
             refetch();
             handleClose();
+            showSnackbar({ message: 'Documento editado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

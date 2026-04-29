@@ -1,0 +1,71 @@
+.fc-toolbar {
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--template-palette-onSurface);
+}
+
+.fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+
+.fc {
+  background-color: var(--template-palette-surfaceContainerLowest);
+  color: var(--template-palette-onSurface);
+
+}
+
+
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid var(--template-palette-outlineVariant);
+}
+
+.fc-col-header-cell {
+  background-color: var(--template-palette-surfaceContainerHigh);
+}
+
+.fc-timegrid-axis {
+  background-color: var(--template-palette-surfaceContainerHigh);
+}
+
+.fc-timegrid-slot {
+  border-color: var(--template-palette-outlineVariant);
+}
+
+.fc-event {
+  background-color: var(--template-palette-primary-main);
+  border: none;
+  color: var(--template-palette-onPrimary);
+}
+
+.fc-event:hover {
+  opacity: 0.9;
+}
+
+.fc-day-today {
+  background-color: var(--template-palette-surfaceContainerLow) !important;
+}
+
+.fc-toolbar-title {
+  color: var(--template-palette-onSurface);
+}
+
+.fc-button {
+  background-color: var(--template-palette-primary-main);
+  border: none;
+  color: var(--template-palette-onPrimary);
+}
+
+.fc-button:hover {
+  background-color: var(--template-palette-primary-container);
+}

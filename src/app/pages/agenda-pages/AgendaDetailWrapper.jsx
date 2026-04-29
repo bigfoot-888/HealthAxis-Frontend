@@ -5,8 +5,9 @@ import { AppBreadcrumbs } from '@/components/navigation';
 import { Tabs, Tab, Box } from '@mui/material';
 import { useState } from 'react';
 import { Outlet, Link, useParams } from 'react-router';
+import { DetailLayout } from '@/components/entity-detail';
 
-export default function AgendaDetailPage() {
+export default function AgendaDetailWrapper() {
     const { uuid } = useParams();
     const { data: agenda, isLoading, error: fetchError, refetch: refetchAgenda } = useAgenda(uuid);
     const [error, setError] = useState(null);
@@ -17,16 +18,20 @@ export default function AgendaDetailPage() {
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
-            {agenda && <AppBreadcrumbs items={[{ label: 'Agendas', to: '/agendas' }, { label: `${agenda.name}` }]} />}
-            <Tabs value={currentTab}>
-                <Tab label='Agenda' value={agenda.uuid} component={Link} to='' />
-                <Tab label='Usuarios' value='users' component={Link} to='users' />
-            </Tabs>
+            <DetailLayout>
+                {agenda && (
+                    <AppBreadcrumbs items={[{ label: 'Agendas', to: '/agendas' }, { label: `${agenda.name}` }]} />
+                )}
+                <Tabs value={currentTab}>
+                    <Tab label='Agenda' value={uuid} component={Link} to='' />
+                    <Tab label='Usuarios' value='users' component={Link} to='users' />
+                </Tabs>
 
-            <Box sx={{ mt: 2 }}>
-                {isLoading && <CircularProgress />}
-                {agenda && <Outlet context={{ setError, agenda, uuid: agenda.uuid }} />}
-            </Box>
+                <Box>
+                    {isLoading && <CircularProgress />}
+                    {agenda && <Outlet context={{ setError, agenda, uuid: agenda.uuid }} />}
+                </Box>
+            </DetailLayout>
         </ContentLayout>
     );
 }

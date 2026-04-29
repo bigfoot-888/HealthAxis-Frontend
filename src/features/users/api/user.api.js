@@ -50,6 +50,11 @@ export async function updateUser(uuid, userData) {
     return response.data;
 }
 
+export async function changeUserPassword(uuid, data) {
+    const response = await axios.patch(`/users/${uuid}/change-password`, data);
+    return response.data; 
+}
+
 // ===== STATE =====
 
 export async function deactivateUser(uuid) {

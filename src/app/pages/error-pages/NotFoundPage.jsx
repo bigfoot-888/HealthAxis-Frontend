@@ -15,7 +15,7 @@ export default function NotFoundPage() {
                     {isRouteErrorResponse(error) && error.status === 404 ? (
                         <Typography variant="h1" gutterBottom sx={{textAlign: 'center'}}> 404 - Página no encontrada </Typography>
                     ) : (
-                        <Typography variant="h1" gutterBottom sx={{textAlign: 'center'}}> Also salió mal </Typography>
+                        <Typography variant="h1" gutterBottom sx={{textAlign: 'center'}}> Algo salió mal </Typography>
                     )}
                 </Box>
             </Stack>

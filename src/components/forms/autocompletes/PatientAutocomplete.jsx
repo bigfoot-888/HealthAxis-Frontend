@@ -4,31 +4,30 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function PatientAutocomplete({ control, errors, rules }) {
     const [options, setOptions] = useState([]);
-    const debounceTimeout = useRef(null); // keep track of timeout across renders
+    const debounceTimeout = useRef(null); 
+    const { showSnackbar } = useSnackbar();
 
     const fetchPatients = (query) => {
-        // Cancel previous timeout
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
-        // Minimum characters check
         if (!query || query.length < 2) {
             setOptions([]);
             return;
         }
 
-        // Set new timeout
         debounceTimeout.current = setTimeout(async () => {
             try {
                 const res = await getPatients({ query, limit: 20 });
                 setOptions(res);
             } catch (err) {
-                console.error('Error fetching patients:', err);
+                showSnackbar({ message: 'Error al obtener pacientes', severity: 'error' });
             }
-        }, 200); // 300ms debounce
+        }, 200); 
     };
     return (
         <Controller

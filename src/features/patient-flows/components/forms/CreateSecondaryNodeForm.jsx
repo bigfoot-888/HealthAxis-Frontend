@@ -9,6 +9,8 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { createSecondaryNode } from '@patient-flows/api/patient-flow-api';
 
+import { useSnackbar } from '@/app/SnackBarContext';
+
 export default function CreateSecondaryNodeForm({ open, handleClose, parentNode, patientUuid, refetch }) {
     const {
         handleSubmit,
@@ -23,6 +25,7 @@ export default function CreateSecondaryNodeForm({ open, handleClose, parentNode,
     });
 
     const [error, setError] = useState(null);
+    const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
@@ -36,6 +39,7 @@ export default function CreateSecondaryNodeForm({ open, handleClose, parentNode,
 
             refetch();
             handleClose();
+            showSnackbar({ message: 'Nodo creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }

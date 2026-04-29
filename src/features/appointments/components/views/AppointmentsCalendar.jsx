@@ -5,7 +5,6 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { Paper } from '@mui/material';
 
 export default function AppointmentsCalendar({ appointments }) {
-    console.log(appointments)
     const events = appointments.map((a) => ({
         id: a.uuid,
         title: a.patient.fullName,

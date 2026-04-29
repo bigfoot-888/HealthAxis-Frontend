@@ -47,25 +47,25 @@ export default function NestedTableLayout({
                     }}
                     onRowClick={onRowClick}
                     sx={(theme) => ({
-                        backgroundColor: theme.palette.surfaceContainerLowest,
-                        border: `1px solid ${theme.palette.outlineVariant}`,
+                        backgroundColor: 'var(--template-palette-surfaceContainerLowest)',
+                        border: `1px solid ${'var(--template-palette-outlineVariant)'}`,
 
                         '& .MuiDataGrid-columnHeaders': {
-                            borderBottom: `1px solid ${theme.palette.outlineVariant}`,
+                            borderBottom: `1px solid ${'var(--template-palette-outlineVariant)'}`,
                         },
 
                         '& .MuiDataGrid-columnHeader, & .MuiDataGrid-filler': {
-                            backgroundColor: theme.palette.surfaceContainer,
-                            borderBottom: `1px solid ${theme.palette.outlineVariant}`,
+                            backgroundColor: 'var(--template-palette-surfaceContainer)',
+                            borderBottom: `1px solid ${'var(--template-palette-outlineVariant)'}`,
                         },
 
                         '& .MuiDataGrid-columnHeaderTitle': {
                             fontWeight: 600,
-                            color: theme.palette.onSurfaceVariant,
+                            color: 'var(--template-palette-onSurfaceVariant)',
                         },
 
                         '& .MuiDataGrid-row:hover': {
-                            backgroundColor: theme.palette.surfaceContainerLow,
+                            backgroundColor: 'var(--template-palette-surfaceContainerLow)',
                         },
 
                         '& .MuiDataGrid-row': {

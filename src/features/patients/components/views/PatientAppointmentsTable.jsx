@@ -25,6 +25,7 @@ import CancelAppointmentForm from '@appointments/components/forms/CancelAppointm
 import AppointmentChip from '@appointments/components/ui/AppointmentChip';
 import { handleApiError } from '@/utils/handle-errors';
 import AddClinicalDataStepperForm from '@appointments/components/forms/AddClinicalDataStepperForm';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 function isCompleted(row) {
     return row.status === 'COMPLETED';
@@ -95,8 +96,9 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
     );
 }
 
-export default function PatientAppointmentsTable({ appointments, setError }) {
+export default function PatientAppointmentsTable({ appointments, setError, refetchPatientAppointments }) {
     const [searchText, setSearchText] = useState('');
+    const { showSnackbar } = useSnackbar();
 
     const filteredAppointments = useSearchFilter(appointments, searchText, [
         'id',
@@ -104,7 +106,7 @@ export default function PatientAppointmentsTable({ appointments, setError }) {
         'user.fullName',
     ]);
 
-    const { refetch } = useAppointments();
+    const { refetch: refetchAppointments } = useAppointments();
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
@@ -112,11 +114,11 @@ export default function PatientAppointmentsTable({ appointments, setError }) {
 
     const handleCompleteAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentatus(row.uuid, 'COMPLETED');
-                refetch();
-            }
+            await updateAppointmentStatus(row.uuid, 'COMPLETED');
+            refetchAppointments();
+            refetchPatientAppointments();
             setAppointmentToComplete(null);
+            showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -124,17 +126,15 @@ export default function PatientAppointmentsTable({ appointments, setError }) {
 
     const handleCheckInAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-                refetch();
-            }
-            setAppointmentToCheckIn(null);
+            await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
+            refetchAppointments();
+            refetchPatientAppointments();
+            setAppointmentToCheckIn(null); 
+            showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
     };
-
-    // https://stackoverflow.com/questions/79546439/why-are-params-undefined-in-valuegetter-but-not-in-rendercell-when-using-mui-dat
 
     const columns = useMemo(() => {
         return [

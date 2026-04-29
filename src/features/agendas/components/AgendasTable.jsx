@@ -54,8 +54,8 @@ function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, ...g
 
 export default function AgendasTable({ agendas }) {
     const { refetch } = useAgendas();
-    const [searchText, setSearchText] = useState(''); 
-    const [error, setError] = useState(null); 
+    const [searchText, setSearchText] = useState('');
+    const [error, setError] = useState(null);
 
     const [isCreateAgendaOpen, setIsCreateAgendaOpen] = useState(false);
     const [agendaToEdit, setAgendaToEdit] = useState(null);
@@ -63,10 +63,10 @@ export default function AgendasTable({ agendas }) {
     const [agendaToDelete, setAgendaToDelete] = useState(null);
     const [agendaToReactivate, setAgendaToReactivate] = useState(null);
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
-    const filteredAgendas = useSearchFilter(agendas, searchText, ["id", "name"])
-    
+    const filteredAgendas = useSearchFilter(agendas, searchText, ['id', 'name']);
+
     const handleConfirmAlertDialog = async (row) => {
         try {
             if (row) {
@@ -87,7 +87,7 @@ export default function AgendasTable({ agendas }) {
             }
             setAgendaToReactivate(null);
         } catch (err) {
-            handleApiError(err, setError, null); 
+            handleApiError(err, setError, null);
         }
     };
 
@@ -98,7 +98,7 @@ export default function AgendasTable({ agendas }) {
             { field: 'id', headerName: 'ID', flex: 1 },
             {
                 field: 'status',
-                headerName: 'Estado Agenda',
+                headerName: 'Estado agenda',
                 flex: 2,
                 renderCell: (params) => {
                     const value = params.value;
@@ -121,7 +121,7 @@ export default function AgendasTable({ agendas }) {
                 valueGetter: (value, row) => new Date(row.activePeriod?.closingDate),
             },
             {
-                field: 'status',
+                field: 'activePeriod.agendaStatus',
                 headerName: 'Estado del periodo',
                 flex: 2,
                 valueGetter: (value, row) => row.activePeriod?.agendaStatus,
@@ -172,14 +172,25 @@ export default function AgendasTable({ agendas }) {
                 se cancelará el proceso. En caso contrario, la agenda será dada de baja. '
             />
             {isCreateAgendaOpen && (
-                <CreateAgendaForm isCreateAgendaOpen={isCreateAgendaOpen} handleClose={() => setIsCreateAgendaOpen(false)} />
+                <CreateAgendaForm
+                    isCreateAgendaOpen={isCreateAgendaOpen}
+                    handleClose={() => setIsCreateAgendaOpen(false)}
+                />
             )}
-            {agendaToEdit && <EditAgendaForm agenda={agendaToEdit} handleClose={() => setAgendaToEdit(null)} setError={setError}/>}
+            {agendaToEdit && (
+                <EditAgendaForm
+                    agenda={agendaToEdit}
+                    handleClose={() => setAgendaToEdit(null)}
+                    setError={setError}
+                    refetch={refetch}
+                />
+            )}
             {agendaForNewPeriod && (
                 <CreateAgendaPeriodForm
                     agenda={agendaForNewPeriod}
                     handleClose={() => setAgendaForNewPeriod(null)}
                     setError={setError}
+                    refetch={refetch}
                 />
             )}
             <ContentLayout error={error} onErrorClose={() => setError(null)}>

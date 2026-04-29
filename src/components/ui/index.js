@@ -4,3 +4,7 @@ export { default as SearchBar } from '@/components/ui/SearchBar';
 export { default as BasicMenu } from '@/components/ui/BasicMenu';
 export { default as ErrorAlert } from '@/components/ui/ErrorAlert';
 export { default as SubtleChip } from '@/components/ui/SubtleChip';
+export { default as DataItem } from '@/components/ui/DataItem';
+export { default as PrimaryInfoCard } from '@/components/ui/PrimaryInfoCard';
+export { default as DetailSectionHeader } from '@/components/ui/DetailSectionHeader';
+export { default as RelatedEntityContainer } from '@/components/ui/RelatedEntityContainer';

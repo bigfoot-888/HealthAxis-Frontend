@@ -49,33 +49,31 @@ export default function BasicTableLayout({
                     }}
                     onRowClick={onRowClick}
                     sx={(theme) => ({
-                        backgroundColor: theme.palette.surfaceContainerLowest,
+                        backgroundColor: 'var(--template-palette-surfaceContainerLowest)',
 
                         '& .MuiDataGrid-columnHeaders': {
-                            borderBottom: `1px solid ${theme.palette.outlineVariant}`,
+                            borderBottom: `1px solid ${'var(--template-palette-outlineVariant)'}`,
                         },
 
                         '& .MuiDataGrid-columnHeader, & .MuiDataGrid-filler': {
-                            backgroundColor: theme.palette.surfaceContainerHigh,
+                            backgroundColor: 'var(--template-palette-surfaceContainerHigh)',
                         },
 
                         '& .MuiDataGrid-columnSeparator': {
-                            color: theme.palette.outlineVariant,
+                            color: 'var(--template-palette-outlineVariant)',
                         },
 
                         '& .MuiDataGrid-columnHeaderTitle': {
                             fontWeight: 600,
-                            color: theme.palette.onSurfaceVariant,
+                            color: 'var(--template-palette-onSurfaceVariant)',
                         },
-
-                        // '& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within': {
-                        //   outline: 'none',
-                        // },
 
                         '& .MuiDataGrid-row': {
                             cursor: 'pointer',
                         },
                     })}
+
+                    
                 />
             </Box>
         </>

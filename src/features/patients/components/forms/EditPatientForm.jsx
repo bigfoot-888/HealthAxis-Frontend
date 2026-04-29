@@ -12,6 +12,7 @@ import { handleApiError } from '@/utils/handle-errors';
 import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
 import { BasicTextInput } from '@/components/forms/inputs/index';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function CreatePatientForm({ patient, uuid }) {
     const {
@@ -34,6 +35,7 @@ export default function CreatePatientForm({ patient, uuid }) {
     });
 
     const queryClient = useQueryClient();
+    const { showSnackbar } = useSnackbar();
 
     const location = useLocation(); 
     const from = location.state?.from || '/patients';
@@ -48,6 +50,7 @@ export default function CreatePatientForm({ patient, uuid }) {
             refetch();
             queryClient.invalidateQueries(['patient', uuid]);
             navigate(from);
+            showSnackbar({ message: 'Paciente editado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
         }
