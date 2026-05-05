@@ -1,4 +1,4 @@
-import { APP_LOCALE, APP_TIMEZONE } from "@/config/date-config";
+import { APP_LOCALE, APP_TIMEZONE } from '@/config/date-config';
 
 export function formatDateTimeUTC(value) {
     if (!value) return 'N.A.';
@@ -14,6 +14,21 @@ export function formatDateTimeUTC(value) {
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
+    });
+}
+
+export function formatDate(value) {
+    if (!value) return 'N.A.';
+
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (isNaN(date)) return '';
+
+    return date.toLocaleString(APP_LOCALE, {
+        timeZone: APP_TIMEZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
     });
 }
 

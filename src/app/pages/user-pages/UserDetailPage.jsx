@@ -41,7 +41,6 @@ export default function UserDetailPage() {
                         <UserAppointmentsTable
                             user={user}
                             appointments={appointments}
-                            setError={setError}
                             refetch={refetchAppointments}
                         />
                     </Box>

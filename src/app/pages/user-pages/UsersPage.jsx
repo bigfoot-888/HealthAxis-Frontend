@@ -1,5 +1,5 @@
 import { useUsers } from '@users/hooks/useUsers';
-import UsersTable from '@users/components/UsersTable';
+import UsersTable from '@/features/users/components/views/UsersTable';
 import { CustomCircularProgress } from '@/components/feedback';
 
 export default function UsersPage() {

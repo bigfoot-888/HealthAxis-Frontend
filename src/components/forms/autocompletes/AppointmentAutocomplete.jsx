@@ -1,14 +1,16 @@
 import { getAppointments } from '../../../shared/api/formDataApi';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useRef } from 'react';
 import { Controller } from 'react-hook-form';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { Watch } from 'react-hook-form';
+import { formatDateTimeUTC } from '@/utils/date-formatters';
 
 export default function AppointmentAutocomplete({ control, errors, rules }) {
     const [options, setOptions] = useState([]);
-    const debounceTimeout = useRef(null); 
+    const debounceTimeout = useRef(null);
     const { showSnackbar } = useSnackbar();
 
     const fetchAppointments = (query) => {
@@ -35,40 +37,41 @@ export default function AppointmentAutocomplete({ control, errors, rules }) {
             name='appointment'
             control={control}
             rules={rules}
-            render={({ field }) => (
-                <Autocomplete
-                    options={options}
-                    {...field}
-                    fullWidth
-                    disablePortal
-                    isOptionEqualToValue={(option, value) => option.id === value?.id}
-                    getOptionLabel={(option) =>
-                        `${option.user.name} ${option.user.surname} — ${option.patient.name} ${option.patient.surname} - ${new Date(option.startTime).toLocaleString(
-                            'es-ES',
-                            {
-                                timeZone: 'UTC',
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            },
-                        )}`
+            render={({ field }) => {
+                useEffect(() => {
+                    if (field.value) {
+                        setOptions((prev) => {
+                            const exists = prev.some((o) => o.id === field.value.id);
+                            return exists ? prev : [field.value, ...prev];
+                        });
                     }
-                    onInputChange={(_, value) => fetchAppointments(value)}
-                    onChange={(_, value) => {
-                        field.onChange(value);
-                    }}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            label='Cita asociada (opcional)'
-                            error={!!errors['appointment']}
-                            helperText={errors['appointment']?.message || ' '}
-                        />
-                    )}
-                />
-            )}
+                }, [field.value]);
+
+                return (
+                    <Autocomplete
+                        options={options}
+                        value={field.value || null}
+                        fullWidth
+                        disablePortal
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        getOptionLabel={(option) =>
+                            `${option.user.name} ${option.user.surname} — ${option.patient.name} ${option.patient.surname} - ${formatDateTimeUTC(
+                                option.startTime,
+                            )}`
+                        }
+                        onInputChange={(_, value) => fetchAppointments(value)}
+                        onChange={(_, value) => field.onChange(value)}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label='Cita asociada (opcional)'
+                                error={!!errors['appointment']}
+                                helperText={errors['appointment']?.message || ' '}
+                            />
+                        )}
+                    />
+                );
+            }}
         />
     );
 }

@@ -10,8 +10,10 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { createAppointment } from '@appointments/api/appointment.api';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCreateAppointmentWithUser } from '@appointments/utils/appointment-query.utils';
 
-export default function CreateUserAppointmentForm({ open, handleClose, user, refetch }) {
+export default function CreateUserAppointmentForm({ open, handleClose, user }) {
     const {
         register,
         handleSubmit,
@@ -28,12 +30,13 @@ export default function CreateUserAppointmentForm({ open, handleClose, user, ref
 
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient(); 
 
     const onSubmit = async (data) => {
         try {
             await createAppointment({ ...data, user: { id: user.id } });
             reset();
-            refetch();
+            invalidateCreateAppointmentWithUser(queryClient, user)
             handleClose();
             showSnackbar({ message: 'Cita creada correctamente' });
         } catch (err) {
@@ -115,22 +118,6 @@ export default function CreateUserAppointmentForm({ open, handleClose, user, ref
                             },
                         }}
                         errors={errors}
-                    />
-                </Grid>
-
-                <Grid size={12}>
-                    <BasicTextInput
-                        label='Notas (opcional)'
-                        name='notes'
-                        register={register}
-                        rules={{
-                            maxLength: {
-                                value: 2000,
-                                message: 'Máximo 2000 caracteres',
-                            },
-                        }}
-                        errors={errors}
-                        others={{ multiline: true, rows: 4 }}
                     />
                 </Grid>
             </Grid>

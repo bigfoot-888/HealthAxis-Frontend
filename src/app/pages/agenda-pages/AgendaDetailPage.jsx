@@ -3,8 +3,8 @@ import { useState } from 'react';
 import AgendaInfoCard from '@agendas/components/ui/AgendaInfoCard';
 import AgendaPeriodsTable from '@agendas/components/views/AgendaPeriodsTable';
 
-import EditAgendaForm from '@agendas/components/EditAgendaForm';
-import CreateAgendaPeriodForm from '@agendas/components/CreatePeriodForm';
+import EditAgendaForm from '@agendas/components/forms/EditAgendaForm';
+import CreateAgendaPeriodForm from '@agendas/components/forms/CreatePeriodForm';
 
 import { ContentLayout } from '@/components/layout';
 import { Box } from '@mui/material';
@@ -34,6 +34,7 @@ export default function AgendaDetailPage() {
         error: usersFetchError,
         refetch: refetchUsers,
     } = useUsersByAgenda(uuid);
+    
     const [agendaToEdit, setAgendaToEdit] = useState(null);
     const [agendaForNewPeriod, setAgendaForNewPeriod] = useState(null);
 
@@ -46,7 +47,6 @@ export default function AgendaDetailPage() {
                 <EditAgendaForm
                     agenda={agendaToEdit}
                     handleClose={() => setAgendaToEdit(null)}
-                    setError={setError}
                     refetch={refetchAgenda}
                 />
             )}
@@ -55,7 +55,6 @@ export default function AgendaDetailPage() {
                 <CreateAgendaPeriodForm
                     agenda={agendaForNewPeriod}
                     handleClose={() => setAgendaForNewPeriod(null)}
-                    setError={setError}
                     refetch={refetchAgenda}
                 />
             )}

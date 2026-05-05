@@ -6,6 +6,7 @@ import { formatCreatedAt } from '@/utils/date-formatters';
 
 import { ROLE_LABELS } from '@/config/roles';
 import { UserStatusChip } from '@users/components/ui/UserChips';
+import { USER_STATUS_CONFIG } from '@/shared/constants/user.constants';
 
 export default function AgendaUsersTable({ users }) {
     const [searchText, setSearchText] = useState('');
@@ -58,9 +59,11 @@ export default function AgendaUsersTable({ users }) {
                 field: 'status',
                 headerName: 'Estado',
                 flex: 2,
+                valueGetter: (value) => {
+                    return USER_STATUS_CONFIG[value].label;
+                },
                 renderCell: (params) => {
-                    const value = params.value;
-                    return <UserStatusChip value={value} />;
+                    return <UserStatusChip value={params.row.status} />;
                 },
             },
             {
@@ -69,7 +72,7 @@ export default function AgendaUsersTable({ users }) {
                 headerName: 'Fecha de creación',
                 flex: 2,
                 hide: true,
-                valueFormatter: (value) => formatCreatedAt(value),
+                valueGetter: (value) => formatCreatedAt(value),
             },
         ];
     }, []);

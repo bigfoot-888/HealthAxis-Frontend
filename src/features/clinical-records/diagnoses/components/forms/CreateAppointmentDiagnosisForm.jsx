@@ -7,50 +7,46 @@ import { FormDialog } from '@/components/dialogs';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { createDiagnosis } from '@diagnoses/api/diagnosis.api';
-import { useDiagnosesByAppointment } from '@diagnoses/hooks/useDiagnosesByAppointment';
 import { useSnackbar } from '@/app/SnackBarContext';
+
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCreateDiagnosisWithAppointment } from '@diagnoses/utils/diagnosis-query.utils';
+import { mapDiagnosisConfigToItems } from '@diagnoses/utils/diagnosis-status.utils';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_SEVERITY_CONFIG } from '@/shared/constants/diagnosis.constants';
 
 export default function CreateAppointmentDiagnosisForm({ open, handleClose, appointment }) {
     const {
         handleSubmit,
         register,
+        reset,
         control,
         setError: setFormError,
-        reset,
         formState: { errors },
     } = useForm({
         mode: 'onBlur',
         defaultValues: {
-            diagnosis: {
-                name: '',
-                severity: '',
-                clinicalStatus: '',
-                description: '',
-                notes: '',
-            },
+            name: '',
+            severity: '',
+            clinicalStatus: '',
+            description: '',
         },
     });
 
     const [error, setError] = useState(null);
-    const { refetch } = useDiagnosesByAppointment(appointment.uuid);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient()
 
     const onSubmit = async (data) => {
         try {
             await createDiagnosis({
-                name: data.diagnosis.name,
-                severity: data.diagnosis.severity,
-                clinicalStatus: data.diagnosis.clinicalStatus,
-                description: data.diagnosis.description,
-                notes: data.diagnosis.notes,
+                ...data,
                 diagnosedAt: new Date(),
                 users: [{ user: { id: appointment.userId }, role: 'AUTHOR' }],
                 patient: { id: appointment.patientId },
                 appointment: { id: appointment.id },
             });
-
-            reset();
-            refetch();
+            invalidateCreateDiagnosisWithAppointment(queryClient, appointment)
+            reset(); 
             handleClose();
             showSnackbar({ message: 'Diagnóstico creado correctamente' });
         } catch (err) {
@@ -71,7 +67,7 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                 <Grid size={12}>
                     <BasicTextInput
                         label='Nombre del diagnóstico'
-                        name='diagnosis.name'
+                        name='name'
                         register={register}
                         rules={{
                             required: 'El nombre es obligatorio',
@@ -88,15 +84,10 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                     <SelectInput
                         control={control}
                         errors={errors}
-                        name='diagnosis.severity'
+                        name='severity'
                         label='Gravedad'
                         rules={{ required: 'La gravedad es obligatoria' }}
-                        items={{
-                            LOW: 'Baja',
-                            MODERATE: 'Moderada',
-                            HIGH: 'Alta',
-                            CRITICAL: 'Crítica',
-                        }}
+                        items={mapDiagnosisConfigToItems(DIAGNOSIS_SEVERITY_CONFIG)}
                     />
                 </Grid>
 
@@ -104,45 +95,10 @@ export default function CreateAppointmentDiagnosisForm({ open, handleClose, appo
                     <SelectInput
                         control={control}
                         errors={errors}
-                        name='diagnosis.clinicalStatus'
+                        name='clinicalStatus'
                         label='Estado'
                         rules={{ required: 'El estado es obligatorio' }}
-                        items={{
-                            ACTIVE: 'Activo',
-                            CHRONIC: 'Crónico',
-                        }}
-                    />
-                </Grid>
-
-                <Grid size={12}>
-                    <BasicTextInput
-                        label='Descripción'
-                        name='diagnosis.description'
-                        register={register}
-                        rules={{
-                            maxLength: {
-                                value: 1000,
-                                message: 'Máximo 1000 caracteres',
-                            },
-                        }}
-                        errors={errors}
-                        others={{ multiline: true, rows: 3 }}
-                    />
-                </Grid>
-
-                <Grid size={12}>
-                    <BasicTextInput
-                        label='Notas (opcional)'
-                        name='diagnosis.notes'
-                        register={register}
-                        errors={errors}
-                        rules={{
-                            maxLength: {
-                                value: 2000,
-                                message: 'Máximo 2000 caracteres',
-                            },
-                        }}
-                        others={{ multiline: true, rows: 4 }}
+                        items={mapDiagnosisConfigToItems(DIAGNOSIS_CLINICAL_STATUS_CONFIG)}
                     />
                 </Grid>
             </Grid>

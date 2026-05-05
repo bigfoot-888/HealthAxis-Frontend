@@ -21,15 +21,18 @@ import ClinicalRecordsPage from './pages/clinical-record-pages/ClinicalRecordsPa
 import DiagnosesPage from './pages/diagnosis-pages/DiagnosesPage';
 import CreateDiagnosisPage from './pages/diagnosis-pages/CreateDiagnosisPage';
 import DiagnosisDetailPage from '@/app/pages/diagnosis-pages/DiagnosisDetailPage';
+import EditDiagnosisPage from '@/app/pages/diagnosis-pages/EditDiagnosisPage';
 
 import CreateTreatmentPage from './pages/treatment-pages/CreateTreatmentPage';
 import TreatmentsPage from './pages/treatment-pages/TreatmentsPage';
 import TreatmentDetailPage from '@/app/pages/treatment-pages/TreatmentDetailPage';
+import EditTreatmentPage from '@/app/pages/treatment-pages/EditTreatmentPage';
 
 import ClinicalDocumentsPage from './pages/clinical-document-pages/ClinicalDocumentsPage';
 import CreateExternalClinicalDocumentForm from '@/app/pages/clinical-document-pages/CreateExternalClinicalDocumentPage';
 import ClinicalDocumentViewPage from '@/app/pages/clinical-document-pages/ClinicalDocumentViewPage';
 import PatientDetailPage from '@/app/pages/patient-pages/PatientDetailPage';
+
 import PatientDetailProfilePage from '@/app/pages/patient-pages/PatientDetailProfilePage';
 import PatientDetailAppointmentsPage from '@/app/pages/patient-pages/PatientDetailAppointmentsPage';
 import PatientDetailDiagnosesPage from '@/app/pages/patient-pages/PatientDetailDiagnosesPage';
@@ -252,6 +255,16 @@ export const router = createBrowserRouter([
                         handle: { title: 'Vista detallada de diagnóstico' },
                     },
                 ],
+            },
+            {
+                path: 'clinical-records/diagnoses/edit/:uuid',
+                Component: EditDiagnosisPage,
+                handle: { title: 'Editar diagnóstico' },
+            },
+            {
+                path: 'clinical-records/treatments/edit/:uuid',
+                Component: EditTreatmentPage,
+                handle: { title: 'Editar tratamiento' },
             },
         ],
     },

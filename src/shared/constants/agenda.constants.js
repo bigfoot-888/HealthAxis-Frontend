@@ -12,6 +12,4 @@ export const AGENDA_PERIOD_STATUS_CONFIG = {
 export const AGENDA_PERIOD_AGENDA_STATUS_CONFIG = {
     ACTIVE: { label: 'Activo', color: 'success' },
     INACTIVE: { label: 'Inactivo', color: 'default' },
-    HIGH: { label: 'Alta', color: 'error' },
-    CRITICAL: { label: 'Crítica', color: 'error' },
 };

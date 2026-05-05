@@ -9,7 +9,7 @@ import { createClinicalDocument, createClinicalAttachment } from '@clinical-docu
 import { SelectInput, BasicTextInput } from '@/components/forms/inputs/index';
 import { BasicFormLayout } from '@/components/forms/index';
 
-import { CLINICAL_DOCUMENT_TYPE_LABELS } from '@clinical-documents/utils/chip-values';
+import { CLINICAL_DOCUMENT_TYPE_CONFIG } from '@/shared/constants/clinical-document.constants';
 import { ClinicalDocumentAttachmentsField } from '../ui/ClinicalDocumentAttachmentsField';
 import { ClinicalDocumentUsersField } from '../ui/ClinicalDocumentUsersField';
 import { useSnackbar } from '@/app/SnackBarContext';
@@ -38,6 +38,10 @@ export default function CreateExternalClinicalDocument() {
     const { refetch } = useClinicalDocuments();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+
+    const documentTypeOptions = Object.fromEntries(
+        Object.entries(CLINICAL_DOCUMENT_TYPE_CONFIG).map(([key, { label }]) => [key, label]),
+    );
 
     const onSubmit = async (data) => {
         try {
@@ -104,7 +108,7 @@ export default function CreateExternalClinicalDocument() {
                                 name='documentType'
                                 label='Tipo de documento'
                                 rules={{ required: 'El tipo de documento es obligatorio' }}
-                                items={CLINICAL_DOCUMENT_TYPE_LABELS}
+                                items={documentTypeOptions}
                             />
                         </Grid>
                         <Grid size={12}>

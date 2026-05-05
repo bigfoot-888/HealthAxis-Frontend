@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useState } from 'react';
 import { Grid, Paper, Button, Typography } from '@mui/material';
 
@@ -8,7 +8,6 @@ import {
     AppointmentAutocomplete,
     DiagnosisAutocomplete,
 } from '@/components/forms/autocompletes/index';
-import { RHFDateTimePicker } from '@/components/forms/pickers/index';
 import { SelectInput, BasicTextInput } from '@/components/forms/inputs/index';
 import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
@@ -20,8 +19,10 @@ import { TreatmentProfessionalsField } from '@treatments/components/ui/Treatment
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useQueryClient } from '@tanstack/react-query';
-
+import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { useSnackbar } from '@/app/SnackBarContext';
+
+import { invalidateCreateTreatmentQueries } from '@treatments/utils/treatment-query.utils';
 
 export default function CreateTreatmentForm() {
     const {
@@ -38,7 +39,8 @@ export default function CreateTreatmentForm() {
     });
 
     const navigate = useNavigate();
-    const { refetch } = useTreatments();
+    const location = useLocation();
+    const from = location.state?.from || '/clinical-records/treatments';
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
     const { showSnackbar } = useSnackbar();
@@ -47,8 +49,8 @@ export default function CreateTreatmentForm() {
         try {
             await createTreatment(data);
             refetch();
-            await queryClient.invalidateQueries({ queryKey: ['treatments', { diagnosisUuid: data.diagnosis.uuid }] });
-            navigate('/clinical-records/treatments');
+            invalidateCreateTreatmentQueries(queryClient); 
+            navigate(from);
             showSnackbar({ message: 'Tratamiento creado correctamente' });
         } catch (err) {
             handleApiError(err, setError, setFormError);
@@ -101,11 +103,12 @@ export default function CreateTreatmentForm() {
                                 name='clinicalStatus'
                                 label='Estado'
                                 rules={{ required: 'El estado es obligatorio' }}
-                                items={{
-                                    PLANNED: 'Planificado',
-                                    ONGOING: 'En curso',
-                                    GIVEN: 'Dado',
-                                }}
+                                items={Object.fromEntries(
+                                    Object.entries(TREATMENT_CLINICAL_STATUS_CONFIG).map(([key, value]) => [
+                                        key,
+                                        value.label,
+                                    ]),
+                                )}
                             />
                         </Grid>
                         <Grid size={12}>
@@ -144,18 +147,6 @@ export default function CreateTreatmentForm() {
                                 Contexto
                             </Typography>
                         </Grid>
-                        <RHFDateTimePicker
-                            name='devisedAt'
-                            control={control}
-                            label='Fecha y hora de creación del tratamiento'
-                            rules={{
-                                validate: (value) => {
-                                    if (!value) return true;
-                                    const date = new Date(value);
-                                    return !isNaN(date) || 'Fecha inválida';
-                                },
-                            }}
-                        />
                         <Grid size={12}>
                             <AppointmentAutocomplete control={control} errors={errors} />
                         </Grid>
@@ -205,7 +196,7 @@ export default function CreateTreatmentForm() {
                                 </Button>
                             </Grid>
                             <Grid>
-                                <Button variant='outlined' size='large' component={Link} to='/appointments'>
+                                <Button variant='outlined' size='large' component={Link} to={from}>
                                     Cancelar
                                 </Button>
                             </Grid>

@@ -1,23 +1,25 @@
 import { useMemo } from 'react';
 import { getNestedValue } from '@/utils/get-nested-values';
+export function useSearchFilter(items, searchText, fields = null, accessors = null) {
+    return useMemo(() => {
+        if (!searchText) return items;
 
-/**
- * Hook for filtering items based on a search text
- * @param {Array} items - The array to filter
- * @param {string} searchText - The search query
- * @param {Array<string>} fields - Array of field paths to search in (e.g., ['id', 'user.fullName'])
- */
-export function useSearchFilter(items, searchText, fields) {
-  return useMemo(() => {
-    if (!searchText) return items;
+        const lowerSearch = searchText.toLowerCase();
 
-    const lowerSearch = searchText.toLowerCase();
-
-    return items.filter((item) =>
-      fields.some((fieldPath) => {
-        const value = getNestedValue(item, fieldPath)?.toString().toLowerCase() || '';
-        return value.includes(lowerSearch);
-      })
-    );
-  }, [items, searchText, fields]);
+        if (fields) {
+            return items.filter((item) =>
+                fields.some((fieldPath) => {
+                    const value = getNestedValue(item, fieldPath)?.toString().toLowerCase() || '';
+                    return value.includes(lowerSearch);
+                }),
+            );
+        } else {
+            return items.filter((item) =>
+                accessors.some((accessor) => {
+                    const value = accessor(item)?.toString().toLowerCase() || '';
+                    return value.includes(lowerSearch);
+                }),
+            );
+        }
+    }, [items, searchText, fields, accessors]);
 }

@@ -7,6 +7,7 @@ import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_SEVERITY_CONFIG } from '@/shared/constants/diagnosis.constants';
+import { CLINICAL_DOCUMENT_STATUS_CONFIG, CLINICAL_DOCUMENT_TYPE_CONFIG } from '@/shared/constants/clinical-document.constants';
 
 export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSecondaryNode }) {
     const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
             DIAGNOSIS: `/clinical-records/diagnoses/${entity.uuid}`,
             TREATMENT: `/clinical-records/treatments/${entity.uuid}`,
             PATIENT: `/patients/${entity.uuid}`,
+            CLINICAL_DOCUMENT: `/clinical-records/clinical-documents/${entity.uuid}`,
         };
 
         if (routes[type]) navigate(routes[type]);
@@ -157,6 +159,15 @@ export default function FlowEventDetail({ node, onAddSecondaryNode, onDeleteSeco
                                     {entity.name} {entity.surname}
                                 </Typography>
                                 <SubtleChip label={PATIENT_STATUS_CONFIG[entity.status]?.label} />
+                            </Stack>
+                        )}
+
+                        {type === 'CLINICAL_DOCUMENT' && (
+                            <Stack spacing={1.5} alignItems='flex-start'>
+                                <Typography variant='body1' fontWeight='medium'>
+                                    {CLINICAL_DOCUMENT_TYPE_CONFIG[entity.documentType].label}
+                                </Typography>
+                                <SubtleChip label={CLINICAL_DOCUMENT_STATUS_CONFIG[entity.status]?.label} />
                             </Stack>
                         )}
                     </Box>

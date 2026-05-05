@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import { UserAutocomplete } from '@/components/forms/autocompletes';
 import { SelectInput } from '@/components/forms/inputs';
 
-export function DiagnosisProfessionalsField({ control, errors, rules }) {
+export function DiagnosisProfessionalsField({ control, errors, rules, multiple=true }) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'users',
@@ -69,9 +69,9 @@ export function DiagnosisProfessionalsField({ control, errors, rules }) {
                 </Grid>
             ))}
 
-            <Button startIcon={<AddIcon />} onClick={handleAddProfessional} variant='outlined' sx={{ mb: 1 }}>
+            {multiple && <Button startIcon={<AddIcon />} onClick={handleAddProfessional} variant='outlined' sx={{ mb: 1 }}>
                 Añadir profesional involucrado
-            </Button>
+            </Button>}
 
             {usersState.error && (
                 <Typography variant='caption' color='error'>

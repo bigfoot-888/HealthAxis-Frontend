@@ -29,14 +29,20 @@ function FlowViewportSync({ selectedNode }) {
 
     useEffect(() => {
         if (!selectedNode) return;
+        
+        // Add short timeout so that the viewport changes when showing a node's detail
+        // to the node from centering based on the full size
+        const timeout = setTimeout(() => {
+            const x = (selectedNode.positionAbsoluteX ?? selectedNode.position.x) + 90;
+            const y = (selectedNode.positionAbsoluteY ?? selectedNode.position.y) + 40;
 
-        const x = (selectedNode.positionAbsoluteX ?? selectedNode.position.x) + 90;
-        const y = (selectedNode.positionAbsoluteY ?? selectedNode.position.y) + 40;
+            setCenter(x, y, {
+                zoom: 1,
+                duration: 300,
+            });
+        }, 50); 
+        return () => clearTimeout(timeout);
 
-        setCenter(x, y, {
-            zoom: 1,
-            duration: 300,
-        });
     }, [selectedNode, setCenter]);
 
     return null;

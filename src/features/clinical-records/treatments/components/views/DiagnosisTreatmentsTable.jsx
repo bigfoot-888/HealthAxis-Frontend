@@ -3,84 +3,132 @@ import { useState, useMemo } from 'react';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { NestedTableLayout } from '@/components/tables';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
-import { formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 
-import { TreatmentClinicalStatusChip, TreatmentStatusChip } from '@treatments/components/ui/TreatmentChips';
+import { TREATMENT_COLUMNS } from '@treatments/config/treatment.columns';
+import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
+import { GridActionsCell, GridActionsCellItem } from '@mui/x-data-grid';
 
-export default function DiagnosisTreatmentsTable({ treatments }) {
+import SyncAltIcon from '@mui/icons-material/SyncAlt';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import EditIcon from '@mui/icons-material/Edit';
+
+import { isTreatmentOver, isCancelled, isFinished } from '@treatments/utils/treatment-status.utils';
+import CreateDiagnosisTreatmentForm from '@treatments/components/forms/CreateDiagnosisTreatmentForm';
+import UpdateTreatmentClinicalStatusForm from '@treatments/components/forms/UpdateTreatmentClinicalStatusForm';
+import UpdateTreatmentStatusForm from '@treatments/components/forms/UpdateTreatmentStatusForm';
+
+function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, diagnosisUuid, ...gridParams }) {
+    return (
+        <GridActionsCell {...gridParams}>
+            {!isFinished(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<SyncAltIcon />}
+                    label='Actualizar estado'
+                    onClick={() => onUpdateClinicalStatus(row)}
+                />
+            )}
+            {!isCancelled(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<AutorenewIcon />}
+                    label='Actualizar estado del registro'
+                    onClick={() => onUpdateStatus(row)}
+                />
+            )}
+            <GridActionsCellItem
+                icon={<EditIcon />}
+                label='Editar tratamiento'
+                component={Link}
+                to={`/clinical-records/treatments/edit/${row.uuid}`}
+                state={{ from: `/clinical-records/diagnoses/${diagnosisUuid}` }}
+            />
+        </GridActionsCell>
+    );
+}
+
+export default function DiagnosisTreatmentsTable({ treatments, diagnosis }) {
     const [searchText, setSearchText] = useState('');
+    const [createTreatment, setCreateTreatment] = useState(false);
+    const navigate = useNavigate();
+    const [treatmentToUpdateClinicalStatus, setTreatmentToUpdateClinicalStatus] = useState(null);
+    const [treatmentToUpdateStatus, setTreatmentToUpdateStatus] = useState(null);
 
-    const filteredTreatments = useSearchFilter(treatments, searchText, ['id', 'name']);
+    const filteredTreatments = useSearchFilter(treatments, searchText, null, [
+        (t) => t.name,
+        (t) => t.users?.map((u) => u.fullName).join(', '),
+        (t) => TREATMENT_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
+    ]);
 
     const columns = useMemo(() => {
         return [
+            TREATMENT_COLUMNS.name,
+            TREATMENT_COLUMNS.users,
+            TREATMENT_COLUMNS.duration,
+            TREATMENT_COLUMNS.clinicalStatus,
+            TREATMENT_COLUMNS.status,
+            TREATMENT_COLUMNS.createdAt,
             {
-                field: 'name',
-                headerName: 'Tratamiento',
-                flex: 3,
-            },
-            {
-                field: 'users',
-                headerName: 'Profesionales',
-                flex: 3,
-                valueGetter: (value, row) => {
-                    return row.users
-                        ? row.users.map((user) => user.fullName).join(', ')
-                        : '';
-                },
-            },
-            {
-                field: 'duration',
-                headerName: 'Duración',
-                flex: 2,
-            },
-            {
-                field: 'clinicalStatus',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => (
-                    <TreatmentClinicalStatusChip value={params.value} />
-                ),
-            },
-            {
-                field: 'status',
-                headerName: 'Estado del registro',
+                field: 'actions',
+                type: 'actions',
                 flex: 3,
                 renderCell: (params) => (
-                    <TreatmentStatusChip value={params.value} />
+                    <ActionsCell
+                        {...params}
+                        onUpdateClinicalStatus={setTreatmentToUpdateClinicalStatus}
+                        onUpdateStatus={setTreatmentToUpdateStatus}
+                        diagnosisUuid={diagnosis.uuid}
+                    />
                 ),
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha',
-                flex: 2,
-                valueFormatter: (value) => formatCreatedAt(value),
             },
         ];
     }, []);
 
     return (
-        <NestedTableLayout
-            rows={filteredTreatments}
-            columns={columns}
-            searchValue={searchText}
-            searchPlaceholder={'Busca por ID, nombre'}
-            onSearchChange={(e) => setSearchText(e.target.value)}
-            actions={
-                <Button
-                    variant='contained'
-                    component={Link}
-                    to='/clinical-records/treatments/new'
-                    startIcon={<PersonAddAltIcon />}
-                    sx={{ mr: 2 }}
-                >
-                    Añadir tratamiento
-                </Button>
-            }
-        />
+        <>
+            {createTreatment && (
+                <CreateDiagnosisTreatmentForm
+                    open={createTreatment}
+                    handleClose={() => setCreateTreatment(false)}
+                    diagnosis={diagnosis}
+                />
+            )}
+
+            {treatmentToUpdateClinicalStatus && (
+                <UpdateTreatmentClinicalStatusForm
+                    treatment={treatmentToUpdateClinicalStatus}
+                    handleClose={() => setTreatmentToUpdateClinicalStatus(null)}
+                />
+            )}
+            {treatmentToUpdateStatus && (
+                <UpdateTreatmentStatusForm
+                    treatment={treatmentToUpdateStatus}
+                    handleClose={() => setTreatmentToUpdateStatus(null)}
+                />
+            )}
+            <NestedTableLayout
+                rows={filteredTreatments}
+                columns={columns}
+                searchValue={searchText}
+                searchPlaceholder={'Busca por nombre, usuarios, estado clínico'}
+                onSearchChange={(e) => setSearchText(e.target.value)}
+                onRowClick={(params) => {
+                    navigate(`/clinical-records/treatments/${params.row.uuid}`);
+                }}
+                actions={
+                    <Button
+                        variant='contained'
+                        onClick={() => setCreateTreatment(true)}
+                        startIcon={<PersonAddAltIcon />}
+                        sx={{ mr: 2 }}
+                    >
+                        Añadir tratamiento
+                    </Button>
+                }
+            />
+        </>
     );
 }

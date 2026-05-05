@@ -7,7 +7,7 @@ import { FormDialog } from '@/components/dialogs/index';
 
 import { handleApiError } from '@/utils/handle-errors';
 
-import { DIAGNOSIS_STATUS_LABELS } from '@diagnoses/utils/chip-values';
+import { DIAGNOSIS_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
 
 import { updateDiagnosisStatus } from '@diagnoses/api/diagnosis.api';
 import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
@@ -37,8 +37,11 @@ export default function UpdateDiagnosisStatusForm({ diagnosis, handleClose }) {
         }
     };
 
-    const statusOptions = Object.entries(DIAGNOSIS_STATUS_LABELS).map(([value, label]) => ({ value, label }));
-
+    const statusOptions = Object.entries(DIAGNOSIS_STATUS_CONFIG).map(([value, config]) => ({
+        value,
+        label: config.label,
+    }));
+    
     return (
         <FormDialog
             open={!!diagnosis}

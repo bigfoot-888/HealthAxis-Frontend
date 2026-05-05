@@ -8,11 +8,9 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
-import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 
 import AlertDialog from '@/components/dialogs/AlertDialog';
 import { NestedTableLayout } from '@/components/tables';
@@ -20,23 +18,17 @@ import { NestedTableLayout } from '@/components/tables';
 import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
-import AppointmentChip from '@appointments/components/ui/AppointmentChip';
 import { handleApiError } from '@/utils/handle-errors';
 import CreateUserAppointmentForm from '../forms/CreateUserAppointmentForm';
+import { APPOINTMENT_COLUMNS } from '@appointments/config/appointment.columns';
+import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 
-function isCompleted(row) {
-    return row.status === 'COMPLETED';
-}
+import { isCompleted, isCheckedIn, isScheduled, isAppointmentOver } from '@appointments/utils/appointment-status.utils';
+import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditAppointmentQueries } from '../../utils/appointment-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
-function isCheckedIn(row) {
-    return row.status === 'CHECKED_IN';
-}
-
-function isScheduled(row) {
-    return row.status === 'SCHEDULED';
-}
-
-function ActionsCell({ row, onCancel, onComplete, onCheckIn, ...gridParams }) {
+function ActionsCell({ row, onCancel, onComplete, onCheckIn, userUuid, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             {!isCompleted(row) && isCheckedIn(row) && (
@@ -63,23 +55,15 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, ...gridParams }) {
                 />
             )}
 
-            <GridActionsCellItem
-                showInMenu
-                icon={<VisibilityIcon />}
-                label='Ver cita en detalle'
-                component={Link}
-                to={`/appointments/${row.uuid}`}
-            />
-
-            <GridActionsCellItem
-                showInMenu
+            {!isAppointmentOver(row) && <GridActionsCellItem
                 icon={<EditIcon />}
                 label='Editar cita'
                 component={Link}
                 to={`/appointments/edit/${row.uuid}`}
+                state={{ from: `/users/${userUuid}` }}
             />
-
-            {!isCompleted(row) && (
+}
+            {!isAppointmentOver(row) && (
                 <GridActionsCellItem
                     showInMenu
                     icon={<HighlightOffIcon />}
@@ -91,10 +75,18 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, ...gridParams }) {
     );
 }
 
-export default function UserAppointmentsTable({ user, appointments, setError, refetch }) {
+export default function UserAppointmentsTable({ user, appointments, refetch }) {
     const [searchText, setSearchText] = useState('');
+    const { showSnackbar } = useSnackbar();
+    const [error, setError] = useState(null); 
+    const queryClient = useQueryClient(); 
 
-    const filteredAppointments = useSearchFilter(appointments, searchText, ['id', 'reason', 'patient.fullName']);
+    const filteredAppointments = useSearchFilter(appointments, searchText, null, [
+        (a) => a.reason,
+        (a) => a.patient.fullName,
+        (a) => APPOINTMENT_STATUS_CONFIG[a.status].label,
+        (a) => formatDateTimeUTC(a.startTime),
+    ]);
 
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
@@ -104,11 +96,10 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
 
     const handleCompleteAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'COMPLETED');
-                refetch();
-            }
+            await updateAppointmentStatus(row.uuid, 'COMPLETED');
+            invalidateEditAppointmentQueries(queryClient, row)
             setAppointmentToComplete(null);
+            showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -116,11 +107,10 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
 
     const handleCheckInAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-                refetch();
-            }
+            await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
+            invalidateEditAppointmentQueries(queryClient, row);
             setAppointmentToCheckIn(null);
+            showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -128,43 +118,12 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
 
     const columns = useMemo(() => {
         return [
-            {
-                field: 'reason',
-                headerName: 'Motivo',
-                flex: 3,
-            },
-            {
-                field: 'startTime',
-                headerName: 'Fecha y hora de inicio',
-                type: 'date',
-                flex: 3,
-                valueFormatter: (value) => formatDateTimeUTC(value),
-            },
-            {
-                field: 'patient',
-                headerName: 'Paciente',
-                flex: 3,
-                valueGetter: (value, row) => row.patient?.fullName || 'N/A',
-            },
-            {
-                field: 'location',
-                headerName: 'Lugar',
-                flex: 2,
-            },
-            {
-                field: 'status',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => <AppointmentChip value={params.value} />,
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha de Creación',
-                flex: 2,
-                hide: true,
-                valueFormatter: (value) => formatCreatedAt(value),
-            },
+            APPOINTMENT_COLUMNS.reason,
+            APPOINTMENT_COLUMNS.startTime,
+            APPOINTMENT_COLUMNS.patient,
+            APPOINTMENT_COLUMNS.location,
+            APPOINTMENT_COLUMNS.status,
+            APPOINTMENT_COLUMNS.createdAt,
             {
                 field: 'actions',
                 type: 'actions',
@@ -175,6 +134,7 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                         onCancel={setAppointmentToCancel}
                         onComplete={setAppointmentToComplete}
                         onCheckIn={setAppointmentToCheckIn}
+                        userUuid={user.uuid}
                     />
                 ),
             },
@@ -188,7 +148,6 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                     open={createAppointment}
                     handleClose={() => setCreateAppointment(false)}
                     user={user}
-                    refetch={refetch}
                 />
             )}
             {appointmentToComplete && (
@@ -197,7 +156,9 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                     handleClose={() => setAppointmentToComplete(null)}
                     handleConfirm={() => handleCompleteAppointment(appointmentToComplete)}
                     title={`Completar cita: ${appointmentToComplete.patient.fullName}`}
-                    content='Esta acción es irreversible.'
+                    content='La cita será completada. Esta acción es irreversible.'
+                    error={error}
+                    onErrorClose={()=>setError(null)}
                 />
             )}
 
@@ -208,6 +169,8 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                     handleConfirm={() => handleCheckInAppointment(appointmentToCheckIn)}
                     title={`Check-in de cita: ${appointmentToCheckIn.patient.fullName}`}
                     content='Se marcará al paciente como presente.'
+                    error={error}
+                    onErrorClose={()=>setError(null)}
                 />
             )}
 
@@ -222,7 +185,7 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                 rows={filteredAppointments}
                 columns={columns}
                 searchValue={searchText}
-                searchPlaceholder='Busca por ID, motivo o paciente'
+                searchPlaceholder='Busca por motivo, paciente, estado, fecha'
                 onSearchChange={(e) => setSearchText(e.target.value)}
                 actions={
                     <Button
@@ -234,6 +197,9 @@ export default function UserAppointmentsTable({ user, appointments, setError, re
                         Añadir cita
                     </Button>
                 }
+                onRowClick={(params) => {
+                    navigate(`/appointments/${params.row.uuid}`);
+                }}
             />
         </>
     );

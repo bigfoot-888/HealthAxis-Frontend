@@ -10,8 +10,10 @@ import {FormDialog} from '@/components/dialogs/index';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
+import { useQueryClient } from '@tanstack/react-query';
 
-export default function CancelAppointmentForm({ appointment, handleClose, refetch }) {
+export default function CancelAppointmentForm({ appointment, handleClose }) {
     const {
         register,
         handleSubmit,
@@ -21,22 +23,26 @@ export default function CancelAppointmentForm({ appointment, handleClose, refetc
     } = useForm({ mode: 'onBlur', defaultValues: { status: "NO_SHOW" }, });
     
     const [error, setError] = useState(null);
+    const queryClient = useQueryClient();
     const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await updateAppointmentStatus(appointment.uuid, data.status, data.notes);
-            refetch(); 
+            queryClient.invalidateQueries(['appointments']);
+            queryClient.invalidateQueries(['appointments', appointment.user.uuid]);
+            queryClient.invalidateQueries(['appointments', appointment.patient.uuid]);
             handleClose();
             showSnackbar({message: 'Cita cancelada correctamente',});
         } catch (err) {
             handleApiError(err, setError, setFormError)
         }
     };
-    const statusOptions = [
-        { value: 'NO_SHOW', label: 'No presentado' },
-        { value: 'CANCELLED', label: 'Cancelado' },
-    ];
+
+    const statusOptions = ['NO_SHOW', 'CANCELLED'].map((status) => ({
+        value: status,
+        label: APPOINTMENT_STATUS_CONFIG[status].label,
+    }));
 
     return (
         <FormDialog

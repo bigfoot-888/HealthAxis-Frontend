@@ -1,13 +1,14 @@
 import { FormDialog } from '@/components/dialogs/index';
 import { useForm } from 'react-hook-form';
 import { Grid } from '@mui/material';
-import { useTreatments } from '@treatments/hooks/useTreatments';
 import { updateTreatmentStatus } from '@treatments/api/treatment.api';
 import { RHFRadioInput } from '@/components/forms/inputs/index';
 import { useState } from 'react';
 import { TREATMENT_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { handleApiError } from '@/utils/handle-errors';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditTreatmentQueries } from '@treatments/utils/treatment-query.utils';
 
 export default function UpdateTreatmentStatusForm({ treatment, handleClose }) {
     const {
@@ -16,14 +17,14 @@ export default function UpdateTreatmentStatusForm({ treatment, handleClose }) {
         setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur', defaultValues: { status: '' } });
-    const { refetch } = useTreatments();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient();
 
     const onSubmit = async (data) => {
         try {
             await updateTreatmentStatus(treatment.uuid, data.status);
-            refetch();
+            invalidateEditTreatmentQueries(queryClient, treatment);
             handleClose();
             showSnackbar({ message: 'Estado del tratamiento actualizado correctamente' });
         } catch (err) {
@@ -32,7 +33,7 @@ export default function UpdateTreatmentStatusForm({ treatment, handleClose }) {
     };
 
     const statusOptions = Object.entries(TREATMENT_STATUS_CONFIG).map(([value, { label }]) => ({ value, label }));
-    
+
     return (
         <FormDialog
             open={!!treatment}

@@ -15,16 +15,20 @@ export default function FormDialog({
     onErrorClose = () => {},
 }) {
     return (
-        <Dialog open={open} onClose={handleClose} fullWidth>
-            <ErrorAlert error={error} onClose={onErrorClose} />
-            <form onSubmit={handleSubmit}>
-                <DialogTitle>{title}</DialogTitle>
-                <DialogContent>{children}</DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
-                    <Button type='submit'>Aceptar</Button>
-                </DialogActions>
-            </form>
-        </Dialog>
+        <>
+            {open && (
+                <Dialog open={open} onClose={handleClose} fullWidth>
+                    <ErrorAlert error={error} onClose={onErrorClose} />
+                    <form onSubmit={handleSubmit}>
+                        <DialogTitle>{title}</DialogTitle>
+                        <DialogContent>{children}</DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancelar</Button>
+                            <Button type='submit'>Aceptar</Button>
+                        </DialogActions>
+                    </form>
+                </Dialog>
+            )}
+        </>
     );
 }

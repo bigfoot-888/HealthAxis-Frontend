@@ -3,9 +3,19 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["*"],
+      "@appointments/*": ["features/appointments/*"],
+      "@auth/*": ["features/auth/*"],
+      "@agendas/*": ["features/agendas/*"],
+      "@users/*": ["features/users/*"],
+      "@patients/*": ["features/patients/*"],
+      "@clinical-records/*": ["features/clinical-records/*"],
+      "@diagnoses/*": ["features/clinical-records/diagnoses/*"],
+      "@treatments/*": ["features/clinical-records/treatments/*"],
+      "@clinical-documents/*": ["features/clinical-records/clinical-documents/*"],
+      "@patient-flows/*": ["features/patient-flows/*"],
+      "@dashboards/*": ["features/dashboards/*"]
     }
-    
   },
   "include": ["src"]
 }

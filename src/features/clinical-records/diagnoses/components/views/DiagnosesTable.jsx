@@ -1,116 +1,74 @@
-// React
 import { useState, useMemo } from 'react';
-
-// External libraries
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import EditIcon from '@mui/icons-material/Edit';
 import { Link, useNavigate } from 'react-router';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
-
 import { BasicTableLayout } from '@/components/tables/index';
-
-import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
-
-import {
-    DiagnosisClinicalStatusChip,
-    DiagnosisStatusChip,
-    DiagnosisSeverityChip,
-} from '@diagnoses/components/ui/DiagnosisChips';
 import UpdateDiagnosisClinicalStatusForm from '@diagnoses/components/forms/UpdateDiagnosisClinicalStatusForm';
 import UpdateDiagnosisStatusForm from '@diagnoses/components/forms/UpdateDiagnosisStatusForm';
+import { DIAGNOSIS_COLUMNS } from '@diagnoses/config/diagnosis.columns';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
+import { isDiagnosisOver, isDiagnosisValid } from '@diagnoses/utils/diagnosis-status.utils';
 
 function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
+            {!isDiagnosisOver(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<SyncAltIcon />}
+                    label='Actualizar estado'
+                    onClick={() => onUpdateClinicalStatus(row)}
+                />
+            )}
+            {!isDiagnosisValid(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<AutorenewIcon />}
+                    label='Actualizar estado del registro'
+                    onClick={() => onUpdateStatus(row)}
+                />
+            )}
             <GridActionsCellItem
                 showInMenu
-                icon={<SyncAltIcon />}
-                label='Actualizar estado'
-                onClick={() => onUpdateClinicalStatus(row)}
-            ></GridActionsCellItem>
-            <GridActionsCellItem
-                showInMenu
-                icon={<AutorenewIcon />}
-                label='Actualizar estado del registro'
-                onClick={() => onUpdateStatus(row)}
-            ></GridActionsCellItem>
+                icon={<EditIcon />}
+                label='Editar diagnóstico'
+                component={Link}
+                to={`/clinical-records/diagnoses/edit/${row.uuid}`}
+                state={{ from: `/clinical-records/diagnoses` }}
+            />
         </GridActionsCell>
     );
 }
 
 export default function DiagnosesTable({ diagnoses }) {
-    const [searchText, setSearchText] = useState(''); // Searchbar text
-    const filteredDiagnoses = useSearchFilter(diagnoses, searchText, ['id', 'name']);
+    const [searchText, setSearchText] = useState('');
+
+    const filteredDiagnoses = useSearchFilter(diagnoses, searchText, null, [
+        (t) => t.name,
+        (t) => t.patient.fullName,
+        (t) => t.users?.map((u) => u.fullName).join(', '),
+        (t) => DIAGNOSIS_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
+    ]);
+
     const navigate = useNavigate();
     const [updateDiagnosisClinicalStatusRow, setUpdateDiagnosisClinicalStatusRow] = useState(null);
     const [updateDiagnosisStatusRow, setUpdateDiagnosisStatusRow] = useState(null);
 
     const columns = useMemo(() => {
         return [
-            {
-                field: 'name',
-                headerName: 'Nombre',
-                flex: 3,
-            },
-            {
-                field: 'severity',
-                headerName: 'Gravedad',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <DiagnosisSeverityChip value={value} />;
-                },
-            },
-            {
-                field: 'patient',
-                headerName: 'Paciente',
-                flex: 2,
-                valueGetter: (value, row) => row.patient?.fullName || 'N/A',
-            },
-            {
-                field: 'users',
-                headerName: 'Profesionales',
-                flex: 3,
-                valueGetter: (value, row) => {
-                    return row.users ? row.users.map((user) => user.fullName).join(', ') : '';
-                },
-            },
-            {
-                field: 'diagnosedAt',
-                headerName: 'Fecha de diagnóstico',
-                type: 'date',
-                flex: 3,
-                valueFormatter: (value) => formatDateTimeUTC(value),
-            },
-            {
-                field: 'clinicalStatus',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <DiagnosisClinicalStatusChip value={value} />;
-                },
-            },
-            {
-                field: 'status',
-                headerName: 'Estado del registro',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <DiagnosisStatusChip value={value} />;
-                },
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha de Creación',
-                flex: 2,
-                hide: true,
-                valueFormatter: (value) => formatCreatedAt(value),
-            },
+            DIAGNOSIS_COLUMNS.name,
+            DIAGNOSIS_COLUMNS.severity,
+            DIAGNOSIS_COLUMNS.patient,
+            DIAGNOSIS_COLUMNS.users,
+            DIAGNOSIS_COLUMNS.diagnosedAt,
+            DIAGNOSIS_COLUMNS.clinicalStatus,
+            DIAGNOSIS_COLUMNS.status,
+            DIAGNOSIS_COLUMNS.createdAt,
             {
                 field: 'actions',
                 type: 'actions',
@@ -144,7 +102,7 @@ export default function DiagnosesTable({ diagnoses }) {
                 rows={filteredDiagnoses}
                 columns={columns}
                 searchValue={searchText}
-                searchPlaceholder={'Busca por ID, nombre'}
+                searchPlaceholder={'Busca por nombre, paciente, usuarios, estado clínico'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
                 onRowClick={(params) => {
                     navigate(`/clinical-records/diagnoses/${params.row.uuid}`);

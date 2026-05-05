@@ -66,11 +66,16 @@ export default function DiagnosisSummaryCard({ diagnosis }) {
                             </Stack>
 
                             {diagnosis.description && (
+                                // So that it truncates once it goes beyond two lines
                                 <Typography
                                     variant='body2'
                                     sx={{
                                         color: 'onSurfaceVariant',
                                         mt: 0.5,
+
+                                        whiteSpace: 'normal',
+                                        wordBreak: 'break-word',
+
                                         display: '-webkit-box',
                                         WebkitLineClamp: 2,
                                         WebkitBoxOrient: 'vertical',

@@ -119,7 +119,7 @@ export default function CreateDiagnosisForm() {
                         </Grid>
                         <Grid size={12}>
                             <BasicTextInput
-                                label='Descripción'
+                                label='Descripción (opcional)'
                                 name='description'
                                 type='text'
                                 register={register}

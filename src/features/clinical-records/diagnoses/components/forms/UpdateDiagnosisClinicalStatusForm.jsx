@@ -6,7 +6,7 @@ import { RHFRadioInput } from '@/components/forms/inputs/index';
 import { FormDialog } from '@/components/dialogs/index';
 import { handleApiError } from '@/utils/handle-errors';
 
-import { DIAGNOSIS_CLINICAL_STATUS_LABELS } from '@diagnoses/utils/chip-values';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
 
 import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
 import { updateDiagnosisClinicalStatus} from '@diagnoses/api/diagnosis.api';
@@ -36,8 +36,11 @@ export default function UpdateDiagnosisClinicalStatusForm({ diagnosis, handleClo
         }
     };
 
-    const statusOptions = Object.entries(DIAGNOSIS_CLINICAL_STATUS_LABELS).map(([value, label]) => ({ value, label }));
-
+    const statusOptions = Object.entries(DIAGNOSIS_CLINICAL_STATUS_CONFIG).map(([value, config]) => ({
+        value,
+        label: config.label,
+    }));
+    
     return (
         <FormDialog
             open={!!diagnosis}

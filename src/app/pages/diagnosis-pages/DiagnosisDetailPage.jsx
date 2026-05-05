@@ -14,8 +14,9 @@ import { RelatedEntityContainer } from '@/components/ui';
 import { useDiagnosis } from '@diagnoses/hooks/useDiagnosis';
 import { useTreatmentsByDiagnosis } from '@treatments/hooks/useTreatmentsByDiagnosis';
 
-import { Box, Stack, Grid } from '@mui/material';
+import { Box, Stack, Grid, Divider } from '@mui/material';
 import { DetailLayout } from '@/components/entity-detail';
+import UserSummaryCard from '@/features/users/components/ui/UserSummaryCard';
 
 export default function DiagnosisDetailPage() {
     const { uuid } = useParams();
@@ -32,6 +33,9 @@ export default function DiagnosisDetailPage() {
     if (treatmentsFetchError || diagnosisFetchError) return <p>Error al cargar diagnóstico</p>;
     if (diagnosisIsLoading || treatmentsIsLoading || !diagnosis) return <CustomCircularProgress />;
 
+    const users = diagnosis.users || [];
+    const hasMultipleUsers = users.length > 1;
+
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)} drawer={false}>
             <DetailLayout>
@@ -42,28 +46,44 @@ export default function DiagnosisDetailPage() {
 
                 <Box>
                     <DetailSectionHeader label='Contexto Clínico' />
-                    <Grid container spacing={3}>
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <RelatedEntityContainer label='Paciente'>
-                                <PatientSummaryCard patient={diagnosis.patient} />
-                            </RelatedEntityContainer>
-                        </Grid>
+                    <Stack spacing={3}>
+                        <Box>
+                            <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, md: hasMultipleUsers ? 12 : 6 }}>
+                                    <RelatedEntityContainer label='Paciente'>
+                                        <PatientSummaryCard patient={diagnosis.patient} />
+                                    </RelatedEntityContainer>
+                                </Grid>
 
-                        {diagnosis.appointment && (
-                            <Grid size={{ xs: 12, md: 6 }}>
-                                <RelatedEntityContainer label='Cita de origen'>
-                                    <AppointmentSummaryCard appointment={diagnosis.appointment} />
-                                </RelatedEntityContainer>
+                                {users.map((user) => (
+                                    <Grid key={user.uuid} size={{ xs: 12, md: 6 }}>
+                                        <RelatedEntityContainer label='Profesional involucrado'>
+                                            <UserSummaryCard user={user} />
+                                        </RelatedEntityContainer>
+                                    </Grid>
+                                ))}
                             </Grid>
+                        </Box>
+                        {diagnosis.appointment && (
+                            <>
+                                <Divider sx={{ borderStyle: 'dashed', borderColor: 'outlineVariant' }} />
+                                <Box>
+                                    <Grid size={{ xs: 12, md: 6 }}>
+                                        <RelatedEntityContainer label='Cita de origen'>
+                                            <AppointmentSummaryCard appointment={diagnosis.appointment} />
+                                        </RelatedEntityContainer>
+                                    </Grid>
+                                </Box>
+                            </>
                         )}
-                    </Grid>
+                    </Stack>
                 </Box>
 
                 {treatments && (
                     <Box>
                         <DetailSectionHeader label='Tratamientos Asociados' />
                         <Box sx={{ px: 1 }}>
-                            <DiagnosisTreatmentsTable treatments={treatments} />
+                            <DiagnosisTreatmentsTable treatments={treatments} diagnosis={diagnosis} />
                         </Box>
                     </Box>
                 )}

@@ -1,5 +1,5 @@
 import { useUser } from '@users/hooks/useUser';
-import EditUserForm from '@users/components/EditUserForm';
+import EditUserForm from '@/features/users/components/forms/EditUserForm';
 import { useParams } from 'react-router';
 import { CustomCircularProgress } from '@/components/feedback';
 import { ContentLayout } from '@/components/layout';

@@ -16,6 +16,7 @@ import { ErrorAlert } from '@/components/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateCreateAppointmentQueries } from '../../utils/appointment-query.utils';
 
 export default function CreateAppointmentForm() {
     const {
@@ -34,7 +35,6 @@ export default function CreateAppointmentForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from || '/appointments';
-    const { refetch } = useAppointments();
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
     const { showSnackbar } = useSnackbar();
@@ -42,8 +42,7 @@ export default function CreateAppointmentForm() {
     const onSubmit = async (data) => {
         try {
             await createAppointment(data);
-            refetch();
-            await queryClient.invalidateQueries({ queryKey: ['appointments', { userUuid: data.user.uuid }] });
+            invalidateCreateAppointmentQueries(queryClient)
             navigate(from);
             showSnackbar({message: 'Cita creada correctamente',});
         } catch (err) {

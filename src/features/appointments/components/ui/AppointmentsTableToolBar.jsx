@@ -6,8 +6,7 @@ import { SearchBar } from '@/components/ui';
 export default function AppointmentsTableToolbar({ searchText, setSearchText }) {
     return (
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <SearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Busca por ID, motivo, paciente, profesional" />
-
+            <SearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Busca por motivo, paciente, usuario, estado, fecha" />
 
             <Button
                 variant="contained"

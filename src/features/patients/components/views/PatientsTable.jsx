@@ -14,13 +14,15 @@ import { importPatients, deactivatePatient, reactivatePatient } from '@patients/
 import { PatientStatusChip } from '@patients/components/ui/PatientChips';
 
 import { AlertDialog } from '@/components/dialogs/index';
-import { BasicTableLayout, NestedTableLayout } from '@/components/tables/index';
+import { BasicTableLayout } from '@/components/tables/index';
 import { ContentLayout } from '@/components/layout/index';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
 import { formatCreatedAt } from '@/utils/date-formatters';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
+import { PATIENT_COLUMNS } from '@patients/config/patient.columns';
 
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
@@ -122,35 +124,13 @@ export default function PatientsTable({ patients }) {
 
     const columns = useMemo(() => {
         return [
-            { field: 'nhc', headerName: 'NHC', flex: 2 },
-            { field: 'name', headerName: 'Nombre', flex: 2 },
-            { field: 'surname', headerName: 'Apellidos', flex: 2 },
-            {
-                field: 'dateOfBirth',
-                headerName: 'Fecha de Nacimiento',
-                flex: 2,
-                type: 'date',
-                valueGetter: (value) => {
-                    return new Date(value);
-                },
-            },
-            { field: 'dni', headerName: 'DNI', flex: 2 },
-            {
-                field: 'status',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <PatientStatusChip value={value} />;
-                },
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha de Creación',
-                flex: 2,
-                valueFormatter: (value) => formatCreatedAt(value),
-            },
+            PATIENT_COLUMNS.nhc,
+            PATIENT_COLUMNS.name,
+            PATIENT_COLUMNS.surname,
+            PATIENT_COLUMNS.dateOfBirth,
+            PATIENT_COLUMNS.dni,
+            PATIENT_COLUMNS.status,
+            PATIENT_COLUMNS.createdAt,
             {
                 field: 'actions',
                 type: 'actions',

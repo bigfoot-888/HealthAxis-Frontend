@@ -9,6 +9,8 @@ import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.c
 import { handleApiError } from '@/utils/handle-errors';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditTreatmentQueries } from '@treatments/utils/treatment-query.utils';
 
 export default function UpdateTreatmentClinicalStatusForm({ treatment, handleClose }) {
     const {
@@ -21,11 +23,12 @@ export default function UpdateTreatmentClinicalStatusForm({ treatment, handleClo
     const { refetch } = useTreatments();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient(); 
 
     const onSubmit = async (data) => {
         try {
             await updateTreatmentClinicalStatus(treatment.uuid, data.clinicalStatus);
-            refetch();
+            invalidateEditTreatmentQueries(queryClient, treatment);
             handleClose();
             showSnackbar({ message: 'Estado clínico del tratamiento actualizado correctamente' });
         } catch (err) {

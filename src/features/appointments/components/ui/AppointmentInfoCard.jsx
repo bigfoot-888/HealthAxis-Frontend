@@ -154,11 +154,11 @@ export default function AppointmentInfoCard({ appointment, onCheckIn, onComplete
 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                        <DataItem
-                            label='Inicio programado'
-                            value={formatDateTimeUTC(appointment.startTime)}
-                            icon={CalendarTodayIcon}
-                        />
+                        <DataItem label='Inicio programado' value={formatDateTimeUTC(appointment.startTime)} />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                        <DataItem label='Fin' value={formatDateTimeUTC(appointment.endTime)} />
                     </Grid>
 
                     {appointment.notes && (

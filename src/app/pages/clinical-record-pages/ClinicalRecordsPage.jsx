@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Tabs, Box, Tab } from '@mui/material';
-import {ContentLayout} from '@/components/layout/index';
-import { Outlet } from 'react-router';
+import { ContentLayout } from '@/components/layout/index';
+import { Outlet, useLocation } from 'react-router';
 import { Link } from 'react-router';
 
 export default function ClinicalRecordsPage() {
-    const [viewMode, setViewMode] = useState('clinical-documents'); 
-    const [error, setError] = useState(null); 
+    const [error, setError] = useState(null);
+    const location = useLocation();
+    const currentTab = location.pathname.split('/').pop();
+
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
-            <Tabs value={viewMode} onChange={(e, value) => setViewMode(value)} sx={{ mb: 2 }}>
+            <Tabs value={currentTab} sx={{ mb: 2 }}>
                 <Tab label='Documentos clínicos' value='clinical-documents' component={Link} to='clinical-documents' />
                 <Tab label='Diagnósticos' value='diagnoses' component={Link} to='diagnoses' />
                 <Tab label='Tratamientos' value='treatments' component={Link} to='treatments' />

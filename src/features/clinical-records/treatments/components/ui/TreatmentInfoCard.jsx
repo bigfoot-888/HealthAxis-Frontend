@@ -41,7 +41,14 @@ export default function TreatmentInfoCard({ treatment }) {
                             </Typography>
 
                             {treatment.description && (
-                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant' }}>
+                                <Typography
+                                    variant='body2'
+                                    sx={{
+                                        color: 'onSurfaceVariant',
+                                        wordBreak: 'break-word',
+                                        whiteSpace: 'normal',
+                                    }}
+                                >
                                     {treatment.description}
                                 </Typography>
                             )}
@@ -84,10 +91,6 @@ export default function TreatmentInfoCard({ treatment }) {
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                         <DataItem label='Duración' value={treatment.duration || '—'} />
-                    </Grid>
-
-                    <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                        <DataItem label='Prescrito el' value={formatDateTimeUTC(treatment.devisedAt)} />
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 6, md: 4 }}>

@@ -1,19 +1,15 @@
 import { useState, useMemo } from 'react';
 
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
-import Button from '@mui/material/Button';
 import { Tooltip } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import MedicalInformationIcon from '@mui/icons-material/MedicalInformation';
 import { Link, useNavigate } from 'react-router';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
-import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
+import { formatDateTimeUTC } from '@/utils/date-formatters';
 
 import AlertDialog from '@/components/dialogs/AlertDialog';
 import BasicTableLayout from '@/components/tables/BasicTableLayout';
@@ -22,25 +18,12 @@ import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
-import AppointmentChip from '@appointments/components/ui/AppointmentChip';
 import { handleApiError } from '@/utils/handle-errors';
 import AddClinicalDataStepperForm from '@appointments/components/forms/AddClinicalDataStepperForm';
-
-function isCompleted(row) {
-    return row.status === 'COMPLETED';
-}
-
-function isCheckedIn(row) {
-    return row.status === 'CHECKED_IN';
-}
-
-function isScheduled(row) {
-    return row.status === 'SCHEDULED';
-}
-
-function isCancelled(row) {
-    return row.status === 'NO_SHOW' || row.status !== 'CANCELLED';
-}
+import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
+import { APPOINTMENT_COLUMNS } from '@appointments/config/appointment.columns';
+import { isCompleted, isCheckedIn, isScheduled, isAppointmentOver } from '@appointments/utils/appointment-status.utils';
+import { useSnackbar } from '@/app/SnackBarContext';
 
 function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, ...gridParams }) {
     return (
@@ -75,7 +58,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
                 to={`/appointments/edit/${row.uuid}`}
                 state={{ from: `/appointments` }}
             />
-            {isCancelled(row) && (
+            {!isAppointmentOver(row) && (
                 <GridActionsCellItem
                     showInMenu
                     icon={<HighlightOffIcon />}
@@ -89,11 +72,14 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
 
 export default function AppointmentsTable({ appointments, setError, searchText }) {
     const navigate = useNavigate();
-    const filteredAppointments = useSearchFilter(appointments, searchText, [
-        'id',
-        'reason',
-        'user.fullName',
-        'patient.fullName',
+    const { showSnackbar } = useSnackbar();
+
+    const filteredAppointments = useSearchFilter(appointments, searchText, null, [
+        (a) => a.reason,
+        (a) => a.user.fullName,
+        (a) => a.patient.fullName,
+        (a) => APPOINTMENT_STATUS_CONFIG[a.status].label,
+        (a) => formatDateTimeUTC(a.startTime),
     ]);
 
     const { refetch } = useAppointments();
@@ -104,11 +90,10 @@ export default function AppointmentsTable({ appointments, setError, searchText }
 
     const handleCompleteAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'COMPLETED');
-                refetch();
-            }
+            await updateAppointmentStatus(row.uuid, 'COMPLETED');
+            refetch();
             setAppointmentToComplete(null);
+            showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -116,11 +101,10 @@ export default function AppointmentsTable({ appointments, setError, searchText }
 
     const handleCheckInAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-                refetch();
-            }
+            await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
+            refetch();
             setAppointmentToCheckIn(null);
+            showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
             handleApiError(err, setError, null);
         }
@@ -148,61 +132,14 @@ export default function AppointmentsTable({ appointments, setError, searchText }
 
     const columns = useMemo(() => {
         return [
-            {
-                field: 'reason',
-                headerName: 'Motivo',
-                flex: 3,
-            },
-            {
-                field: 'startTime',
-                headerName: 'Fecha y hora de inicio',
-                type: 'date',
-                flex: 3,
-                valueFormatter: (value) => {
-                    return formatDateTimeUTC(value);
-                },
-            },
-            {
-                field: 'patient',
-                headerName: 'Paciente',
-                flex: 2,
-                valueGetter: (value, row) => row.patient?.fullName || 'N/A',
-            },
-            {
-                field: 'user',
-                headerName: 'Profesional',
-                flex: 2,
-                valueGetter: (value, row) => row.user?.fullName || 'N/A',
-            },
-            {
-                field: 'location',
-                headerName: 'Lugar',
-                flex: 2,
-            },
-            {
-                field: 'status',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <AppointmentChip value={value} />;
-                },
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha de Creación',
-                flex: 2,
-                hide: true,
-                valueFormatter: (value) => {
-                    return formatCreatedAt(value);
-                },
-            },
-            {
-                field: 'priority',
-                headerName: 'Priority',
-                hide: true,
-            },
+            APPOINTMENT_COLUMNS.reason,
+            APPOINTMENT_COLUMNS.startTime,
+            APPOINTMENT_COLUMNS.patient,
+            APPOINTMENT_COLUMNS.user,
+            APPOINTMENT_COLUMNS.location,
+            APPOINTMENT_COLUMNS.status,
+            APPOINTMENT_COLUMNS.createdAt,
+            APPOINTMENT_COLUMNS.priority,
             {
                 field: 'actions',
                 type: 'actions',

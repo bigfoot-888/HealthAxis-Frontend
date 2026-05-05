@@ -3,7 +3,7 @@ import { getUsersByAgenda } from '@users/api/user.api';
 
 export function useUsersByAgenda(agendaUuid) {
     return useQuery({
-        queryKey: ['users', { agendaUuid }],
+        queryKey: ['users', agendaUuid],
         queryFn: () => getUsersByAgenda(agendaUuid),
         enabled: !!agendaUuid,
     });

@@ -8,34 +8,43 @@ import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 
-import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
-
-import {
-    DiagnosisClinicalStatusChip,
-    DiagnosisStatusChip,
-    DiagnosisSeverityChip,
-} from '@diagnoses/components/ui/DiagnosisChips';
-
+import EditIcon from '@mui/icons-material/Edit';
+import { Link, useNavigate } from 'react-router';
 import UpdateDiagnosisClinicalStatusForm from '@diagnoses/components/forms/UpdateDiagnosisClinicalStatusForm';
 import UpdateDiagnosisStatusForm from '@diagnoses/components/forms/UpdateDiagnosisStatusForm';
 
 import CreateAppointmentDiagnosisForm from '@diagnoses/components/forms/CreateAppointmentDiagnosisForm';
+import { DIAGNOSIS_COLUMNS } from '@diagnoses/config/diagnosis.columns';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
 
-function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParams }) {
+import { isDiagnosisOver, isDiagnosisValid } from '@diagnoses/utils/diagnosis-status.utils';
+
+function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, appointmentUuid, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
+            {!isDiagnosisOver(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<SyncAltIcon />}
+                    label='Actualizar estado'
+                    onClick={() => onUpdateClinicalStatus(row)}
+                />
+            )}
+            {!isDiagnosisValid(row) && (
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<AutorenewIcon />}
+                    label='Actualizar estado del registro'
+                    onClick={() => onUpdateStatus(row)}
+                />
+            )}
             <GridActionsCellItem
-                showInMenu
-                icon={<SyncAltIcon />}
-                label='Actualizar estado clínico'
-                onClick={() => onUpdateClinicalStatus(row)}
-            />
-            <GridActionsCellItem
-                showInMenu
-                icon={<AutorenewIcon />}
-                label='Actualizar estado del registro'
-                onClick={() => onUpdateStatus(row)}
+                icon={<EditIcon />}
+                label='Editar diagnóstico'
+                component={Link}
+                to={`/clinical-records/diagnoses/edit/${row.uuid}`}
+                state={{ from: `/appointments/${appointmentUuid}` }}
             />
         </GridActionsCell>
     );
@@ -43,52 +52,27 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParam
 
 export default function AppointmentDiagnosesTable({ diagnoses, appointment, refetch }) {
     const [searchText, setSearchText] = useState('');
-    const [openDialog, setOpenDialog] = useState(false);
+    const [createDiagnosis, setCreateDiagnosis] = useState(false);
+    const navigate = useNavigate();
 
     const [updateDiagnosisClinicalStatusRow, setUpdateDiagnosisClinicalStatusRow] = useState(null);
     const [updateDiagnosisStatusRow, setUpdateDiagnosisStatusRow] = useState(null);
 
-    const filteredDiagnoses = useSearchFilter(diagnoses, searchText, ['id', 'name']);
+    const filteredDiagnoses = useSearchFilter(diagnoses, searchText, null, [
+        (t) => t.name,
+        (t) => t.users?.map((u) => u.fullName).join(', '),
+        (t) => DIAGNOSIS_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
+    ]);
 
     const columns = useMemo(() => {
         return [
-            {
-                field: 'name',
-                headerName: 'Diagnóstico',
-                flex: 3,
-            },
-            {
-                field: 'severity',
-                headerName: 'Gravedad',
-                flex: 2,
-                renderCell: (params) => <DiagnosisSeverityChip value={params.value} />,
-            },
-            {
-                field: 'users',
-                headerName: 'Profesionales',
-                flex: 3,
-                valueGetter: (value, row) =>
-                    row.users ? row.users.map((u) => u.fullName).join(', ') : '',
-            },
-            {
-                field: 'diagnosedAt',
-                headerName: 'Fecha diagnóstico',
-                type: 'date',
-                flex: 3,
-                valueFormatter: (value) => formatDateTimeUTC(value),
-            },
-            {
-                field: 'clinicalStatus',
-                headerName: 'Estado clínico',
-                flex: 2,
-                renderCell: (params) => <DiagnosisClinicalStatusChip value={params.value} />,
-            },
-            {
-                field: 'status',
-                headerName: 'Estado registro',
-                flex: 2,
-                renderCell: (params) => <DiagnosisStatusChip value={params.value} />,
-            },
+            DIAGNOSIS_COLUMNS.name,
+            DIAGNOSIS_COLUMNS.severity,
+            DIAGNOSIS_COLUMNS.users,
+            DIAGNOSIS_COLUMNS.diagnosedAt,
+            DIAGNOSIS_COLUMNS.clinicalStatus,
+            DIAGNOSIS_COLUMNS.status,
+            DIAGNOSIS_COLUMNS.createdAt,
             {
                 field: 'actions',
                 type: 'actions',
@@ -98,6 +82,7 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                         {...params}
                         onUpdateClinicalStatus={setUpdateDiagnosisClinicalStatusRow}
                         onUpdateStatus={setUpdateDiagnosisStatusRow}
+                        appointmentUuid={appointment.uuid}
                     />
                 ),
             },
@@ -108,8 +93,8 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
         <>
             {/* Create dialog */}
             <CreateAppointmentDiagnosisForm
-                open={openDialog}
-                handleClose={() => setOpenDialog(false)}
+                open={createDiagnosis}
+                handleClose={() => setCreateDiagnosis(false)}
                 appointment={appointment}
             />
 
@@ -137,13 +122,16 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                 rows={filteredDiagnoses}
                 columns={columns}
                 searchValue={searchText}
-                searchPlaceholder={'Busca por ID, nombre'}
+                searchPlaceholder={'Busca por nombre, usuarios, estado clínico'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                onRowClick={(params) => {
+                    navigate(`/clinical-records/diagnoses/${params.row.uuid}`);
+                }}
                 actions={
                     <Button
                         variant='contained'
                         startIcon={<PersonAddAltIcon />}
-                        onClick={() => setOpenDialog(true)}
+                        onClick={() => setCreateDiagnosis(true)}
                         sx={{ mr: 2 }}
                     >
                         Añadir diagnóstico

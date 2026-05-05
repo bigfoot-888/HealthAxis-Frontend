@@ -5,7 +5,7 @@ import AppointmentDiagnosesTable from '@diagnoses/components/views/AppointmentDi
 import AppointmentTreatmentsTable from '@treatments/components/views/AppointmentTreatmentsTable';
 
 import { useAppointment } from '@appointments/hooks/useAppointment';
-import { useDiagnosesByAppointment } from '@diagnoses/hooks/useDiagnosesByAppointment';
+import { useDiagnosesByAppointment } from '@/features/clinical-records/diagnoses/hooks/useDiagnosesByAppointment';
 import { useTreatmentsByAppointment } from '@treatments/hooks/useTreatmentsByAppointment';
 
 import { updateAppointmentStatus } from '@appointments/api/appointment.api';
@@ -16,7 +16,7 @@ import { useState } from 'react';
 import { ContentLayout } from '@/components/layout';
 import { AppBreadcrumbs } from '@/components/navigation';
 
-import { Grid, Stack, Box, Typography } from '@mui/material';
+import { Grid, Box } from '@mui/material';
 
 import AlertDialog from '@/components/dialogs/AlertDialog';
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
@@ -45,10 +45,8 @@ export default function AppointmentDetailPage() {
 
     const handleCompleteAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'COMPLETED');
-                refetchAppointment();
-            }
+            await updateAppointmentStatus(row.uuid, 'COMPLETED');
+            refetchAppointment();
             setAppointmentToComplete(null);
             showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
@@ -58,10 +56,8 @@ export default function AppointmentDetailPage() {
 
     const handleCheckInAppointment = async (row) => {
         try {
-            if (row) {
-                await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-                refetchAppointment();
-            }
+            await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
+            refetchAppointment();
             setAppointmentToCheckIn(null);
             showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
@@ -73,7 +69,7 @@ export default function AppointmentDetailPage() {
     if (isLoading || !appointment) return <CustomCircularProgress />;
 
     return (
-        <ContentLayout error={error} onErrorClose={() => setError(null)}>
+        <ContentLayout>
             {appointmentToComplete && (
                 <AlertDialog
                     open
@@ -81,6 +77,8 @@ export default function AppointmentDetailPage() {
                     handleConfirm={() => handleCompleteAppointment(appointmentToComplete)}
                     title={`Completar cita`}
                     content='Esta acción es irreversible. La cita se marcará como completada.'
+                    error={error}
+                    onErrorClose={()=>setError(null)}
                 />
             )}
 
@@ -89,8 +87,10 @@ export default function AppointmentDetailPage() {
                     open
                     handleClose={() => setAppointmentToCheckIn(null)}
                     handleConfirm={() => handleCheckInAppointment(appointmentToCheckIn)}
-                    title={`Check-in: ${appointmentToCheckIn.patient.fullName}`}
-                    content='Se marcará al paciente como presente.'
+                    title={`Registrar cita`}
+                    content='Se marcará al paciente como presente para realizar la cita.'
+                    error={error}
+                    onErrorClose={()=>setError(null)}
                 />
             )}
 
@@ -103,7 +103,6 @@ export default function AppointmentDetailPage() {
             )}
             <DetailLayout>
                 <AppBreadcrumbs items={[{ label: 'Citas', to: '/appointments' }, { label: `${appointment.reason}` }]} />
-
                 <Box>
                     <DetailSectionHeader label='Información de la Cita' marginTop={false} />
                     <AppointmentInfoCard
@@ -148,7 +147,7 @@ export default function AppointmentDetailPage() {
                 <Box>
                     <DetailSectionHeader label='Tratamientos Prescritos' />
                     <Box sx={{ px: 1 }}>
-                        <AppointmentTreatmentsTable treatments={treatments} refetch={refetchTreatments} />
+                        <AppointmentTreatmentsTable treatments={treatments} appointment={appointment}/>
                     </Box>
                 </Box>
             </DetailLayout>

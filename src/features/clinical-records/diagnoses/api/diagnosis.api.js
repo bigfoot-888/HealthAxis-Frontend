@@ -9,6 +9,11 @@ export async function createDiagnosis(diagnosisData) {
 
 // ===== UPDATE =====
 
+export async function updateDiagnosis(uuid, diagnosisData) {
+    const response = await axios.put(`/diagnoses/${uuid}`, diagnosisData);
+    return response.data;
+}
+
 export async function updateDiagnosisStatus(uuid, status) {
     const response = await axios.patch(`/diagnoses/${uuid}/status`, { status });
     return response.data;

@@ -14,6 +14,16 @@ export async function createTreatment(treatmentData) {
 
 // ===== UPDATE =====
 
+export async function updateTreatment(uuid, treatmentData) {
+    try {
+        const response = await axios.put(`/treatments/${uuid}`, treatmentData);
+        return response.data;
+    } catch (err) {
+        console.error('Error updating treatment data:', err);
+        throw err;
+    }
+}
+
 export async function updateTreatmentClinicalStatus(uuid, clinicalStatus) {
     try {
         const response = await axios.patch(`/treatments/${uuid}/clinical-status`, { clinicalStatus });

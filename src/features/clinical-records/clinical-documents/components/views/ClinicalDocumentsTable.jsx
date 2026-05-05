@@ -1,7 +1,6 @@
 // React
 import { useState, useMemo } from 'react';
 
-// External libraries
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
@@ -9,20 +8,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router';
 import { Tooltip } from '@mui/material';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-
 import {BasicTableLayout} from '@/components/tables/index';
-
-import { formatDateTimeUTC, formatCreatedAt } from '@/utils/date-formatters';
 import { useSearchFilter } from '@/hooks/useSearchFilter';
-
-
-import { ClinicalDocumentTypeChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
-
-import { ClinicalDocumentStatusChip } from '@clinical-documents/components/ui/ClinicalDocumentChips';
-import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
 import UpdateClinicalDocumentStatusForm from '@clinical-documents/components/forms/UpdateClinicalDocumentStatusForm';
+import { handleApiError } from '@/utils/handle-errors';
+import { CLINICAL_DOCUMENT_COLUMNS } from '@clinical-documents/config/clinical-document.columns';
+import { CLINICAL_DOCUMENT_TYPE_CONFIG } from '@/shared/constants/clinical-document.constants';
 
 function ActionsCell({ row, onUpdateStatus, onViewAttachmentsDocument, ...gridParams }) {
     return (
@@ -48,10 +39,14 @@ function ActionsCell({ row, onUpdateStatus, onViewAttachmentsDocument, ...gridPa
 }
 
 export default function ClinicalDocumentsTable({ clinicalDocuments }) {
-    const [searchText, setSearchText] = useState(''); // Searchbar text
-    const [error, setError] = useState(null); // Non-form errors
+    const [searchText, setSearchText] = useState('');
+    const [error, setError] = useState(null);
 
-    const filteredClinicalDocuments = useSearchFilter(clinicalDocuments, searchText, ['id', 'title']);
+    const filteredClinicalDocuments = useSearchFilter(clinicalDocuments, searchText, null, [
+        (d) => d.title,
+        (d) => CLINICAL_DOCUMENT_TYPE_CONFIG[d.documentType].label,
+        (d) => d.users?.map((u) => u.fullName).join(', '),
+    ]);
 
     const [updateClinicalDocumentStatusRow, setUpdateClinicalDocumentStatusRow] = useState(null);
     const [updateClinicalDocumentRecordStatusRow, setUpdateClinicalDocumentRecordStatusRow] = useState(null);
@@ -66,59 +61,23 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
             await importUsers(users);
             refetch();
         } catch (err) {
-            setError(err.response.data.message);
+            handleApiError(err, setError, null);
         }
         event.target.value = '';
     };
 
     const columns = useMemo(() => {
         return [
-            {
-                field: 'title',
-                headerName: 'Nombre',
-                flex: 3,
-            },
-            {
-                field: 'documentType',
-                headerName: 'Tipo de documento',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <ClinicalDocumentTypeChip value={value} />;
-                },
-            },
-            {
-                field: 'users',
-                headerName: 'Usuarios involucrados',
-                flex: 3,
-                valueGetter: (value, row) => {
-                    return row.users ? row.users.map((user) => user.fullName).join(', ') : '';
-                },
-            },
-            {
-                field: 'status',
-                headerName: 'Estado',
-                flex: 2,
-                renderCell: (params) => {
-                    const value = params.value;
-                    return <ClinicalDocumentStatusChip value={value} />;
-                },
-            },
-            {
-                type: 'date',
-                field: 'createdAt',
-                headerName: 'Fecha de Creación',
-                flex: 2,
-                hide: true,
-                valueFormatter: (value) => formatCreatedAt(value),
-            },
+            CLINICAL_DOCUMENT_COLUMNS.title,
+            CLINICAL_DOCUMENT_COLUMNS.documentType,
+            CLINICAL_DOCUMENT_COLUMNS.users,
+            CLINICAL_DOCUMENT_COLUMNS.status,
+            CLINICAL_DOCUMENT_COLUMNS.createdAt,
             {
                 field: 'actions',
                 type: 'actions',
                 flex: 3,
-                renderCell: (params) => (
-                    <ActionsCell {...params} onUpdateStatus={setUpdateClinicalDocumentStatusRow}/>
-                ),
+                renderCell: (params) => <ActionsCell {...params} onUpdateStatus={setUpdateClinicalDocumentStatusRow} />,
             },
         ];
     }, []);
@@ -135,7 +94,7 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
                 rows={filteredClinicalDocuments}
                 columns={columns}
                 searchValue={searchText}
-                searchPlaceholder={'Busca por ID, nombre'}
+                searchPlaceholder={'Busca por ID, nombre, tipo de documento'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
                 actions={
                     <>

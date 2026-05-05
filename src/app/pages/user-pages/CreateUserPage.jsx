@@ -1,4 +1,4 @@
-import CreateUserForm from '@users/components/CreateUserForm';
+import CreateUserForm from '@/features/users/components/forms/CreateUserForm';
 import { AppBreadcrumbs } from '@/components/navigation';
 import { ContentLayout } from '@/components/layout';
 export default function CreateUserPage() {

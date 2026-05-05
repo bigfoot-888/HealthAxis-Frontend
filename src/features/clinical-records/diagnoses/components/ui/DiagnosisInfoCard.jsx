@@ -41,7 +41,14 @@ export default function DiagnosisInfoCard({ diagnosis }) {
                             </Typography>
 
                             {diagnosis.description && (
-                                <Typography variant='body2' sx={{ color: 'onSurfaceVariant' }}>
+                                <Typography
+                                    variant='body2'
+                                    sx={{
+                                        color: 'onSurfaceVariant',
+                                        wordBreak: 'break-word',
+                                        whiteSpace: 'normal',
+                                    }}
+                                >
                                     {diagnosis.description}
                                 </Typography>
                             )}

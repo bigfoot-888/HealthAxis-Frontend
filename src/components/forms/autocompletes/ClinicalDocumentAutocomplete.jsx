@@ -1,4 +1,4 @@
-import { getFilteredClinicalDocuments } from '@clinical-documents';
+import { getFilteredClinicalDocuments } from '@clinical-documents/api/clinical-document.api';
 import { useState, useRef } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
