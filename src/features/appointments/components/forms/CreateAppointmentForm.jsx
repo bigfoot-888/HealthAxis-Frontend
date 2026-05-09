@@ -114,7 +114,7 @@ export default function CreateAppointmentForm() {
                         </Grid>
                         <Grid size={12}>
                             <BasicTextInput
-                                label='Lugar'
+                                label='Lugar (opcional)'
                                 name='location'
                                 type='text'
                                 register={register}

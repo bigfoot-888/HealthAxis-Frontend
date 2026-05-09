@@ -3,8 +3,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
 import { Paper } from '@mui/material';
+import { useNavigate } from 'react-router';
 
 export default function AppointmentsCalendar({ appointments }) {
+    const navigate = useNavigate(); 
     const events = appointments.map((a) => ({
         id: a.uuid,
         title: a.patient.fullName,
@@ -19,6 +21,13 @@ export default function AppointmentsCalendar({ appointments }) {
                 initialView='timeGridWeek'
                 events={events}
                 height='auto'
+                eventDidMount={(info) => {
+                    info.el.style.cursor = 'pointer';
+                }}
+                eventClick={(info) => {
+                    const appointmentId = info.event.id;
+                    navigate(`/appointments/${appointmentId}`);
+                }}
             />
         </Paper>
     );

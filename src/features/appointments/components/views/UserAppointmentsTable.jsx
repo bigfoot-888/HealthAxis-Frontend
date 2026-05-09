@@ -187,6 +187,7 @@ export default function UserAppointmentsTable({ user, appointments, refetch }) {
                 searchValue={searchText}
                 searchPlaceholder='Busca por motivo, paciente, estado, fecha'
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                tableSpecificVisibility={{ priority: false }}
                 actions={
                     <Button
                         variant='contained'

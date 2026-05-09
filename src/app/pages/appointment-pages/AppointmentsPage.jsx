@@ -9,10 +9,18 @@ import AppointmentsTable from '@appointments/components/views/AppointmentsTable'
 import AppointmentsCalendar from '@appointments/components/views/AppointmentsCalendar';
 import AppointmentsTableToolbar from '@/features/appointments/components/ui/AppointmentsTableToolBar';
 import { CustomCircularProgress } from '@/components/feedback';
+import { useMyAppointments } from '@/features/appointments/hooks/useMyAppointments';
+import { useAuth } from '@/app/AuthContext';
 
 export default function AppointmentsPage() {
-    const { data: appointments, isLoading, error: fetchError, refetch } = useAppointments();
-    if (fetchError) return <p>Error al cargar citas</p>;
+    const { data: appointments, isLoading: appointmentsIsLoading, error: appointmentsFetchError } = useAppointments();
+    const {
+        data: myAppointments,
+        isLoading: myAppointmentsIsLoading,
+        error: myAppointmentsFetchError,
+    } = useMyAppointments();
+
+    if (appointmentsFetchError || myAppointmentsFetchError) return <p>Error al cargar citas</p>;
     const [viewMode, setViewMode] = useState('table');
     const [error, setError] = useState(null);
     const [searchText, setSearchText] = useState('');
@@ -22,12 +30,12 @@ export default function AppointmentsPage() {
         const t = setTimeout(() => setDebouncedSearch(searchText), 300);
         return () => clearTimeout(t);
     }, [searchText]);
-    
+
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
             <TableTopBar
                 left={
-                    <Tabs value={viewMode} onChange={(e, value) => setViewMode(value)} >
+                    <Tabs value={viewMode} onChange={(e, value) => setViewMode(value)}>
                         <Tab label='Tabla' value='table' />
                         <Tab label='Calendario' value='calendar' />
                     </Tabs>
@@ -35,7 +43,7 @@ export default function AppointmentsPage() {
                 right={<AppointmentsTableToolbar searchText={searchText} setSearchText={setSearchText} />}
             />
 
-            {isLoading ? (
+            {(appointmentsIsLoading || myAppointmentsIsLoading) ? (
                 <CustomCircularProgress />
             ) : (
                 <Box sx={{ mt: 0 }}>
@@ -46,7 +54,7 @@ export default function AppointmentsPage() {
                             searchText={debouncedSearch}
                         />
                     ) : (
-                        <AppointmentsCalendar appointments={appointments} setError={setError} />
+                        <AppointmentsCalendar appointments={myAppointments} setError={setError} />
                     )}
                 </Box>
             )}

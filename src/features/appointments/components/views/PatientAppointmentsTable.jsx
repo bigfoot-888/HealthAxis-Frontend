@@ -184,6 +184,7 @@ export default function PatientAppointmentsTable({ appointments, patient }) {
                 searchValue={searchText}
                 searchPlaceholder={'Busca por motivo, usuario, estado, inicio'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
+                tableSpecificVisibility={{ priority: false }}
                 actions={
                     <Button
                         variant='contained'

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, TextField, MenuItem } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
+import { BasicTextInput } from '@/components/forms/inputs';
 
 const ENTITY_OPTIONS = [
     { value: 'Patient', label: 'Pacientes' },
@@ -18,7 +19,7 @@ const COLOR_OPTIONS = [
 ];
 
 export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
-    const { control, handleSubmit, watch, reset } = useForm({
+    const { control, handleSubmit, watch, reset, register, formState: { errors }, } = useForm({
         defaultValues: {
             title: '',
             entity: 'Patient',
@@ -81,13 +82,14 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
 
             <DialogContent>
                 <Stack spacing={2} sx={{ mt: 1 }}>
-                    <Controller
+                    <BasicTextInput
+                        label='Título'
                         name='title'
-                        control={control}
+                        type='text'
+                        register={register}
+                        errors={errors}
                         rules={{ required: true }}
-                        render={({ field }) => <TextField {...field} label='Título' fullWidth />}
                     />
-
                     <Controller
                         name='entity'
                         control={control}

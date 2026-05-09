@@ -67,7 +67,7 @@ export const TREATMENT_COLUMNS = {
     diagnosisName: {
         field: 'diagnosisName',
         headerName: 'Diagnóstico',
-        valueGetter: (value, row) => row.diagnosis.name || 'N/A',
+        valueGetter: (value, row) => row.diagnosis?.name || 'N/A',
         flex: 3,
     },
 };

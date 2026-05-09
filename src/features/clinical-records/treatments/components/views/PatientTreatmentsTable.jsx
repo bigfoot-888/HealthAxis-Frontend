@@ -66,7 +66,6 @@ export default function PatientTreatmentsTable({ treatments, patient }) {
             TREATMENT_COLUMNS.name,
             TREATMENT_COLUMNS.users,
             TREATMENT_COLUMNS.duration,
-            TREATMENT_COLUMNS.startedAt,
             TREATMENT_COLUMNS.clinicalStatus,
             TREATMENT_COLUMNS.status,
             TREATMENT_COLUMNS.createdAt,

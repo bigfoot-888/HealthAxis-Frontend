@@ -49,6 +49,11 @@ export async function getAppointmentsByUser(uuid) {
     return response.data;
 }
 
+export async function getMyAppointments(){
+    const response = await axios.get('/appointments/me');
+    return response.data;
+}
+
 export async function getAppointment(uuid) {
     const response = await axios.get(`/appointments/${uuid}`);
     return response.data;

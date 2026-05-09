@@ -39,6 +39,8 @@ export default function AppointmentDetailPage() {
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
 
+    console.log(treatments)
+
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);

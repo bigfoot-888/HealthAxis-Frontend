@@ -10,8 +10,15 @@ export default function NestedTableLayout({
     searchPlaceholder,
     onRowClick = () => {},
     actions,
+    tableSpecificVisibility = {},
     loading = false,
+    sorting = {
+        sortModel: [{ field: 'createdAt', sort: 'desc' }],
+    },
 }) {
+    const baseVisibility = {
+        createdAt: false,
+    };
     return (
         <>
             <Box sx={{ marginBottom: 2, display: 'flex' }}>
@@ -37,14 +44,13 @@ export default function NestedTableLayout({
                     hideFooterSelectedRowCount
                     ignoreValueFormatterDuringExport
                     columnVisibilityModel={{
-                        createdAt: false,
+                        ...baseVisibility,
+                        ...tableSpecificVisibility,
+                    }}
+                    initialState={{
+                        sorting,
                     }}
                     loading={loading}
-                    initialState={{
-                        sorting: {
-                            sortModel: [{ field: 'createdAt', sort: 'desc' }],
-                        },
-                    }}
                     onRowClick={onRowClick}
                     sx={(theme) => ({
                         backgroundColor: 'var(--template-palette-surfaceContainerLowest)',
