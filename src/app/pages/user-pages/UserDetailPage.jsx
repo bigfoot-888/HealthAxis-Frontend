@@ -10,10 +10,11 @@ import { DetailLayout } from '@/components/entity-detail';
 import { Stack, Box } from '@mui/material';
 import { useAppointmentsByUser } from '@appointments/hooks/useAppointmentsByUser';
 import DetailSectionHeader from '@/components/ui/DetailSectionHeader';
+import Error from '@/components/feedback/Error';
 
 export default function UserDetailPage() {
     const { uuid } = useParams();
-    const { data: user, isLoading: userIsLoading, error: userFetchError, refetch: refetchUser } = useUser(uuid);
+    const { data: user, isLoading: userIsLoading, error: userFetchError } = useUser(uuid);
     const {
         data: appointments,
         isLoading: appointmentsIsLoading,
@@ -23,7 +24,7 @@ export default function UserDetailPage() {
 
     const [error, setError] = useState(null);
 
-    if (userFetchError || appointmentsFetchError) return <p>Error al cargar usuario</p>;
+    if (userFetchError || appointmentsFetchError) return <Error msg='Error al cargar usuario' />;
     if (userIsLoading || appointmentsIsLoading || !user) return <CustomCircularProgress />;
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
@@ -38,11 +39,7 @@ export default function UserDetailPage() {
                 <Box>
                     <DetailSectionHeader label='Citas Asociadas' />
                     <Box sx={{ px: 1 }}>
-                        <UserAppointmentsTable
-                            user={user}
-                            appointments={appointments}
-                            refetch={refetchAppointments}
-                        />
+                        <UserAppointmentsTable user={user} appointments={appointments} refetch={refetchAppointments} />
                     </Box>
                 </Box>
             </DetailLayout>

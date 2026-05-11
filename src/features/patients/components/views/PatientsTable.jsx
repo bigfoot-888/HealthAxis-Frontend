@@ -7,12 +7,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RestoreIcon from '@mui/icons-material/Restore';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { usePatients } from '@patients/hooks/usePatients';
-import { importPatients, deactivatePatient, reactivatePatient } from '@patients/api/patient.api';
-import { PatientStatusChip } from '@patients/components/ui/PatientChips';
-
+import { deactivatePatient, reactivatePatient } from '@patients/api/patient.api';
 import { AlertDialog } from '@/components/dialogs/index';
 import { BasicTableLayout } from '@/components/tables/index';
 import { ContentLayout } from '@/components/layout/index';
@@ -70,21 +67,6 @@ export default function PatientsTable({ patients }) {
     const [patientToDelete, setPatientToDelete] = useState(null);
     const [patientToReactivate, setPatientToReactivate] = useState(null);
     const { showSnackbar } = useSnackbar();
-
-    const handlePatientsFileSelect = async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        try {
-            const text = await file.text();
-            const patients = JSON.parse(text);
-            await importPatients(patients);
-            refetch();
-            showSnackbar({ message: 'Pacientes creados correctamente' });
-        } catch (err) {
-            handleApiError(err, setError, null);
-        }
-        event.target.value = '';
-    };
 
     const handleCloseAlertDialog = (e) => {
         setError(null); 
@@ -184,15 +166,6 @@ export default function PatientsTable({ patients }) {
                                 sx={{ mr: 2 }}
                             >
                                 Añadir paciente
-                            </Button>
-                            <Button component='label' variant='outlined' startIcon={<GroupAddIcon />}>
-                                Importar pacientes
-                                <input
-                                    type='file'
-                                    hidden
-                                    accept='application/json'
-                                    onChange={handlePatientsFileSelect}
-                                />
                             </Button>
                         </>
                     }

@@ -10,7 +10,7 @@ import AppointmentsCalendar from '@appointments/components/views/AppointmentsCal
 import AppointmentsTableToolbar from '@/features/appointments/components/ui/AppointmentsTableToolBar';
 import { CustomCircularProgress } from '@/components/feedback';
 import { useMyAppointments } from '@/features/appointments/hooks/useMyAppointments';
-import { useAuth } from '@/app/AuthContext';
+import Error from '@/components/feedback/Error';
 
 export default function AppointmentsPage() {
     const { data: appointments, isLoading: appointmentsIsLoading, error: appointmentsFetchError } = useAppointments();
@@ -20,7 +20,7 @@ export default function AppointmentsPage() {
         error: myAppointmentsFetchError,
     } = useMyAppointments();
 
-    if (appointmentsFetchError || myAppointmentsFetchError) return <p>Error al cargar citas</p>;
+    if (appointmentsFetchError || myAppointmentsFetchError) return <Error msg="Error al cargar citas"/>
     const [viewMode, setViewMode] = useState('table');
     const [error, setError] = useState(null);
     const [searchText, setSearchText] = useState('');
@@ -35,7 +35,14 @@ export default function AppointmentsPage() {
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
             <TableTopBar
                 left={
-                    <Tabs value={viewMode} onChange={(e, value) => setViewMode(value)}>
+                    <Tabs
+                        value={viewMode}
+                        onChange={(e, value) => setViewMode(value)}
+                        sx={{
+                            borderBottom: 1,
+                            borderColor: 'divider',
+                        }}
+                    >
                         <Tab label='Tabla' value='table' />
                         <Tab label='Calendario' value='calendar' />
                     </Tabs>
@@ -43,7 +50,7 @@ export default function AppointmentsPage() {
                 right={<AppointmentsTableToolbar searchText={searchText} setSearchText={setSearchText} />}
             />
 
-            {(appointmentsIsLoading || myAppointmentsIsLoading) ? (
+            {appointmentsIsLoading || myAppointmentsIsLoading ? (
                 <CustomCircularProgress />
             ) : (
                 <Box sx={{ mt: 0 }}>

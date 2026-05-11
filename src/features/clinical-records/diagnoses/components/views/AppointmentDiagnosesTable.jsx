@@ -31,7 +31,7 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, appointmentU
                     onClick={() => onUpdateClinicalStatus(row)}
                 />
             )}
-            {!isDiagnosisValid(row) && (
+            {isDiagnosisValid(row) && (
                 <GridActionsCellItem
                     showInMenu
                     icon={<AutorenewIcon />}

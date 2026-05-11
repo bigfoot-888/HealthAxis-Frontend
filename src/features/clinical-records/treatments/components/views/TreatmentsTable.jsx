@@ -4,7 +4,7 @@ import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import BasicTableLayout from '@/components/tables/BasicTableLayout';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useOutletContext } from 'react-router';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import EditIcon from '@mui/icons-material/Edit';
@@ -50,12 +50,12 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParam
 }
 
 export default function TreatmentsTable({ treatments }) {
-    const [searchText, setSearchText] = useState('');
+    const { searchText } = useOutletContext();
     const filteredTreatments = useSearchFilter(treatments, searchText, null, [
-        (t) => t.name,
-        (t) => t.patient.fullName,
-        (t) => t.users?.map((u) => u.fullName).join(', '),
-        (t) => TREATMENT_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
+        t => t.name,
+        t => t.patient.fullName,
+        t => t.users?.map(u => u.fullName).join(', '),
+        t => TREATMENT_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
     ]);
 
     const navigate = useNavigate();
@@ -75,7 +75,7 @@ export default function TreatmentsTable({ treatments }) {
                 field: 'actions',
                 type: 'actions',
                 flex: 3,
-                renderCell: (params) => (
+                renderCell: params => (
                     <ActionsCell
                         {...params}
                         onUpdateClinicalStatus={setTreatmentToUpdateClinicalStatus}
@@ -103,24 +103,9 @@ export default function TreatmentsTable({ treatments }) {
             <BasicTableLayout
                 rows={filteredTreatments}
                 columns={columns}
-                searchValue={searchText}
-                searchPlaceholder={'Busca por nombre, paciente, usuarios, estado'}
-                onSearchChange={(e) => setSearchText(e.target.value)}
-                onRowClick={(params) => {
+                onRowClick={params => {
                     navigate(`/clinical-records/treatments/${params.row.uuid}`);
                 }}
-                actions={
-                    <Button
-                        variant='contained'
-                        component={Link}
-                        to='/clinical-records/treatments/new'
-                        startIcon={<PersonAddAltIcon />}
-                        loadingPosition='start'
-                        sx={{ mr: 2 }}
-                    >
-                        Añadir tratamiento
-                    </Button>
-                }
             />
         </>
     );

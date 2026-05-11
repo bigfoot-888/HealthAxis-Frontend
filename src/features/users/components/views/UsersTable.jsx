@@ -7,7 +7,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RestoreIcon from '@mui/icons-material/Restore';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 import { useUsers } from '@users/hooks/useUsers';
 import { deactivateUser, reactivateUser, importUsers } from '@users/api/user.api';
@@ -178,10 +177,6 @@ export default function UsersTable({ users }) {
                                 }}
                             >
                                 Añadir usuario
-                            </Button>
-                            <Button component='label' variant='outlined' startIcon={<GroupAddIcon />}>
-                                Importar usuarios
-                                <input type='file' hidden accept='application/json' onChange={handleUsersFileSelect} />
                             </Button>
                         </>
                     }

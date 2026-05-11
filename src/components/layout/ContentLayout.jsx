@@ -5,7 +5,7 @@ import { ErrorAlert } from '@/components/ui/index';
 
 export default function ContentLayout({ children, error = null, onErrorClose = () => {}, drawer = true }) {
     return (
-        <Stack sx={{ width: '100%', height: '100%' }}>
+        <Stack sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
             {drawer && <DrawerHeader />}
             <ErrorAlert error={error} onErrorClose={onErrorClose} />
             <Box

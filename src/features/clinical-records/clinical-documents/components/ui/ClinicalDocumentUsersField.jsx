@@ -1,20 +1,27 @@
-import { useFieldArray, Controller } from 'react-hook-form';
-import { Button, Box, Grid } from '@mui/material';
+import { useFieldArray, useController } from 'react-hook-form';
+import { Button, Box, Grid, Typography} from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { UserAutocomplete } from '@/components/forms/autocompletes/index';
 import {SelectInput} from '@/components/forms/inputs/index';
 
-export function ClinicalDocumentUsersField({ control, errors }) {
+export function ClinicalDocumentUsersField({ control, errors, rules={} }) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'users', // This will be the array in your form data
+        name: 'users',
+    });
+
+    const {
+        fieldState: usersState,
+    } = useController({
+        name: 'users',
+        control,
+        rules,
     });
 
     const handleAddProfessional = () => {
-        append({ user: "", role: "" }); // Add empty row
+        append({ user: null, role: '' }); 
     };
-
     return (
         <Box>
             {fields.map((field, index) => (
@@ -59,6 +66,11 @@ export function ClinicalDocumentUsersField({ control, errors }) {
             <Button startIcon={<AddIcon />} onClick={handleAddProfessional} variant='outlined' sx={{mb: 2}}>
                 Añadir profesional involucrado
             </Button>
+            {usersState.error && (
+                <Typography variant='caption' color='error'>
+                    {usersState.error.message}
+                </Typography>
+            )}
         </Box>
     );
 }

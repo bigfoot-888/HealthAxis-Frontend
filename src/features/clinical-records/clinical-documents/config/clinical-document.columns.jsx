@@ -30,7 +30,7 @@ export const CLINICAL_DOCUMENT_COLUMNS = {
         headerName: 'Usuarios involucrados',
         flex: 3,
         valueGetter: (value, row) => {
-            return row.users ? row.users.map((user) => user.fullName).join(', ') : '';
+            return row.users ? row.users.map((user) => user.name + " " + user.surname).join(', ') : '';
         },
     },
     status: {

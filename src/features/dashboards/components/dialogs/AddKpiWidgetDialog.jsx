@@ -1,52 +1,136 @@
 import { useMemo } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack, TextField, MenuItem } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
-import { BasicTextInput } from '@/components/forms/inputs';
+
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Stack } from '@mui/material';
+
+import { useForm } from 'react-hook-form';
+
+import { BasicTextInput, SelectInput } from '@/components/forms/inputs';
+
+import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
+import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
+import { DIAGNOSIS_CLINICAL_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
+
+import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
+
+function mapOptionsToItems(options) {
+    return Object.fromEntries(options.map((option) => [option.value, option.label]));
+}
+
+function mapStatusConfigToItems(config) {
+    return Object.fromEntries(Object.entries(config).map(([key, value]) => [key, value.label]));
+}
 
 const ENTITY_OPTIONS = [
     { value: 'Patient', label: 'Pacientes' },
-    { value: 'Appointment', label: 'Citas' },
+    { value: 'Appointment', label: 'Citas' }, 
     { value: 'Diagnosis', label: 'Diagnósticos' },
     { value: 'Treatment', label: 'Tratamientos' },
+];
+
+const WIDGET_TYPE_OPTIONS = [
+    { value: 'KPI', label: 'KPI' },
+    { value: 'LINE_CHART', label: 'Gráfico temporal' },
+    { value: 'BAR_CHART', label: 'Gráfico de barras' },
 ];
 
 const COLOR_OPTIONS = [
     { value: 'primary.main', label: 'Azul' },
     { value: 'success.main', label: 'Verde' },
     { value: 'warning.main', label: 'Amarillo' },
-    { value: 'info.main', label: 'Info' },
     { value: 'error.main', label: 'Rojo' },
 ];
 
-export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
-    const { control, handleSubmit, watch, reset, register, formState: { errors }, } = useForm({
+const BAR_CHART_GROUP_BY_OPTIONS = {
+    Patient: {
+        status: 'Estado',
+    },
+
+    Appointment: {
+        status: 'Estado',
+    },
+
+    Diagnosis: {
+        severity: 'Gravedad',
+        clinicalStatus: 'Estado clínico',
+    },
+
+    Treatment: {
+        clinicalStatus: 'Estado clínico',
+    },
+};
+
+const TEMPORAL_FIELD_OPTIONS = {
+    Patient: {
+        createdAt: 'Fecha de creación',
+    },
+
+    Appointment: {
+        startTime: 'Fecha de inicio cita',
+        createdAt: 'Fecha de creación',
+    },
+
+    Diagnosis: {
+        createdAt: 'Fecha de creación',
+        diagnosedAt: 'Fecha de diagnóstico'
+    },
+
+    Treatment: {
+        createdAt: 'Fecha de creación',
+    },
+};
+
+export default function AddWidgetDialog({ open, onClose, onSubmit }) {
+    const {
+        control,
+        handleSubmit,
+        watch,
+        reset,
+        register,
+        formState: { errors },
+    } = useForm({
         defaultValues: {
             title: '',
+            type: 'KPI',
             entity: 'Patient',
             aggregation: 'COUNT',
             targetColumn: 'id',
+
             color: 'primary.main',
+
             filterType: 'none',
             statusValue: '',
             dateValue: 'today',
+
+            groupBy: '',
+            temporalField: 'createdAt',
+            timeGrain: 'week',
         },
     });
 
     const filterType = watch('filterType');
     const entity = watch('entity');
+    const widgetType = watch('type');
+
+    const isBarChart = widgetType === 'BAR_CHART';
+
+    const isLineChart = widgetType === 'LINE_CHART';
 
     const statusOptions = useMemo(() => {
         switch (entity) {
             case 'Patient':
-                return ['ACTIVE', 'INACTIVE'];
+                return mapStatusConfigToItems(PATIENT_STATUS_CONFIG);
+
             case 'Appointment':
-                return ['SCHEDULED', 'CHECKED_IN', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+                return mapStatusConfigToItems(APPOINTMENT_STATUS_CONFIG);
+
             case 'Diagnosis':
-                return ['VALID', 'VOID', 'ENTERED_IN_ERROR'];
+                return mapStatusConfigToItems(DIAGNOSIS_CLINICAL_STATUS_CONFIG);
+
             case 'Treatment':
-                return ['VALID', 'VOID', 'ENTERED_IN_ERROR'];
+                return mapStatusConfigToItems(TREATMENT_CLINICAL_STATUS_CONFIG);
+
             default:
-                return [];
+                return {};
         }
     }, [entity]);
 
@@ -54,7 +138,11 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
         const filters = {};
 
         if (values.filterType === 'status' && values.statusValue) {
-            filters.status = values.statusValue;
+            if (values.entity === 'Patient' || values.entity === 'Appointment') {
+                filters.status = values.statusValue;
+            } else {
+                filters.clinicalStatus = values.statusValue;
+            }
         }
 
         if (values.filterType === 'date' && values.dateValue) {
@@ -63,11 +151,13 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
 
         onSubmit({
             title: values.title,
-            type: 'KPI',
+            type: values.type,
             entity: values.entity,
             aggregation: values.aggregation,
             targetColumn: values.targetColumn,
             filters,
+            groupBy: isBarChart ? values.groupBy : isLineChart ? values.temporalField : undefined,
+            timeGrain: isLineChart ? values.timeGrain : undefined,
             visuals: {
                 color: values.color,
             },
@@ -78,7 +168,7 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
-            <DialogTitle>Añadir KPI</DialogTitle>
+            <DialogTitle>Añadir componente</DialogTitle>
 
             <DialogContent>
                 <Stack spacing={2} sx={{ mt: 1 }}>
@@ -88,74 +178,96 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
                         type='text'
                         register={register}
                         errors={errors}
-                        rules={{ required: true }}
+                        rules={{
+                            required: 'El título es obligatorio',
+                        }}
                     />
-                    <Controller
+
+                    <SelectInput
+                        name='type'
+                        control={control}
+                        label='Tipo de componente'
+                        rules={{
+                            required: 'El tipo de componente es obligatorio',
+                        }}
+                        items={mapOptionsToItems(WIDGET_TYPE_OPTIONS)}
+                    />
+
+                    <SelectInput
                         name='entity'
                         control={control}
-                        render={({ field }) => (
-                            <TextField {...field} select label='Entidad' fullWidth>
-                                {ENTITY_OPTIONS.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        )}
+                        label='Entidad'
+                        rules={{
+                            required: 'La entidad es obligatoria',
+                        }}
+                        items={mapOptionsToItems(ENTITY_OPTIONS)}
                     />
 
-                    <Controller
+                    <SelectInput
                         name='color'
                         control={control}
-                        render={({ field }) => (
-                            <TextField {...field} select label='Color' fullWidth>
-                                {COLOR_OPTIONS.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </TextField>
-                        )}
+                        label='Color'
+                        items={mapOptionsToItems(COLOR_OPTIONS)}
                     />
 
-                    <Controller
-                        name='filterType'
-                        control={control}
-                        render={({ field }) => (
-                            <TextField {...field} select label='Filtro' fullWidth>
-                                <MenuItem value='none'>Sin filtro</MenuItem>
-                                <MenuItem value='status'>Por estado</MenuItem>
-                                <MenuItem value='date'>Por fecha</MenuItem>
-                            </TextField>
-                        )}
-                    />
-
-                    {filterType === 'status' && (
-                        <Controller
-                            name='statusValue'
+                    {isBarChart && (
+                        <SelectInput
+                            name='groupBy'
                             control={control}
-                            render={({ field }) => (
-                                <TextField {...field} select label='Estado' fullWidth>
-                                    {statusOptions.map((status) => (
-                                        <MenuItem key={status} value={status}>
-                                            {status}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                            )}
+                            label='Agrupar por'
+                            rules={{
+                                required: 'El campo de agrupación es obligatorio',
+                            }}
+                            items={BAR_CHART_GROUP_BY_OPTIONS[entity] || {}}
                         />
                     )}
 
+                    {isLineChart && (
+                        <>
+                            <SelectInput
+                                name='temporalField'
+                                control={control}
+                                label='Campo temporal'
+                                items={TEMPORAL_FIELD_OPTIONS[entity] || {}}
+                            />
+
+                            <SelectInput
+                                name='timeGrain'
+                                control={control}
+                                label='Intervalo temporal'
+                                items={{
+                                    day: 'Día',
+                                    week: 'Semana',
+                                    month: 'Mes',
+                                }}
+                            />
+                        </>
+                    )}
+
+                    <SelectInput
+                        name='filterType'
+                        control={control}
+                        label='Filtro'
+                        items={{
+                            none: 'Sin filtro',
+                            status: 'Por estado',
+                            date: 'Por fecha',
+                        }}
+                    />
+
+                    {filterType === 'status' && (
+                        <SelectInput name='statusValue' control={control} label='Estado' items={statusOptions} />
+                    )}
+
                     {filterType === 'date' && (
-                        <Controller
+                        <SelectInput
                             name='dateValue'
                             control={control}
-                            render={({ field }) => (
-                                <TextField {...field} select label='Rango temporal' fullWidth>
-                                    <MenuItem value='today'>Hoy</MenuItem>
-                                    <MenuItem value='last_7_days'>Últimos 7 días</MenuItem>
-                                </TextField>
-                            )}
+                            label='Rango temporal'
+                            items={{
+                                today: 'Hoy',
+                                last_7_days: 'Últimos 7 días',
+                            }}
                         />
                     )}
                 </Stack>
@@ -163,6 +275,7 @@ export default function AddKpiWidgetDialog({ open, onClose, onSubmit }) {
 
             <DialogActions>
                 <Button onClick={onClose}>Cancelar</Button>
+
                 <Button variant='contained' onClick={handleSubmit(handleFormSubmit)}>
                     Añadir
                 </Button>

@@ -7,10 +7,10 @@ import {FormDialog} from '@/components/dialogs/index.js';
 
 import { handleApiError } from '@/utils/handle-errors';
 
-import { useAgendas } from '@agendas/hooks/useAgendas';
-import { createAgenda } from '@agendas/api/agenda-api';
-
+import { createAgenda } from '@/features/agendas/api/agenda.api';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateCreateAgendaQueries } from '../../utils/agenda-query.utils';
 
 export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
     const {
@@ -21,17 +21,16 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
         formState: { errors },
     } = useForm({ mode: 'onBlur' });
 
-    const { refetch } = useAgendas();
     const [error, setError] = useState(null); 
+    const queryClient = useQueryClient();
     const { showSnackbar } = useSnackbar();
     
     const onSubmit = async (data) => {
         try {
             await createAgenda(data);
-            refetch();
+            invalidateCreateAgendaQueries(queryClient)
             handleClose();
             showSnackbar({ message: 'Agenda creada correctamente' });
-
         } catch (err) {
             handleApiError(err, setError, setFormError); 
         }
@@ -52,7 +51,13 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
                         label='Nombre'
                         name='name'
                         type='text'
-                        rules={{ required: 'El nombre es obligatorio' }}
+                        rules={{
+                            required: 'El nombre es obligatorio',
+                            maxLength: {
+                                value: 50,
+                                message: 'Máximo 50 caracteres',
+                            },
+                        }}
                         errors={errors}
                         register={register}
                     />
@@ -61,7 +66,13 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
                     <RHFDatePicker
                         name='openingDate'
                         control={control}
-                        rules={{ required: 'La fecha de apertura es obligatoria' }}
+                        rules={{
+                            required: 'La fecha de apertura es obligatoria',
+                            validate: (value) => {
+                                const date = new Date(value);
+                                return !isNaN(date) || 'Fecha inválida';
+                            },
+                        }}
                         label='Fecha de apertura'
                     />
                 </Grid>
@@ -69,7 +80,13 @@ export default function CreateAgendaForm({ isCreateAgendaOpen, handleClose }) {
                     <RHFDatePicker
                         name='closingDate'
                         control={control}
-                        rules={{ required: 'La fecha de cierre es obligatoria' }}
+                        rules={{
+                            required: 'La fecha de cierre es obligatoria',
+                            validate: (value) => {
+                                const date = new Date(value);
+                                return !isNaN(date) || 'Fecha inválida';
+                            },
+                        }}
                         label='Fecha de cierre'
                     />
                 </Grid>

@@ -4,11 +4,12 @@ import { useParams } from 'react-router';
 import { CustomCircularProgress } from '@/components/feedback';
 import { ContentLayout } from '@/components/layout';
 import { AppBreadcrumbs } from '@/components/navigation';
+import Error from '@/components/feedback/Error';
 
 export default function EditAppointmentPage() {
     const { uuid } = useParams();
     const { data: appointment, isLoading, error, refetch } = useAppointmentPlain(uuid);
-    if (error) return <p>Error al cargar los datos de la cita</p>;
+    if (error) return <Error msg="Error al cargar datos de la cita"/>
     if (isLoading) return <CustomCircularProgress />;
     return (
         <ContentLayout>

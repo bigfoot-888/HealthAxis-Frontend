@@ -1,0 +1,72 @@
+url: "http://localhost:5173"
+
+steps:
+  # login
+  - action: goto
+    value: "http://localhost:5173/login"
+
+  - action: fill
+    selector: email
+    value: testing@gmail.com
+
+  - action: fill
+    selector: password
+    value: "123456789"
+
+  - action: click
+    selector: Aceptar
+
+  - action: expectUrl
+    value: "/"
+
+  - action: goto
+    value: "http://localhost:5173/appointments"
+
+  - action: fill
+    selector: "Busca por motivo, paciente, usuario, estado, fecha"
+    value: Pikachu
+
+  - action: expectText
+    value: "Pikachu Gosh"
+
+  - action: clickRow
+    selector: "Pikachu Gosh"
+
+  - action: click
+    selector: "Check-in"
+
+  - action: click
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Cita registrada correctamente"
+
+  - action: click
+    selector: "Añadir diagnóstico"
+
+  - action: fill
+    selector: "name"
+    value: "Hipertensión leve"
+
+  - action: select
+    selector: "Gravedad"
+    value: "Moderada"
+
+  - action: select
+    selector: "Estado"
+    value: "Activo"
+
+  - action: click
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Diagnóstico creado correctamente"
+
+  - action: click
+    selector: "Completar"
+
+  - action: click
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Cita completada correctamente"

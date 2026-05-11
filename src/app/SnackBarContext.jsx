@@ -15,7 +15,7 @@ export function SnackbarProvider({ children }) {
     };
 
     const handleClose = () => {
-        setSnackbar((prev) => ({ ...prev, open: false }));
+        setSnackbar(prev => ({ ...prev, open: false }));
     };
 
     return (

@@ -17,6 +17,7 @@ import { useTreatmentsByDiagnosis } from '@treatments/hooks/useTreatmentsByDiagn
 import { Box, Stack, Grid, Divider } from '@mui/material';
 import { DetailLayout } from '@/components/entity-detail';
 import UserSummaryCard from '@/features/users/components/ui/UserSummaryCard';
+import Error from '@/components/feedback/Error';
 
 export default function DiagnosisDetailPage() {
     const { uuid } = useParams();
@@ -30,7 +31,7 @@ export default function DiagnosisDetailPage() {
         error: treatmentsFetchError,
     } = useTreatmentsByDiagnosis(uuid);
 
-    if (treatmentsFetchError || diagnosisFetchError) return <p>Error al cargar diagnóstico</p>;
+    if (treatmentsFetchError || diagnosisFetchError) return <Error msg="Error al cargar el diagnóstico"/>
     if (diagnosisIsLoading || treatmentsIsLoading || !diagnosis) return <CustomCircularProgress />;
 
     const users = diagnosis.users || [];

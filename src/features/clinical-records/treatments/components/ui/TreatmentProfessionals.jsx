@@ -6,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import { UserAutocomplete } from '@/components/forms/autocompletes';
 import { SelectInput } from '@/components/forms/inputs';
 
-export function TreatmentProfessionalsField({ control, errors, rules, multiple}) {
+export function TreatmentProfessionalsField({ control, errors, rules, multiple = true}) {
     const { fields, append, remove } = useFieldArray({
         control,
         name: 'users',

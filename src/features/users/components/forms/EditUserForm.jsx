@@ -13,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/index';
 
 import { BasicTextInput } from '@/components/forms/inputs/index';
 import { handleApiError } from '@/utils/handle-errors';
-import { RoleAutocomplete } from '@/components/forms/autocompletes';
+import { AgendaAutocomplete, RoleAutocomplete } from '@/components/forms/autocompletes';
 import { useSnackbar } from '@/app/SnackBarContext';
 
 export default function EditUserForm({ user, uuid }) {
@@ -60,6 +60,7 @@ export default function EditUserForm({ user, uuid }) {
             reset({
                 ...user,
                 roles: user.roles?.map((r) => r.name ?? r) ?? [],
+                agenda: user.agenda
             });
         }
     }, [user, reset]);
@@ -146,6 +147,15 @@ export default function EditUserForm({ user, uuid }) {
                                 errors={errors}
                             />
                         </Grid>
+
+                        <Grid size={12}>
+                            <AgendaAutocomplete
+                                control={control}
+                                errors={errors}
+                                rules={{ required: 'La agenda es obligatoria' }}
+                            />
+                        </Grid>
+
                         <Grid size={12}>
                             <RoleAutocomplete control={control} rules={{ required: 'El rol es obligatorio' }} />
                         </Grid>

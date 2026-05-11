@@ -1,21 +1,20 @@
 import { createBrowserRouter } from 'react-router';
 import Layout from '../components/layout/Layout';
 
+import ProfilePage from './pages/user-pages/ProfilePage';
+import CreateUserPage from './pages/user-pages/CreateUserPage';
 import UsersPage from './pages/user-pages/UsersPage';
 import UserDetailPage from '@/app/pages/user-pages/UserDetailPage';
+import EditUserPage from './pages/user-pages/EditUserPage';
 
 import LoginPage from './pages/auth-pages/LoginPage';
 import NotFoundPage from './pages/error-pages/NotFoundPage';
-import ProfilePage from './pages/user-pages/ProfilePage';
-import CreateUserPage from './pages/user-pages/CreateUserPage';
-import EditUserPage from './pages/user-pages/EditUserPage';
-import PatientsPage from './pages/patient-pages/PatientsPage';
-import CreatePatientPage from './pages/patient-pages/CreatePatientPage';
-import EditPatientPage from './pages/patient-pages/EditPatientPage';
+
 import AppointmentsPage from './pages/appointment-pages/AppointmentsPage';
-import AgendasPage from './pages/agenda-pages/AgendasPage';
+import AppointmentDetailPage from '@/app/pages/appointment-pages/AppointmentDetailPage';
 import CreateAppointmentPage from './pages/appointment-pages/CreateAppointmentPage';
 import EditAppointmentPage from './pages/appointment-pages/EditAppointmentPage';
+
 import ClinicalRecordsPage from './pages/clinical-record-pages/ClinicalRecordsPage';
 
 import DiagnosesPage from './pages/diagnosis-pages/DiagnosesPage';
@@ -29,21 +28,21 @@ import TreatmentDetailPage from '@/app/pages/treatment-pages/TreatmentDetailPage
 import EditTreatmentPage from '@/app/pages/treatment-pages/EditTreatmentPage';
 
 import ClinicalDocumentsPage from './pages/clinical-document-pages/ClinicalDocumentsPage';
-import CreateExternalClinicalDocumentForm from '@/app/pages/clinical-document-pages/CreateExternalClinicalDocumentPage';
+import CreateClinicalDocumentPage from '@/app/pages/clinical-document-pages/CreateExternalClinicalDocumentPage';
 import ClinicalDocumentViewPage from '@/app/pages/clinical-document-pages/ClinicalDocumentViewPage';
-import PatientDetailPage from '@/app/pages/patient-pages/PatientDetailPage';
 
+import PatientDetailPage from '@/app/pages/patient-pages/PatientDetailPage';
 import PatientDetailProfilePage from '@/app/pages/patient-pages/PatientDetailProfilePage';
 import PatientDetailAppointmentsPage from '@/app/pages/patient-pages/PatientDetailAppointmentsPage';
 import PatientDetailDiagnosesPage from '@/app/pages/patient-pages/PatientDetailDiagnosesPage';
 import PatientDetailTreatmentsPage from '@/app/pages/patient-pages/PatientDetailTreatmentsPage';
 import PatientHistoryPage from '@/app/pages/patient-pages/PatientHistoryPage';
+import PatientsPage from './pages/patient-pages/PatientsPage';
+import CreatePatientPage from './pages/patient-pages/CreatePatientPage';
+import EditPatientPage from './pages/patient-pages/EditPatientPage';
 
-import AppointmentDetailPage from '@/app/pages/appointment-pages/AppointmentDetailPage';
-
-import AgendaDetailWrapper from '@/app/pages/agenda-pages/AgendaDetailWrapper';
 import AgendaDetailPage from '@/app/pages/agenda-pages/AgendaDetailPage';
-import AgendaUsersPage from '@/app/pages/agenda-pages/AgendaUsersPage';
+import AgendasPage from './pages/agenda-pages/AgendasPage';
 
 import PatientFlowPage from '@/app/pages/patient-pages/PatientFlowPage';
 
@@ -74,7 +73,7 @@ async function redirectIfAuthenticated() {
 export const router = createBrowserRouter([
     {
         Component: Layout,
-        // loader: requireAuth, // <- protect all child routes
+        loader: requireAuth, // <- protect all child routes
         errorElement: <NotFoundPage />,
         children: [
             {
@@ -220,19 +219,9 @@ export const router = createBrowserRouter([
                         handle: { title: 'Ver documento clínico' },
                     },
                     {
-                        path: 'clinical-documents/new-external',
-                        Component: CreateExternalClinicalDocumentForm,
-                        handle: { title: 'Crear documento clínico externo' },
-                    },
-                    {
                         path: 'treatments',
                         Component: TreatmentsPage,
                         handle: { title: 'Tratamientos' },
-                    },
-                    {
-                        path: 'treatments/new',
-                        Component: CreateTreatmentPage,
-                        handle: { title: 'Crear tratamiento' },
                     },
                     {
                         path: 'treatments/:uuid',
@@ -245,11 +234,6 @@ export const router = createBrowserRouter([
                         handle: { title: 'Diagnósticos' },
                     },
                     {
-                        path: 'diagnoses/new',
-                        Component: CreateDiagnosisPage,
-                        handle: { title: 'Crear diagnóstico' },
-                    },
-                    {
                         path: 'diagnoses/:uuid',
                         Component: DiagnosisDetailPage,
                         handle: { title: 'Vista detallada de diagnóstico' },
@@ -257,9 +241,24 @@ export const router = createBrowserRouter([
                 ],
             },
             {
+                path: 'clinical-records/clinical-documents/new',
+                Component: CreateClinicalDocumentPage,
+                handle: { title: 'Crear documento clínico externo' },
+            },
+            {
+                path: 'clinical-records/diagnoses/new',
+                Component: CreateDiagnosisPage,
+                handle: { title: 'Crear diagnóstico' },
+            },
+            {
                 path: 'clinical-records/diagnoses/edit/:uuid',
                 Component: EditDiagnosisPage,
                 handle: { title: 'Editar diagnóstico' },
+            },
+            {
+                path: 'clinical-records/treatments/new',
+                Component: CreateTreatmentPage,
+                handle: { title: 'Crear tratamiento' },
             },
             {
                 path: 'clinical-records/treatments/edit/:uuid',

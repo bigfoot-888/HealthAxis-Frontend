@@ -1,21 +1,18 @@
-import { Stack, Box, Typography } from '@mui/material';
+import { Stack, Box, Typography, Button } from '@mui/material';
 import { translate } from '@/utils/translation.utils';
 import { formatDateTimeUTC } from '@/utils/date-formatters';
 import { ContentLayout } from '@/components/layout';
 import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
 import { TREATMENT_CLINICAL_STATUS_CONFIG, TREATMENT_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
+import { useMemo } from 'react';
+
 function groupLogsByDate(logs) {
     const groups = {};
-
-    logs.forEach((log) => {
+    logs.forEach(log => {
         const date = new Date(log.createdAt);
         const key = date.toDateString();
-
-        if (!groups[key]) {
-            groups[key] = [];
-        }
-
+        if (!groups[key]) groups[key] = [];
         groups[key].push(log);
     });
 
@@ -37,7 +34,6 @@ function getDateLabel(dateStr) {
 function getLogDescription(log) {
     const { action, entityType, meta } = log;
 
-    // --- CLINICAL STATUS ---
     if (action === 'CLINICAL_STATUS_CHANGED') {
         if (entityType === 'DIAGNOSIS') {
             return `Estado clínico de diagnóstico cambiado de ${
@@ -58,7 +54,6 @@ function getLogDescription(log) {
         }
     }
 
-    // --- RECORD STATUS ---
     if (action === 'STATUS_CHANGED') {
         if (entityType === 'DIAGNOSIS') {
             return `Estado de diagnóstico cambiado de ${
@@ -81,7 +76,6 @@ function getLogDescription(log) {
         return `Estado cambiado de ${translate(meta.previousStatus)} a ${translate(meta.newStatus)}`;
     }
 
-    // --- UPDATED ---
     if (action === 'UPDATED' && meta?.changes) {
         const fields = Object.keys(meta.changes);
 
@@ -90,37 +84,32 @@ function getLogDescription(log) {
         return `Actualizado: ${fields.join(', ')}`;
     }
 
-    // --- CREATED ---
     if (action === 'CREATED') {
         return `${translate(entityType)} creado`;
     }
 
-    // --- DELETED ---
     if (action === 'DELETED') {
         return `${translate(entityType)} eliminado`;
     }
 
-    // --- FALLBACK ---
     return `${translate(entityType)} · ${translate(action)}`;
 }
-
-export default function PatientHistory({ logs }) {
-    const grouped = groupLogsByDate(logs);
+export default function PatientHistory({ logs, onLoadMore, hasMore, isFetching }) {
+    const grouped = useMemo(() => groupLogsByDate(logs), [logs]);
 
     return (
         <ContentLayout drawer={false}>
             <Stack
                 spacing={2}
-                sx={(theme) => ({
+                sx={{
                     border: '1px solid',
                     borderColor: 'divider',
                     borderRadius: 2,
                     p: 2,
-                })}
+                }}
             >
                 {Object.entries(grouped).map(([dateKey, dayLogs]) => (
                     <Box key={dateKey}>
-                        {/* Header día */}
                         <Typography
                             variant='caption'
                             sx={{
@@ -132,9 +121,8 @@ export default function PatientHistory({ logs }) {
                             {getDateLabel(dateKey)}
                         </Typography>
 
-                        {/* Logs */}
                         <Stack spacing={1}>
-                            {dayLogs.map((log, index) => (
+                            {dayLogs.map(log => (
                                 <Box
                                     key={log.id}
                                     sx={{
@@ -144,7 +132,6 @@ export default function PatientHistory({ logs }) {
                                         py: 1,
                                     }}
                                 >
-                                    {/* Punto timeline */}
                                     <Box
                                         sx={{
                                             width: 6,
@@ -156,9 +143,8 @@ export default function PatientHistory({ logs }) {
                                         }}
                                     />
 
-                                    {/* Contenido */}
                                     <Box sx={{ flexGrow: 1 }}>
-                                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                                        <Stack direction='row' justifyContent='space-between'>
                                             <Typography variant='body2'>{getLogDescription(log)}</Typography>
 
                                             <Typography variant='caption' color='text.secondary'>
@@ -175,6 +161,14 @@ export default function PatientHistory({ logs }) {
                         </Stack>
                     </Box>
                 ))}
+
+                {hasMore && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Button onClick={onLoadMore} disabled={isFetching} variant='outlined'>
+                            {isFetching ? 'Cargando...' : 'Cargar más'}
+                        </Button>
+                    </Box>
+                )}
             </Stack>
         </ContentLayout>
     );

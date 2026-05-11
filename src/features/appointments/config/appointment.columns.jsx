@@ -61,7 +61,7 @@ export const APPOINTMENT_COLUMNS = {
     },
     priority: {
         field: 'priority',
-        headerName: 'Priority',
+        headerName: 'Prioridad',
         hide: true,
     },
 };

@@ -4,7 +4,7 @@ import AgendaInfoCard from '@agendas/components/ui/AgendaInfoCard';
 import AgendaPeriodsTable from '@agendas/components/views/AgendaPeriodsTable';
 
 import EditAgendaForm from '@agendas/components/forms/EditAgendaForm';
-import CreateAgendaPeriodForm from '@agendas/components/forms/CreatePeriodForm';
+import CreateAgendaPeriodForm from '@/features/agendas/components/forms/CreateAgendaPeriodForm';
 
 import { ContentLayout } from '@/components/layout';
 import { Box } from '@mui/material';
@@ -19,44 +19,25 @@ import { useUsersByAgenda } from '@users/hooks/useUsersByAgenda';
 import AgendaUsersTable from '@/features/users/components/views/AgendaUsersTable';
 import { CustomCircularProgress } from '@/components/feedback';
 import { DetailLayout } from '@/components/entity-detail';
+import Error from '@/components/feedback/Error';
 
 export default function AgendaDetailPage() {
     const { uuid } = useParams();
-    const {
-        data: agenda,
-        isLoading: agendaIsLoading,
-        error: agendaFetchError,
-        refetch: refetchAgenda,
-    } = useAgenda(uuid);
-    const {
-        data: users,
-        isLoading: usersIsLoading,
-        error: usersFetchError,
-        refetch: refetchUsers,
-    } = useUsersByAgenda(uuid);
-    
+    const { data: agenda, isLoading: agendaIsLoading, error: agendaFetchError } = useAgenda(uuid);
+    const { data: users, isLoading: usersIsLoading, error: usersFetchError } = useUsersByAgenda(uuid);
+
     const [agendaToEdit, setAgendaToEdit] = useState(null);
     const [agendaForNewPeriod, setAgendaForNewPeriod] = useState(null);
 
     if (agendaIsLoading || usersIsLoading) return <CustomCircularProgress />;
-    if (agendaFetchError || usersFetchError) return <p>Error al cargar la agenda.</p>;
+    if (agendaFetchError || usersFetchError) return <Error msg='Error al cargar la agenda' />;
 
     return (
         <>
-            {agendaToEdit && (
-                <EditAgendaForm
-                    agenda={agendaToEdit}
-                    handleClose={() => setAgendaToEdit(null)}
-                    refetch={refetchAgenda}
-                />
-            )}
+            {agendaToEdit && <EditAgendaForm agenda={agendaToEdit} handleClose={() => setAgendaToEdit(null)} />}
 
             {agendaForNewPeriod && (
-                <CreateAgendaPeriodForm
-                    agenda={agendaForNewPeriod}
-                    handleClose={() => setAgendaForNewPeriod(null)}
-                    refetch={refetchAgenda}
-                />
+                <CreateAgendaPeriodForm agenda={agendaForNewPeriod} handleClose={() => setAgendaForNewPeriod(null)} />
             )}
 
             <ContentLayout>

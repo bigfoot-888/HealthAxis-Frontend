@@ -27,6 +27,8 @@ export const TRANSLATE = {
     REVIEWER: 'Revisión',
     VALIDATOR: 'Validación',
     CONTRIBUTOR: 'Colaboración',
+    MODERATE: 'Moderada',
+    HIGH: 'Alta'
 };
 
 export function translate(value) {

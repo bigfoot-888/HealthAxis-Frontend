@@ -7,17 +7,18 @@ import DiagnosisSummaryCard from '@diagnoses/components/ui/DiagnosisSummaryCard'
 import { ContentLayout } from '@/components/layout';
 import { CustomCircularProgress } from '@/components/feedback';
 import { useTreatment } from '@treatments/hooks/useTreatment';
-import { Box, Typography, Stack, Grid, Divider } from '@mui/material';
+import { Box, Stack, Grid, Divider } from '@mui/material';
 import UserSummaryCard from '@users/components/ui/UserSummaryCard';
 import DetailSectionHeader from '@/components/ui/DetailSectionHeader';
 import { RelatedEntityContainer } from '@/components/ui';
 import { DetailLayout } from '@/components/entity-detail';
+import Error from '@/components/feedback/Error';
 
 export default function TreatmentDetailPage() {
     const { uuid } = useParams();
     const { data: treatment, isLoading, error: fetchError } = useTreatment(uuid);
 
-    if (fetchError) return <p>Error al cargar tratamiento</p>;
+    if (fetchError) return <Error msg='Error al cargar tratamiento' />;
     if (isLoading || !treatment) return <CustomCircularProgress />;
 
     const users = treatment.users || [];
@@ -42,7 +43,7 @@ export default function TreatmentDetailPage() {
                                     </RelatedEntityContainer>
                                 </Grid>
 
-                                {users.map((user) => (
+                                {users.map(user => (
                                     <Grid key={user.uuid} size={{ xs: 12, md: 6 }}>
                                         <RelatedEntityContainer label='Profesional involucrado'>
                                             <UserSummaryCard user={user} />

@@ -1,0 +1,52 @@
+url: "http://localhost:5173"
+
+steps:
+  - action: goto
+    value: "http://localhost:5173/login"
+
+  - action: fill
+    selector: email
+    value: testing@gmail.com
+
+  - action: fill
+    selector: password
+    value: "123456789"
+
+  - action: click
+    selector: Aceptar
+
+  - action: expectUrl
+    value: "/"
+
+  - action: expectText
+    value: "Cerrar Sesión"
+
+  - action: goto
+    value: "http://localhost:5173/users/new"
+
+  - action: "fill"
+    selector: "name"
+    value: "Lucas Cerdo"
+  - action: "fill"
+    selector: "surname"
+    value: "Vidal"
+  - action: "fill"
+    selector: "email"
+    value: "lucas.tasdfaasdfest@example.com"
+  - action: "fill"
+    selector: "password"
+    value: "Vidal_Lucas01"
+  - action: "fill"
+    selector: "phone"
+    value: "655666777"
+  - action: "autocomplete"
+    selector: "Agenda"
+    value: "Testing"
+  - action: "autocomplete"
+    selector: "Cargo"
+    value: "Administrativo"
+  - action: "click"
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Usuario creado correctamente"

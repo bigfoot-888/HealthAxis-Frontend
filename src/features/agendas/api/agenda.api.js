@@ -24,6 +24,16 @@ export async function reactivateAgenda(uuid) {
     return response.data;
 }
 
+export async function createAgendaPeriod(uuid, periodData) {
+    const response = await axios.post(`/agendas/${uuid}/periods`, periodData);
+    return response.data;
+}
+
+export async function updateAgendaPeriodStatus(agendaUuid, periodUuid, status) {
+    const response = await axios.patch(`/agendas/${agendaUuid}/periods/${periodUuid}`, status);
+    return response.data;
+}
+
 // ===== READ =====
 
 export async function getAgendas() {

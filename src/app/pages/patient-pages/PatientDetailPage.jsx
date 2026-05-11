@@ -9,7 +9,7 @@ import { DetailLayout } from '@/components/entity-detail';
 
 export default function PatientDetailPage() {
     const { uuid } = useParams();
-    const { data: patient, isLoading, error: fetchError, refetch } = usePatientDetail(uuid);
+    const { data: patient, isLoading } = usePatientDetail(uuid);
     const [error, setError] = useState(null);
     const location = useLocation();
     const currentTab = location.pathname.split('/').pop();
@@ -24,7 +24,13 @@ export default function PatientDetailPage() {
                         ]}
                     />
                 )}
-                <Tabs value={currentTab}>
+                <Tabs
+                    value={currentTab}
+                    sx={{
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                    }}
+                >
                     <Tab label='Perfil' value={uuid} component={Link} to='' />
                     <Tab label='Citas' value='appointments' component={Link} to='appointments' />
                     <Tab label='Diagnósticos' value='diagnoses' component={Link} to='diagnoses' />

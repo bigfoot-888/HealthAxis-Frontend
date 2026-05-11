@@ -28,6 +28,11 @@ export async function updateClinicalAttachmentStatus(uuid, status) {
     return response.data;
 }
 
+export async function updateClinicalDocument(uuid, documentData) {
+    const response = await axios.put(`/clinical-documents/${uuid}`, documentData);
+    return response.data;
+}
+
 // ===== READ =====
 
 export async function getClinicalDocuments() {

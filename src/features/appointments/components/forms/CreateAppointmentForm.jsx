@@ -1,10 +1,9 @@
-import { Grid, Paper, Stack, Box } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import { Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router';
 
-import { useAppointments } from '@appointments/hooks/useAppointments';
 import { createAppointment } from '@appointments/api/appointment.api';
 
 import { BasicTextInput, SelectInput } from '@/components/forms/inputs/index';

@@ -1,0 +1,84 @@
+url: "http://localhost:5173"
+
+steps:
+  - action: goto
+    value: "http://localhost:5173/login"
+
+  - action: fill
+    selector: email
+    value: testing@gmail.com
+
+  - action: fill
+    selector: password
+    value: "123456789"
+
+  - action: click
+    selector: Aceptar
+
+  - action: expectUrl
+    value: "/"
+
+  - action: expectText
+    value: "Cerrar Sesión"
+
+  - action: goto
+    value: "http://localhost:5173/patients/new"
+
+  - action: "fill"
+    selector: "name"
+    value: "Pikachu"
+  - action: "fill"
+    selector: "surname"
+    value: "Gosh"
+  - action: "date"
+    selector: "Fecha de nacimiento"
+    value: "15051985"
+  - action: "click"
+    selector: "Mujer"
+  - action: "fill"
+    selector: "dni"
+    value: "00075000E"
+  - action: "fill"
+    selector: "email"
+    value: "elena@email.com"
+  - action: "fill"
+    selector: "phone"
+    value: "600111222"
+  - action: "fill"
+    selector: "addressLine1"
+    value: "Calle Mayor 1"
+  - action: "click"
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Paciente creado correctamente"
+
+  - action: goto
+    value: "http://localhost:5173/appointments/new"
+
+  - action: "autocomplete"
+    selector: "Paciente"      
+    value: "Pikachu"
+  - action: "autocomplete"
+    selector: "Profesional"       
+    value: "Testing"
+  - action: "select"
+    selector: "Modalidad"     
+    value: "Presencial"    
+  - action: "date"
+    selector: "Fecha y hora de inicio"
+    value: "010420260900"     # 01/04/2026 09:00
+  - action: "fill"
+    selector: "location"
+    value: "Consulta 1"
+  - action: "fill"
+    selector: "reason"
+    value: "Revisión cardiológica anual"      
+  - action: "fill"
+    selector: "notes"
+    value: "Traer electros anteriores"
+  - action: "click"
+    selector: "Aceptar"
+
+  - action: expectText
+    value: "Cita creada correctamente"

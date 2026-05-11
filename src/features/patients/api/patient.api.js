@@ -41,8 +41,8 @@ export async function getFilteredPatients(query, limit = 20) {
     return response.data;
 }
 
-export async function getPatientHistory(uuid) {
-    const response = await axios.get(`/patients/${uuid}/history`)
+export async function getPatientHistory(uuid, page, limit) {
+    const response = await axios.get(`/patients/${uuid}/history`, {params: { page, limit}})
     return response.data; 
 }
 

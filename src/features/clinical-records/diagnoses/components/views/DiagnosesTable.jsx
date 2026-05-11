@@ -1,9 +1,7 @@
 import { useState, useMemo } from 'react';
 import { GridActionsCellItem, GridActionsCell } from '@mui/x-data-grid';
-import Button from '@mui/material/Button';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useOutletContext } from 'react-router';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { BasicTableLayout } from '@/components/tables/index';
@@ -25,7 +23,7 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParam
                     onClick={() => onUpdateClinicalStatus(row)}
                 />
             )}
-            {!isDiagnosisValid(row) && (
+            {isDiagnosisValid(row) && (
                 <GridActionsCellItem
                     showInMenu
                     icon={<AutorenewIcon />}
@@ -46,8 +44,7 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, ...gridParam
 }
 
 export default function DiagnosesTable({ diagnoses }) {
-    const [searchText, setSearchText] = useState('');
-
+    const {searchText} = useOutletContext(); 
     const filteredDiagnoses = useSearchFilter(diagnoses, searchText, null, [
         (t) => t.name,
         (t) => t.patient.fullName,
@@ -101,24 +98,9 @@ export default function DiagnosesTable({ diagnoses }) {
             <BasicTableLayout
                 rows={filteredDiagnoses}
                 columns={columns}
-                searchValue={searchText}
-                searchPlaceholder={'Busca por nombre, paciente, usuarios, estado clínico'}
-                onSearchChange={(e) => setSearchText(e.target.value)}
                 onRowClick={(params) => {
                     navigate(`/clinical-records/diagnoses/${params.row.uuid}`);
                 }}
-                actions={
-                    <Button
-                        variant='contained'
-                        component={Link}
-                        to='/clinical-records/diagnoses/new'
-                        startIcon={<PersonAddAltIcon />}
-                        loadingPosition='start'
-                        sx={{ mr: 2 }}
-                    >
-                        Añadir diagnóstico
-                    </Button>
-                }
             />
         </>
     );

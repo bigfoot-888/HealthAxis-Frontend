@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getAgendas } from '@agendas/api/agenda-api';
+import { getAgendas } from '@/features/agendas/api/agenda.api';
 
 export function useAgendas() {
     return useQuery({

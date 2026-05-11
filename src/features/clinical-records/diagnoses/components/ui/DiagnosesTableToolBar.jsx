@@ -6,15 +6,15 @@ import { SearchBar } from '@/components/ui';
 export default function DiagnosesTableToolBar({ searchText, setSearchText }) {
     return (
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <SearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Busca por ID, nombre" />
-
+            <SearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Busca por nombre, paciente, usuarios, estado clínico" />
             <Button
                 variant="contained"
                 component={Link}
-                to="/appointments/new"
+                to="/clinical-records/diagnoses/new"
+                state={{ from: `/clinical-records/diagnoses` }}
                 startIcon={<PersonAddAltIcon />}
             >
-                Añadir cita
+                Añadir diagnóstico
             </Button>
         </Box>
     );

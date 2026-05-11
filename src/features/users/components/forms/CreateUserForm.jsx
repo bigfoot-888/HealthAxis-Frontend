@@ -35,7 +35,7 @@ export default function CreateUserForm() {
         try {
             await createUser(data);
             refetchUsers();
-            await queryClient.invalidateQueries({ queryKey: ['users', { agendaUuid: data.agenda.uuid }] });
+            await queryClient.invalidateQueries({ queryKey: ['users', data.agenda.uuid] });
             navigate('/users');
             showSnackbar({ message: 'Usuario creado correctamente' });
         } catch (err) {

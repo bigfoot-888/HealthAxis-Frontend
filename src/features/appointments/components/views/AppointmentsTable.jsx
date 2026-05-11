@@ -86,7 +86,6 @@ export default function AppointmentsTable({ appointments, setError, searchText }
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
-    const [appointmentToAddClinicalData, setAppointmentToAddClinicalData] = useState(null);
 
     const handleCompleteAppointment = async (row) => {
         try {
@@ -109,8 +108,6 @@ export default function AppointmentsTable({ appointments, setError, searchText }
             handleApiError(err, setError, null);
         }
     };
-
-    // https://stackoverflow.com/questions/79546439/why-are-params-undefined-in-valuegetter-but-not-in-rendercell-when-using-mui-dat
 
     const computedAppointments = useMemo(() => {
         if (!filteredAppointments) return [];
@@ -150,7 +147,6 @@ export default function AppointmentsTable({ appointments, setError, searchText }
                         onCancel={setAppointmentToCancel}
                         onComplete={setAppointmentToComplete}
                         onCheckIn={setAppointmentToCheckIn}
-                        onAddClinicalData={setAppointmentToAddClinicalData}
                     />
                 ),
             },
@@ -182,14 +178,6 @@ export default function AppointmentsTable({ appointments, setError, searchText }
                     appointment={appointmentToCancel}
                     handleClose={() => setAppointmentToCancel(null)}
                     refetch={refetch}
-                />
-            )}
-
-            {appointmentToAddClinicalData && (
-                <AddClinicalDataStepperForm
-                    appointment={appointmentToAddClinicalData}
-                    open={!!appointmentToAddClinicalData}
-                    handleClose={() => setAppointmentToAddClinicalData(null)}
                 />
             )}
 

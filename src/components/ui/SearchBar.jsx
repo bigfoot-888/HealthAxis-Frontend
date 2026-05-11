@@ -46,7 +46,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         [theme.breakpoints.up('sm')]: {
             width: '45ch',
             '&:focus': {
-                width: '55ch',
+                width: '47ch',
             },
         },
     },
@@ -60,7 +60,7 @@ export default function SearchBar({placeholder, onChange, value}) {
             </SearchIconWrapper>
             <StyledInputBase
                 placeholder={placeholder}
-                inputProps={{ 'aria-label': 'buscar' }}
+                inputProps={{ 'aria-label': placeholder}}
                 onChange={onChange}
                 value={value}
             />
