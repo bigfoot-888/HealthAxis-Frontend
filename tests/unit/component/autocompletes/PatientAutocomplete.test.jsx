@@ -53,14 +53,14 @@ describe('PatientAutocomplete', () => {
 
         const input = screen.getByRole('combobox');
 
-        await user.type(input, 'jo');
+        await user.type(input, 'ara');
 
         jest.advanceTimersByTime(500);
 
         await waitFor(() => {
             expect(getPatients).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    query: 'jo',
+                    query: 'ara',
                 }),
             );
         });
@@ -75,7 +75,7 @@ describe('PatientAutocomplete', () => {
 
         const input = screen.getByRole('combobox');
 
-        await user.type(input, 'jo');
+        await user.type(input, 'ele');
 
         jest.advanceTimersByTime(500);
 

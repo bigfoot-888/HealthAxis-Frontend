@@ -3,15 +3,26 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { Link } from 'react-router';
 import { SearchBar } from '@/components/ui';
 
-export default function AppointmentsTableToolbar({ searchText, setSearchText }) {
+export default function AppointmentsTableToolbar({ searchText, setSearchText, todayOnly = false, setTodayOnly = null, viewMode }) {
     return (
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <SearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Busca por motivo, paciente, usuario, estado, fecha" />
+            <SearchBar
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
+                placeholder='Busca por motivo, paciente, usuario, estado, fecha'
+            />
+            <Button
+                disabled={viewMode === 'calendar'}
+                variant={todayOnly ? 'contained' : 'outlined'}
+                onClick={() => setTodayOnly(prev => !prev)}
+            >
+                Citas hoy
+            </Button>
 
             <Button
-                variant="contained"
+                variant='contained'
                 component={Link}
-                to="/appointments/new"
+                to='/appointments/new'
                 state={{ from: `/appointments` }}
                 startIcon={<PersonAddAltIcon />}
             >

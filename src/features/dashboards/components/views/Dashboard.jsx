@@ -18,8 +18,8 @@ export default function Dashboard({ dashboard }) {
     const [layout, setLayout] = useState([]);
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const { refetch } = useDashboard();
-    const [error, setError] = useState(null); 
-    const [componentToDelete, setComponentToDelete] = useState(null); 
+    const [error, setError] = useState(null);
+    const [componentToDelete, setComponentToDelete] = useState(null);
     const { showSnackbar } = useSnackbar();
 
     const layouts = {
@@ -34,7 +34,7 @@ export default function Dashboard({ dashboard }) {
 
     const handleSaveLayout = async () => {
         try {
-            const formattedLayout = layout.map((item) => ({
+            const formattedLayout = layout.map(item => ({
                 id: item.i,
                 x: item.x,
                 y: item.y,
@@ -44,28 +44,30 @@ export default function Dashboard({ dashboard }) {
             await updateLayout(formattedLayout);
             showSnackbar({ message: 'Distribución de componentes actualizada correctamente' });
         } catch (err) {
-            handleApiError(err, setError, null); 
+            handleApiError(err, setError, null);
         }
     };
 
-    const handleCreateWidget = async (widgetData) => {
+    const handleCreateWidget = async widgetData => {
         try {
             await createDashboardWidget(widgetData);
             setOpenAddDialog(false);
             refetch();
             showSnackbar({ message: 'Componente creado correctamente' });
         } catch (err) {
-            handleApiError(err, setError, null); 
+            setOpenAddDialog(false);
+            handleApiError(err, setError, null);
         }
     };
 
-    const handleDeleteComponent = async (widgetData) => {
+    const handleDeleteComponent = async widgetData => {
         try {
             await deleteDashboardWidget(widgetData.id);
             setComponentToDelete(null);
             refetch();
             showSnackbar({ message: 'Componente eliminado correctamente' });
         } catch (err) {
+            setComponentToDelete(null);
             handleApiError(err, setError, null);
         }
     };
@@ -79,11 +81,13 @@ export default function Dashboard({ dashboard }) {
                     handleConfirm={() => handleDeleteComponent(componentToDelete)}
                     title={`Eliminar componente`}
                     content='Esta acción es irreversible. Al finalizar, el componente será eliminado. '
-                    error={error}
-                    onErrorClose={() => setError(null)}
                 />
             )}
-            <DashboardToolbar onSave={handleSaveLayout} onAddWidget={() => setOpenAddDialog(true)} />
+            <DashboardToolbar
+                onSave={handleSaveLayout}
+                onAddWidget={() => setOpenAddDialog(true)}
+                disableAddWidget={dashboard.components.length >= 10}
+            />
             {openAddDialog && (
                 <AddKpiWidgetDialog
                     open={openAddDialog}
@@ -110,7 +114,7 @@ export default function Dashboard({ dashboard }) {
                         width={width}
                         isDraggable={true}
                         isResizable={true}
-                        onLayoutChange={(newLayout) => {
+                        onLayoutChange={newLayout => {
                             setLayout(newLayout);
                         }}
                         style={{ flex: 1 }}

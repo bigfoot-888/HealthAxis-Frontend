@@ -6,6 +6,7 @@ import { DIAGNOSIS_CLINICAL_STATUS_CONFIG, DIAGNOSIS_STATUS_CONFIG } from '@/sha
 import { TREATMENT_CLINICAL_STATUS_CONFIG, TREATMENT_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 import { useMemo } from 'react';
+import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
 
 function groupLogsByDate(logs) {
     const groups = {};
@@ -55,6 +56,11 @@ function getLogDescription(log) {
     }
 
     if (action === 'STATUS_CHANGED') {
+        if (entityType === 'PATIENT') {
+            return `Estado del paciente cambiado de ${
+                PATIENT_STATUS_CONFIG[meta.previousStatus]?.label ?? translate(meta.previousStatus)
+            } a ${PATIENT_STATUS_CONFIG[meta.newStatus]?.label ?? translate(meta.newStatus)}`;
+        }
         if (entityType === 'DIAGNOSIS') {
             return `Estado de diagnóstico cambiado de ${
                 DIAGNOSIS_STATUS_CONFIG[meta.previousStatus]?.label ?? translate(meta.previousStatus)
@@ -77,7 +83,7 @@ function getLogDescription(log) {
     }
 
     if (action === 'UPDATED' && meta?.changes) {
-        const fields = Object.keys(meta.changes);
+        const fields = Object.keys(meta.changes).map(field => translate(field));
 
         if (fields.length === 0) return 'Datos actualizados';
 

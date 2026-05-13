@@ -1,6 +1,6 @@
 import { Box, Button, Stack } from '@mui/material';
 
-export default function DashboardToolbar({ onSave, onAddWidget }) {
+export default function DashboardToolbar({ onSave, onAddWidget, disableAddWidget}) {
     return (
         <Box
             sx={{
@@ -16,7 +16,7 @@ export default function DashboardToolbar({ onSave, onAddWidget }) {
                     Guardar layout
                 </Button>
 
-                <Button variant='outlined' onClick={onAddWidget}>Añadir widget</Button>
+                <Button variant='outlined' onClick={onAddWidget} disabled={disableAddWidget}>Añadir widget</Button>
             </Stack>
         </Box>
     );

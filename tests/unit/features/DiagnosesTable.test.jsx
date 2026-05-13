@@ -21,7 +21,6 @@ jest.mock('@/hooks/useSearchFilter', () => ({
     useSearchFilter: (data) => data,
 }));
 
-// 🔹 capturar props de tabla
 let capturedProps = null;
 
 jest.mock('@/components/tables/index', () => ({

@@ -32,12 +32,9 @@ function getChartLabel(component, value) {
 }
 
 export default function DashboardComponentRenderer({ component, onDelete }) {
-    const theme = useTheme();
-    // Destructure the new payload structure
     const { vizType, config = {}, data, title } = component;
 
     const renderContent = () => {
-        // Fallback if the query failed or returned no data
         if (!data) return <Typography color='text.secondary'>Sin datos</Typography>;
 
         switch (vizType) {
@@ -89,7 +86,6 @@ export default function DashboardComponentRenderer({ component, onDelete }) {
     );
 }
 
-// Convert backend data into chart-friendly format
 function normalizeData(data, component) {
     if (!Array.isArray(data)) return data;
     return data.map((d) => ({
@@ -99,10 +95,8 @@ function normalizeData(data, component) {
     }));
 }
 
-// Detect if value is a date
 function isDate(value) {
     if (!value || typeof value !== 'string') return false;
-    // A stricter check so random strings/numbers don't accidentally get formatted as dates
     const isISODate = /^\d{4}-\d{2}-\d{2}/.test(value);
     if (!isISODate) return false;
     return !isNaN(Date.parse(value));

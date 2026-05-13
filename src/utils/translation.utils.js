@@ -28,7 +28,21 @@ export const TRANSLATE = {
     VALIDATOR: 'Validación',
     CONTRIBUTOR: 'Colaboración',
     MODERATE: 'Moderada',
-    HIGH: 'Alta'
+    HIGH: 'Alta',
+    NAME: 'Nombre',
+    SURNAME: 'Apellidos',
+    EMAIL: 'Correo',
+    PHONE: 'Teléfono',
+    ADDRESSLINE1: 'Dirección',
+    ADDRESSLINE2: 'Dirección complementaria',
+    NOTES: 'Notas',
+    LOCATION: 'Lugar',
+    STARTTIME: 'Fecha de inicio',
+    TYPE: 'Modalidad',
+    REASON: 'Motivo',
+    SEVERITY: 'Gravedad',
+    DESCRIPTION: 'Descripción',
+    DURATION: 'Duración',
 };
 
 export function translate(value) {

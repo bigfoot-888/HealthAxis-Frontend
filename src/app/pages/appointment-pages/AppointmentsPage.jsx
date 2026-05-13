@@ -20,16 +20,22 @@ export default function AppointmentsPage() {
         error: myAppointmentsFetchError,
     } = useMyAppointments();
 
-    if (appointmentsFetchError || myAppointmentsFetchError) return <Error msg="Error al cargar citas"/>
+    if (appointmentsFetchError || myAppointmentsFetchError) return <Error msg='Error al cargar citas' />;
     const [viewMode, setViewMode] = useState('table');
     const [error, setError] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [todayOnly, setTodayOnly] = useState(false);
 
     useEffect(() => {
         const t = setTimeout(() => setDebouncedSearch(searchText), 300);
         return () => clearTimeout(t);
     }, [searchText]);
+
+    useEffect(() => {
+        if (viewMode === 'calendar') 
+            setTodayOnly(false);
+    }, [viewMode]);
 
     return (
         <ContentLayout error={error} onErrorClose={() => setError(null)}>
@@ -47,7 +53,15 @@ export default function AppointmentsPage() {
                         <Tab label='Calendario' value='calendar' />
                     </Tabs>
                 }
-                right={<AppointmentsTableToolbar searchText={searchText} setSearchText={setSearchText} />}
+                right={
+                    <AppointmentsTableToolbar
+                        searchText={searchText}
+                        setSearchText={setSearchText}
+                        todayOnly={todayOnly}
+                        setTodayOnly={setTodayOnly}
+                        viewMode={viewMode}
+                    />
+                }
             />
 
             {appointmentsIsLoading || myAppointmentsIsLoading ? (
@@ -59,6 +73,7 @@ export default function AppointmentsPage() {
                             appointments={appointments}
                             setError={setError}
                             searchText={debouncedSearch}
+                            todayOnly={todayOnly}
                         />
                     ) : (
                         <AppointmentsCalendar appointments={myAppointments} setError={setError} />

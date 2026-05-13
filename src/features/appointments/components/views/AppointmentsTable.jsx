@@ -70,24 +70,38 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, 
     );
 }
 
-export default function AppointmentsTable({ appointments, setError, searchText }) {
+export default function AppointmentsTable({ appointments, setError, searchText, todayOnly }) {
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
 
     const filteredAppointments = useSearchFilter(appointments, searchText, null, [
-        (a) => a.reason,
-        (a) => a.user.fullName,
-        (a) => a.patient.fullName,
-        (a) => APPOINTMENT_STATUS_CONFIG[a.status].label,
-        (a) => formatDateTimeUTC(a.startTime),
+        a => a.reason,
+        a => a.user.fullName,
+        a => a.patient.fullName,
+        a => APPOINTMENT_STATUS_CONFIG[a.status].label,
+        a => formatDateTimeUTC(a.startTime),
     ]);
+
+    const visibleAppointments = useMemo(() => {
+        if (!todayOnly) return filteredAppointments;
+        const today = new Date();
+
+        return filteredAppointments.filter(a => {
+            const date = new Date(a.startTime);
+            return (
+                date.getDate() === today.getDate() &&
+                date.getMonth() === today.getMonth() &&
+                date.getFullYear() === today.getFullYear()
+            );
+        });
+    }, [filteredAppointments, todayOnly]);
 
     const { refetch } = useAppointments();
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
 
-    const handleCompleteAppointment = async (row) => {
+    const handleCompleteAppointment = async row => {
         try {
             await updateAppointmentStatus(row.uuid, 'COMPLETED');
             refetch();
@@ -98,7 +112,7 @@ export default function AppointmentsTable({ appointments, setError, searchText }
         }
     };
 
-    const handleCheckInAppointment = async (row) => {
+    const handleCheckInAppointment = async row => {
         try {
             await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
             refetch();
@@ -110,22 +124,22 @@ export default function AppointmentsTable({ appointments, setError, searchText }
     };
 
     const computedAppointments = useMemo(() => {
-        if (!filteredAppointments) return [];
+        if (!visibleAppointments) return [];
 
         const now = new Date();
 
-        const getPriority = (row) => {
+        const getPriority = row => {
             if (row.status === 'CHECKED_IN') return 0;
             if (row.status === 'SCHEDULED') return 1;
             if (new Date(row.startTime) >= now) return 2;
             return 3;
         };
 
-        return filteredAppointments.map((row) => ({
+        return visibleAppointments.map(row => ({
             ...row,
             priority: getPriority(row),
         }));
-    }, [filteredAppointments]);
+    }, [visibleAppointments]);
 
     const columns = useMemo(() => {
         return [
@@ -141,7 +155,7 @@ export default function AppointmentsTable({ appointments, setError, searchText }
                 field: 'actions',
                 type: 'actions',
                 flex: 3,
-                renderCell: (params) => (
+                renderCell: params => (
                     <ActionsCell
                         {...params}
                         onCancel={setAppointmentToCancel}
@@ -188,7 +202,7 @@ export default function AppointmentsTable({ appointments, setError, searchText }
                     sortModel: [{ field: 'priority', sort: 'asc' }],
                 }}
                 tableSpecificVisibility={{ priority: false }}
-                onRowClick={(params) => {
+                onRowClick={params => {
                     navigate(`/appointments/${params.row.uuid}`);
                 }}
             />

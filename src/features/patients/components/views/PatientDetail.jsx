@@ -1,39 +1,38 @@
 import React from 'react';
 import { DetailLayout } from '@/components/entity-detail';
-import { 
-    Box, Card, CardContent, Typography, Grid, Button, Stack, List, 
-    ListItem, ListItemText, Avatar, Chip, Divider 
+import {
+    Box,
+    Card,
+    CardContent,
+    Typography,
+    Grid,
+    Button,
+    Stack,
+    List,
+    ListItem,
+    ListItemText,
+    Avatar,
+    Chip,
+    Divider,
 } from '@mui/material';
 import { usePatientContext } from '@patients/hooks/usePatientContext';
 import { formatDateTimeUTC } from '@/utils/date-formatters';
-
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-
-import { calculateAge, translateSex } from '@patients/utils/patient.utils';
 import { TREATMENT_CLINICAL_STATUS_CONFIG } from '@/shared/constants/treatment.constants';
-import { Link } from 'react-router';
 import PatientInfoCard from '@patients/components/ui/PatientInfoCard';
 export default function PatientDetail() {
-    const { setError, patient, uuid } = usePatientContext();
+    const { patient } = usePatientContext();
 
     if (!patient) return null;
-
-    const patientName = patient.name?.trim() || '';
-    const patientSurname = patient.surname?.trim() || '';
-    const initials = `${patientName.charAt(0) || ''}${patientSurname.charAt(0) || ''}`.toUpperCase();
-    const age = calculateAge(patient.date_of_birth);
-    const fullAddress = [patient.address_line1, patient.address_line2].filter(Boolean).join(', ');
 
     return (
         <DetailLayout>
             <Stack sx={{ p: { xs: 2, md: 3 }, width: '100%' }} spacing={3}>
-                <PatientInfoCard patient={patient}/>
+                <PatientInfoCard patient={patient} />
 
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
-                            <CardContent>
+                            <CardContent sx={{ bgcolor: 'surfaceContainerLowest' }}>
                                 <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                                     Próximas Citas
                                 </Typography>
@@ -41,7 +40,7 @@ export default function PatientDetail() {
 
                                 {patient.appointments?.length > 0 ? (
                                     <List dense disablePadding>
-                                        {patient.appointments.slice(0, 3).map((appt) => (
+                                        {patient.appointments.slice(0, 3).map(appt => (
                                             <ListItem
                                                 key={appt.id}
                                                 disableGutters
@@ -83,7 +82,7 @@ export default function PatientDetail() {
 
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
-                            <CardContent>
+                            <CardContent sx={{ bgcolor: 'surfaceContainerLowest' }}>
                                 <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                                     Tratamientos
                                 </Typography>
@@ -91,7 +90,7 @@ export default function PatientDetail() {
 
                                 {patient.treatments?.length > 0 ? (
                                     <List dense disablePadding>
-                                        {patient.treatments.slice(0, 3).map((t) => (
+                                        {patient.treatments.slice(0, 3).map(t => (
                                             <ListItem key={t.id} disableGutters sx={{ py: 1 }}>
                                                 <ListItemText
                                                     disableTypography
@@ -127,7 +126,7 @@ export default function PatientDetail() {
 
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Card sx={{ height: '100%', borderRadius: 2 }} elevation={0} variant='outlined'>
-                            <CardContent>
+                            <CardContent sx={{ bgcolor: 'surfaceContainerLowest' }}>
                                 <Typography variant='subtitle1' sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                                     Diagnósticos
                                 </Typography>
@@ -135,7 +134,7 @@ export default function PatientDetail() {
 
                                 {patient.diagnoses?.length > 0 ? (
                                     <List dense disablePadding>
-                                        {patient.diagnoses.slice(0, 3).map((d) => (
+                                        {patient.diagnoses.slice(0, 3).map(d => (
                                             <ListItem
                                                 key={d.id}
                                                 disableGutters

@@ -78,7 +78,6 @@ export default function PatientInfoCard({ patient }) {
                         alignItems={{ xs: 'flex-start', md: 'center' }}
                         sx={{ flexShrink: 0 }}
                     >
-                        {/* Estado */}
                         <Stack spacing={0.5} alignItems={{ xs: 'flex-start', md: 'flex-end' }}>
                             <Typography
                                 variant='caption'
@@ -94,28 +93,20 @@ export default function PatientInfoCard({ patient }) {
                             <PatientStatusChip value={patient.status} />
                         </Stack>
 
-                        <Stack direction='row' spacing={1.5} sx={{ mt: { xs: 1, md: 2.5 } }}>
-                            <Button
-                                variant='contained'
-                                color='primary'
-                                startIcon={<AddIcon />}
-                                sx={{ borderRadius: 2 }}
-                            >
-                                Nueva Cita
-                            </Button>
-
-                            <Button
-                                variant='outlined'
-                                color='primary'
-                                startIcon={<EditIcon />}
-                                component={Link}
-                                to={`/patients/edit/${patient.uuid}`}
-                                state={{ from: `/patients/${patient.uuid}` }}
-                                sx={{ borderRadius: 2 }}
-                            >
-                                Editar
-                            </Button>
-                        </Stack>
+                        <Button
+                            variant='outlined'
+                            size='primary'
+                            startIcon={<EditIcon />}
+                            component={Link}
+                            to={`/patients/edit/${patient.uuid}`}
+                            state={{ from: `/patients/${patient.uuid}` }}
+                            sx={{
+                                mt: { xs: 1, sm: 2.5 },
+                                borderRadius: 2,
+                            }}
+                        >
+                            Editar
+                        </Button>
                     </Stack>
                 </Stack>
 

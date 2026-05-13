@@ -2,9 +2,11 @@
 import { SubtleChip } from "@/components/ui";
 import { APPOINTMENT_STATUS_CONFIG } from "@/shared/constants/appointment.constants";
 import { formatCreatedAt } from "@/utils/date-formatters";
-import { List, ListItem, ListItemText, Stack, Typography } from "@mui/material";
+import { List, ListItem, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
+import { Link } from "react-router";
 
 export default function CustomAppointmentsList({data}) {
+    console.log(data)
     return (
         <List dense>
             {!Array.isArray(data) || data.length === 0 ? (
@@ -12,15 +14,19 @@ export default function CustomAppointmentsList({data}) {
             ) : (
                 data.map((item, index) => (
                     <ListItem key={index} divider>
-                        <ListItemText
-                            primary={
-                                <Stack direction='row' spacing={1} alignItems='center'>
-                                    <Typography variant='body2'>{item.patientId || 'Paciente'}</Typography>
-                                    <SubtleChip label={APPOINTMENT_STATUS_CONFIG[item.status].label} />
-                                </Stack>
-                            }
-                            secondary={item.startTime ? formatCreatedAt(item.startTime) : ''}
-                        />
+                        <ListItemButton component={Link} to={`/appointments/${item.uuid}`}>
+                            <ListItemText
+                                primary={
+                                    <Stack direction='row' spacing={1} alignItems='center'>
+                                        <Typography variant='body2'>
+                                            {item.patient ? `${item.patient.name} ${item.patient.surname}` : 'Paciente'}
+                                        </Typography>
+                                        <SubtleChip label={APPOINTMENT_STATUS_CONFIG[item.status].label} />
+                                    </Stack>
+                                }
+                                secondary={item.startTime ? formatCreatedAt(item.startTime) : ''}
+                            />
+                        </ListItemButton>
                     </ListItem>
                 ))
             )}
