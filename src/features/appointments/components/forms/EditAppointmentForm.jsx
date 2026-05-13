@@ -58,7 +58,6 @@ export default function EditAppointmentForm({ appointment, uuid }) {
         }
     };
 
-    // Just in case
     useEffect(() => {
         if (appointment) {
             reset({

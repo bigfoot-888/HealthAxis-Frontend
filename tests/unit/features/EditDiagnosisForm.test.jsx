@@ -96,7 +96,7 @@ describe('EditDiagnosisForm', () => {
 
         renderForm(baseDiagnosis);
 
-        await userEvent.type(screen.getByTestId('name'), 'Nuevo nombre');
+        await userEvent.type(screen.getByTestId('name'), 'Piel irritada');
         await userEvent.selectOptions(screen.getByTestId('severity'), 'LOW');
         await userEvent.type(screen.getByTestId('users'), '1');
 
@@ -110,7 +110,7 @@ describe('EditDiagnosisForm', () => {
     });
 
     it('shows error when API fails', async () => {
-        mockUpdateDiagnosis.mockRejectedValue(new Error('fail'));
+        mockUpdateDiagnosis.mockRejectedValue(new Error('error......'));
 
         renderForm(baseDiagnosis);
 

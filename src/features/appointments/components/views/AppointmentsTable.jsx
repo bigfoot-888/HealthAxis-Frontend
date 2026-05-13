@@ -19,7 +19,6 @@ import { updateAppointmentStatus } from '@appointments/api/appointment.api';
 
 import CancelAppointmentForm from '@appointments/components/forms/CancelAppointmentForm';
 import { handleApiError } from '@/utils/handle-errors';
-import AddClinicalDataStepperForm from '@appointments/components/forms/AddClinicalDataStepperForm';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 import { APPOINTMENT_COLUMNS } from '@appointments/config/appointment.columns';
 import { isCompleted, isCheckedIn, isScheduled, isAppointmentOver } from '@appointments/utils/appointment-status.utils';

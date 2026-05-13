@@ -6,7 +6,6 @@ import { List, ListItem, ListItemButton, ListItemText, Stack, Typography } from 
 import { Link } from "react-router";
 
 export default function CustomAppointmentsList({data}) {
-    console.log(data)
     return (
         <List dense>
             {!Array.isArray(data) || data.length === 0 ? (

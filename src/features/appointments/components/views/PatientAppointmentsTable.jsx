@@ -104,7 +104,6 @@ export default function PatientAppointmentsTable({ appointments, patient }) {
 
     const handleCheckInAppointment = async (row) => {
         try {
-            console.log(row)
             await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
             invalidateEditAppointmentQueries(queryClient, row)
             setAppointmentToCheckIn(null); 

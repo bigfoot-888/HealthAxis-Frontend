@@ -53,8 +53,8 @@ export default function CreateExternalClinicalDocument() {
 
                     const formData = new FormData();
                     formData.append('file', attachment.file);
-                    formData.append('fileName', attachment.file.name); // original file name
-                    formData.append('fileSize', attachment.file.size); // size in bytes
+                    formData.append('fileName', attachment.file.name); 
+                    formData.append('fileSize', attachment.file.size); 
 
                     const createdAttachment = await createClinicalAttachment(formData);
                     attachmentIds.push(createdAttachment.id);

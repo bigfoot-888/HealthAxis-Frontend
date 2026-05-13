@@ -7,11 +7,11 @@ import { DiagnosisAutocomplete } from '@/components/forms/autocompletes/index';
 export function TreatmentDiagnoses({ control }) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: 'diagnoses', // This will be the array in your form data
+        name: 'diagnoses', 
     });
 
     const handleAddDiagnosis = () => {
-        append({ diagnosis: ""}); // Add empty row
+        append({ diagnosis: ""}); 
     };
 
     return (
