@@ -160,7 +160,7 @@ export default function EditUserForm({ user, uuid }) {
                             <RoleAutocomplete control={control} rules={{ required: 'El rol es obligatorio' }} />
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
 
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>

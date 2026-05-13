@@ -48,7 +48,6 @@ export default function CreateTreatmentForm() {
     const onSubmit = async (data) => {
         try {
             await createTreatment(data);
-            refetch();
             invalidateCreateTreatmentQueries(queryClient); 
             navigate(from);
             showSnackbar({ message: 'Tratamiento creado correctamente' });
@@ -65,9 +64,6 @@ export default function CreateTreatmentForm() {
                         <Grid container size={12} sx={{ justifyContent: 'start', pb: 2 }}>
                             <Typography variant='h2'>Crear nuevo tratamiento</Typography>
                         </Grid>
-
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
-
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
                                 Información básica
@@ -107,7 +103,7 @@ export default function CreateTreatmentForm() {
                                     Object.entries(TREATMENT_CLINICAL_STATUS_CONFIG).map(([key, value]) => [
                                         key,
                                         value.label,
-                                    ]),
+                                    ])
                                 )}
                             />
                         </Grid>
@@ -163,7 +159,7 @@ export default function CreateTreatmentForm() {
                                 control={control}
                                 errors={errors}
                                 rules={{
-                                    validate: (value) =>
+                                    validate: value =>
                                         (value && value.length > 0) || 'Debe haber al menos un profesional',
                                 }}
                             />
@@ -189,6 +185,8 @@ export default function CreateTreatmentForm() {
                                 others={{ multiline: true, rows: 4 }}
                             />
                         </Grid>
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
+
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>
                                 <Button variant='contained' size='large' type='submit'>

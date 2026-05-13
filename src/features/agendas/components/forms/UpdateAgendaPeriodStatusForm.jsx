@@ -33,6 +33,7 @@ export default function UpdateAgendaPeriodStatusForm({ agenda, handleClose }) {
             handleClose();
             showSnackbar({ message: 'Estado del periodo de la agenda actualizado correctamente' });
         } catch (err) {
+            console.log("ERROR")
             handleApiError(err, setError, setFormError);
         }
     };

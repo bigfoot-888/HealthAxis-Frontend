@@ -174,7 +174,7 @@ export default function EditTreatmentForm({ treatment }) {
                             />
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
 
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>

@@ -27,6 +27,7 @@ export const TRANSLATE = {
     REVIEWER: 'Revisión',
     VALIDATOR: 'Validación',
     CONTRIBUTOR: 'Colaboración',
+    UPLOADER: 'Subida',
     MODERATE: 'Moderada',
     HIGH: 'Alta',
     NAME: 'Nombre',

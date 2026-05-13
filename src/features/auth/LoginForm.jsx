@@ -137,7 +137,7 @@ export default function LoginForm() {
                                 </FormControl>
                             </Grid>
                             <Grid size={12}>
-                                <ErrorAlert error={error} onErrorClose={()=>setError(null)}/>
+                                <ErrorAlert error={error} onClose={()=>setError(null)}/>
                             </Grid>
                             <Grid
                                 container

@@ -59,7 +59,7 @@ export default function CreateDiagnosisForm() {
                             <Typography variant='h2'>Crear nuevo diagnóstico</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
 
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>

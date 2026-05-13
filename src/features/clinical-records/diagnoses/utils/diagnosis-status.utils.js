@@ -1,6 +1,6 @@
 export function isDiagnosisOver(diagnosis) {
     return (
-        diagnosis.clinicalStatus === 'RESOLVED' || diagnosis.clinicalStatus.clinicalStatus === 'RULED_OUT'
+        diagnosis.clinicalStatus === 'RESOLVED' || diagnosis.clinicalStatus === 'RULED_OUT'
     );
 }
 

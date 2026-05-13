@@ -171,7 +171,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
             {appointmentToComplete && (
                 <AlertDialog
                     open={true}
-                    handleClose={() => setAppointmentToComplete(null)}
+                    handleClose={() => {setError(null);setAppointmentToComplete(null)}}
                     handleConfirm={() => handleCompleteAppointment(appointmentToComplete)}
                     title={`Completar cita: ${appointmentToComplete.patient.fullName} - Dr. / Dra. ${appointmentToComplete.user.fullName}`}
                     content='Esta acción es irreversible. Al finalizar, la cita será dada como realizada..'
@@ -180,7 +180,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
             {appointmentToCheckIn && (
                 <AlertDialog
                     open={!!appointmentToCheckIn}
-                    handleClose={() => setAppointmentToCheckIn(null)}
+                    handleClose={() => {setError(null);setAppointmentToCheckIn(null)}}
                     handleConfirm={() => handleCheckInAppointment(appointmentToCheckIn)}
                     title={`Check-in de cita: ${appointmentToCheckIn.patient.fullName}  - Dr. / Dra. ${appointmentToCheckIn.user.fullName}`}
                     content='Esta acción es reversible. Al finalizar, se considerará al paciente presente para la cita.'
@@ -189,7 +189,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
             {appointmentToCancel && (
                 <CancelAppointmentForm
                     appointment={appointmentToCancel}
-                    handleClose={() => setAppointmentToCancel(null)}
+                    handleClose={() => {setError(null);setAppointmentToCancel(null)}}
                     refetch={refetch}
                 />
             )}

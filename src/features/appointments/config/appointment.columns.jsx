@@ -35,6 +35,7 @@ export const APPOINTMENT_COLUMNS = {
         field: 'location',
         headerName: 'Lugar',
         flex: 2,
+        valueGetter: (value, row) => row.location || 'N/A',
     },
     status: {
         field: 'status',

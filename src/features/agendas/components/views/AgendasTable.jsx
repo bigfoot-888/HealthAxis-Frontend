@@ -52,10 +52,20 @@ function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, onUp
                 />
             )}
             {row.status === 'ACTIVE' && (
-                <GridActionsCellItem showInMenu icon={<DeleteIcon />} label='Dar de baja' onClick={() => onDelete(row)} />
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<DeleteIcon />}
+                    label='Dar de baja'
+                    onClick={() => onDelete(row)}
+                />
             )}
             {row.status === 'INACTIVE' && (
-                <GridActionsCellItem showInMenu icon={<RestoreIcon />} label='Reactivar' onClick={() => onReactivate(row)} />
+                <GridActionsCellItem
+                    showInMenu
+                    icon={<RestoreIcon />}
+                    label='Reactivar'
+                    onClick={() => onReactivate(row)}
+                />
             )}
         </GridActionsCell>
     );
@@ -126,45 +136,69 @@ export default function AgendasTable({ agendas }) {
 
     return (
         <>
-            <AlertDialog
-                open={!!agendaToReactivate}
-                handleClose={() => setAgendaToReactivate(null)}
-                handleConfirm={() => handleConfirmReactivateDialog(agendaToReactivate)}
-                title={`¿Reactivar la agenda de ${!!agendaToReactivate && agendaToReactivate.name}?`}
-                content='Al finalizar, la agenda será reactivada.'
-                error={error}
-                onErrorClose={() => setError(null)}
-
-            />
-            <AlertDialog
-                open={!!agendaToDelete}
-                handleClose={() => setAgendaToDelete(null)}
-                handleConfirm={() => handleConfirmAlertDialog(agendaToDelete)}
-                title={`¿Dar de baja a la agenda de ${!!agendaToDelete && agendaToDelete.name}?`}
-                content='Al finalizar, la agenda será dada de baja.'
-                error={error}
-                onErrorClose={() => setError(null)}
-            />
+            {!!agendaToReactivate && (
+                <AlertDialog
+                    open={!!agendaToReactivate}
+                    handleClose={() => {
+                        setError(null);
+                        setAgendaToDelete(null);
+                    }}
+                    handleConfirm={() => handleConfirmReactivateDialog(agendaToReactivate)}
+                    title={`¿Reactivar la agenda de ${!!agendaToReactivate && agendaToReactivate.name}?`}
+                    content='Al finalizar, la agenda será reactivada.'
+                    error={error}
+                    onErrorClose={() => setError(null)}
+                />
+            )}
+            {!!agendaToDelete && (
+                <AlertDialog
+                    open={!!agendaToDelete}
+                    handleClose={() => {
+                        setError(null);
+                        setAgendaToDelete(null);
+                    }}
+                    handleConfirm={() => handleConfirmAlertDialog(agendaToDelete)}
+                    title={`¿Dar de baja a la agenda de ${!!agendaToDelete && agendaToDelete.name}?`}
+                    content='Al finalizar, la agenda será dada de baja.'
+                    error={error}
+                    onErrorClose={() => setError(null)}
+                />
+            )}
             {isCreateAgendaOpen && (
                 <CreateAgendaForm
                     isCreateAgendaOpen={isCreateAgendaOpen}
-                    handleClose={() => setIsCreateAgendaOpen(false)}
+                    handleClose={() => {
+                        setError(null);
+                        setIsCreateAgendaOpen(false);
+                    }}
                 />
             )}
             {agendaToEdit && (
-                <EditAgendaForm agenda={agendaToEdit} handleClose={() => setAgendaToEdit(null)} />
+                <EditAgendaForm
+                    agenda={agendaToEdit}
+                    handleClose={() => {
+                        setError(null);
+                        setAgendaToEdit(null);
+                    }}
+                />
             )}
             {agendaForNewPeriod && (
                 <CreateAgendaPeriodForm
                     agenda={agendaForNewPeriod}
-                    handleClose={() => setAgendaForNewPeriod(null)}
+                    handleClose={() => {
+                        setError(null);
+                        setAgendaForNewPeriod(null);
+                    }}
                     refetch={refetch}
                 />
             )}
             {agendaToUpdatePeriodStatus && (
                 <UpdateAgendaPeriodStatusForm
                     agenda={agendaToUpdatePeriodStatus}
-                    handleClose={() => setAgendaToUpdatePeriodStatus(null)}
+                    handleClose={() => {
+                        setError(null);
+                        setAgendaToUpdatePeriodStatus(null);
+                    }}
                 />
             )}
             <ContentLayout>

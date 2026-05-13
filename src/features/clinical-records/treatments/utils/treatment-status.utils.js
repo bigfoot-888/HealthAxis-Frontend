@@ -12,5 +12,5 @@ export function isCancelled(treatment) {
 }
 
 export function isFinished(treatment) {
-    return treatment.clinicalStatus === "COMPLETED" || treatment.clinicalStatus === "GIVEN"; 
+    return treatment.clinicalStatus === "COMPLETED" || treatment.clinicalStatus === "GIVEN" || treatment.clinicalStatus === 'DISCONTINUED'; 
 }

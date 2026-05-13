@@ -91,13 +91,13 @@ export default function TreatmentsTable({ treatments }) {
             {treatmentToUpdateClinicalStatus && (
                 <UpdateTreatmentClinicalStatusForm
                     treatment={treatmentToUpdateClinicalStatus}
-                    handleClose={() => setTreatmentToUpdateClinicalStatus(null)}
+                    handleClose={() => {setError(null);setTreatmentToUpdateClinicalStatus(null)}}
                 />
             )}
             {treatmentToUpdateStatus && (
                 <UpdateTreatmentStatusForm
                     treatment={treatmentToUpdateStatus}
-                    handleClose={() => setTreatmentToUpdateStatus(null)}
+                    handleClose={() => {setError(null);setTreatmentToUpdateStatus(null)}}
                 />
             )}
             <BasicTableLayout

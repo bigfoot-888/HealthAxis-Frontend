@@ -86,13 +86,13 @@ export default function DiagnosesTable({ diagnoses }) {
             {updateDiagnosisClinicalStatusRow && (
                 <UpdateDiagnosisClinicalStatusForm
                     diagnosis={updateDiagnosisClinicalStatusRow}
-                    handleClose={() => setUpdateDiagnosisClinicalStatusRow(null)}
+                    handleClose={() => {setError(null);setUpdateDiagnosisClinicalStatusRow(null)}}
                 />
             )}
             {updateDiagnosisStatusRow && (
                 <UpdateDiagnosisStatusForm
                     diagnosis={updateDiagnosisStatusRow}
-                    handleClose={() => setUpdateDiagnosisStatusRow(null)}
+                    handleClose={() => {setError(null);setUpdateDiagnosisStatusRow(null)}}
                 />
             )}
             <BasicTableLayout

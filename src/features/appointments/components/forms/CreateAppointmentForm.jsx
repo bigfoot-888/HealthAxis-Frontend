@@ -58,8 +58,6 @@ export default function CreateAppointmentForm() {
                             <Typography variant='h2'>Crear Nueva Cita</Typography>
                         </Grid>
 
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
-
                         <Grid size={12}>
                             <Typography variant='h4' component='h3' sx={{ pb: 1 }}>
                                 Información básica
@@ -163,6 +161,7 @@ export default function CreateAppointmentForm() {
                                 others={{ multiline: true, rows: 4 }}
                             />
                         </Grid>
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>
                                 <Button variant='contained' size='large' type='submit'>

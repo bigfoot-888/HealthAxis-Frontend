@@ -127,7 +127,7 @@ export default function CreateExternalClinicalDocument() {
                         <Grid size={12}>
                             <ClinicalDocumentUsersField control={control} />
                         </Grid>
-                        <ErrorAlert error={error} onErrorClose={() => setError(null)} />
+                        <ErrorAlert error={error} onClose={() => setError(null)} />
                         <Grid container justifyContent='space-between' size={12} sx={{ marginTop: 2 }}>
                             <Grid>
                                 <Button variant='contained' size='large' type='submit'>

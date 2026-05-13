@@ -68,11 +68,11 @@ export default function ClinicalDocumentsTable({ clinicalDocuments }) {
             {updateClinicalDocumentStatusRow && (
                 <UpdateClinicalDocumentStatusForm
                     clinicalDocument={updateClinicalDocumentStatusRow}
-                    handleClose={() => setUpdateClinicalDocumentStatusRow(null)}
+                    handleClose={() => {setError(null);setUpdateClinicalDocumentStatusRow(null)}}
                 />
             )}
             {documentToEdit && (
-                <EditClinicalDocumentForm document={documentToEdit} handleClose={() => setDocumentToEdit(null)}/>
+                <EditClinicalDocumentForm document={documentToEdit} handleClose={() => {setError(null);setDocumentToEdit(null)}}/>
             )}
             <BasicTableLayout
                 rows={filteredClinicalDocuments}

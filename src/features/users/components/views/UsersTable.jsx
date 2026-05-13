@@ -132,7 +132,7 @@ export default function UsersTable({ users }) {
 
     return (
         <>
-            <AlertDialog
+            {!!userToReactivate && <AlertDialog
                 open={!!userToReactivate}
                 handleClose={handleCloseReactivateDialog}
                 handleConfirm={() => handleConfirmReactivateDialog(userToReactivate)}
@@ -140,8 +140,8 @@ export default function UsersTable({ users }) {
                 content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
                 error={error}
                 onErrorClose={() => setError(null)}
-            />
-            <AlertDialog
+            />}
+            {!!userToDelete && <AlertDialog
                 open={!!userToDelete}
                 handleClose={handleCloseAlertDialog}
                 handleConfirm={() => handleConfirmAlertDialog(userToDelete)}
@@ -150,7 +150,7 @@ export default function UsersTable({ users }) {
                 se cancelará el proceso. En caso contrario, el usuario será dado de baja. '
                 error={error}
                 onErrorClose={() => setError(null)}
-            />
+            />}
             <ContentLayout
                 error={!userToDelete && !userToReactivate ? error : null}
                 onErrorClose={() => setError(null)}
