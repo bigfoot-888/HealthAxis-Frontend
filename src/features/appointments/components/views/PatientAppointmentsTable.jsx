@@ -9,7 +9,7 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 
@@ -77,6 +77,7 @@ export default function PatientAppointmentsTable({ appointments, patient }) {
     const { showSnackbar } = useSnackbar();
     const [error, setError] = useState(null); 
     const queryClient = useQueryClient(); 
+    const navigate = useNavigate();
 
     const filteredAppointments = useSearchFilter(appointments, searchText, null, [
         (a) => a.reason,
@@ -184,6 +185,9 @@ export default function PatientAppointmentsTable({ appointments, patient }) {
                 searchPlaceholder={'Busca por motivo, usuario, estado, inicio'}
                 onSearchChange={(e) => setSearchText(e.target.value)}
                 tableSpecificVisibility={{ priority: false }}
+                onRowClick={params => {
+                    navigate(`/appointments/${params.row.uuid}`);
+                }}
                 actions={
                     <Button
                         variant='contained'
