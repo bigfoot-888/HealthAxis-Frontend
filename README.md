@@ -1,16 +1,102 @@
-# React + Vite
+= Guía de instalación
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+En este último anexo se describen los pasos para instalar y ejecutar el proyecto. 
 
-Currently, two official plugins are available:
+Los repositorios con el código se pueden encontrar en: 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- *Backend*: https://github.com/bigfoot-888/HealthAxis-Backend
 
-## React Compiler
+- *Frontend*: https://github.com/bigfoot-888/HealthAxis-Frontend
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. *Requisitos previos*
 
-## Expanding the ESLint configuration
+El sistema ha sido probado en un entorno con:
+- Node.js 
+- npm 
+- PostgreSQL 
+- Redis 
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Antes de ejecutar el proyecto, es necesario tener PostgreSQL y Redis instalados y en ejecución.
+
+*Node.js*: https://nodejs.org/.
+
+*PostgreSQL*: https://www.postgresql.org/download/.
+
+*Redis*: https://redis.io/downloads/.
+
+2. *Clonado de repositorios*
+
+Crea una carpeta donde almacenar el proyecto, y ejecutar en la terminal los siguientes comandos.
+
+```bash
+git clone https://github.com/bigfoot-888/HealthAxis-Frontend.git frontend
+```,
+
+```bash
+git clone https://github.com/bigfoot-888/HealthAxis-Backend.git backend
+```,
+
+3. *Configuración del backend*
+
+Primero ejecuta los siguientes comandos. 
+
+```bash
+cd backend
+npm install
+```,
+
+Luego crea el archivo "*.env*" con las variables de entorno en la raíz de la carpeta backend. Este debe tener el siguiente contenido y estructura:
+
+```bash
+PORT=3000
+PGUSER=<usuario_postgres>
+PGPASSWORD=<password_postgres>
+PGHOST=localhost
+PGPORT=5432
+PGDATABASE=<nombre_bd>
+SESSION_SECRET=<string_largo_aleatorio>
+REDIS_URL=redis://localhost:6379
+```,
+
+Asegúrate de tener los puertos especificados en la estructura libres. 
+
+4. *Creación de la base de datos*
+
+Crea una base de datos PostgreSQL vacía con el nombre definido en la variable `PGDATABASE`:
+
+```bash
+createdb <nombre_bd>
+```,
+
+Alternativamente, desde PostgreSQL:
+
+```bash
+CREATE DATABASE <nombre_bd>;
+```,
+
+5. *Inicialización del sistema*
+
+Crea una carpeta llamada "uploads" en la raíz de la carpeta del backend. 
+
+```bash
+mkdir -p uploads // Linux / Max
+mkdir uploads    // Windows
+```,
+
+Inicializa las tablas y datos de prueba:
+
+```bash
+node utils/init-db.js
+```,
+
+Este comando elimina y recrea las tablas de la base de datos, además de insertar datos de prueba.
+
+6. *Ejecución del backend*
+
+Desde la raíz de la carpeta del backend ejecuta:
+
+```bash
+npx nodemon ./index.js
+```,
+
+El backend quedará disponible en http://localhost:3000.
