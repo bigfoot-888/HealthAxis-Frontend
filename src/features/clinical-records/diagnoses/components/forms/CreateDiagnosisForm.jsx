@@ -12,12 +12,13 @@ import { BasicFormLayout } from '@/components/forms/index';
 
 import { handleApiError } from '@/utils/handle-errors';
 
-import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
+import { useQueryClient } from '@tanstack/react-query';
 import { createDiagnosis } from '@diagnoses/api/diagnosis.api';
 import { DiagnosisProfessionalsField } from '@diagnoses/components/ui/DiagnosisProfessionals';
 import { ErrorAlert } from '@/components/ui';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateCreateDiagnosisQueries } from '@diagnoses/utils/diagnosis-query.utils';
 
 export default function CreateDiagnosisForm() {
     const {
@@ -35,14 +36,14 @@ export default function CreateDiagnosisForm() {
     });
 
     const navigate = useNavigate();
-    const { refetch } = useDiagnoses();
     const [error, setError] = useState();
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient(); 
 
     const onSubmit = async (data) => {
         try {
             await createDiagnosis(data);
-            refetch();
+            invalidateCreateDiagnosisQueries(queryClient); 
             navigate('/clinical-records/diagnoses');
             showSnackbar({ message: 'Diagnóstico creado correctamente' });
         } catch (err) {

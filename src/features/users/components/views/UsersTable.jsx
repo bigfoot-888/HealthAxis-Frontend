@@ -9,7 +9,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 
 import { useUsers } from '@users/hooks/useUsers';
-import { deactivateUser, reactivateUser, importUsers } from '@users/api/user.api';
+import { deactivateUser, reactivateUser } from '@users/api/user.api';
 
 import { AlertDialog } from '@/components/dialogs/index';
 import { BasicTableLayout } from '@/components/tables/index';
@@ -18,12 +18,19 @@ import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
 import { useSnackbar } from '@/app/SnackBarContext';
 import { USER_COLUMNS } from '@users/config/user.columns';
+import { invalidateEditUserQueries } from '../../utils/user-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
         <GridActionsCell {...gridParams}>
             {row.status === 'ACTIVE' && (
-                <GridActionsCellItem icon={<DeleteIcon />} showInMenu label='Dar de baja' onClick={() => onDelete(row)} />
+                <GridActionsCellItem
+                    icon={<DeleteIcon />}
+                    showInMenu
+                    label='Dar de baja'
+                    onClick={() => onDelete(row)}
+                />
             )}
             {row.status === 'INACTIVE' && (
                 <GridActionsCellItem
@@ -54,36 +61,19 @@ export default function UsersTable({ users }) {
     const filteredUsers = useSearchFilter(users, searchText, ['id', 'name', 'surname', 'email']);
 
     const navigate = useNavigate();
-    const { refetch } = useUsers();
     const [userToDelete, setUserToDelete] = useState(null);
+    const queryClient = useQueryClient();
     const [userToReactivate, setUserToReactivate] = useState(null);
 
-    const handleUsersFileSelect = async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        try {
-            const text = await file.text();
-            const users = JSON.parse(text);
-            await importUsers(users);
-            refetch();
-            showSnackbar({ message: 'Usuarios creados correctamente' });
-        } catch (err) {
-            handleApiError(err, setError, null);
-        }
-        event.target.value = '';
-    };
-
-    const handleCloseAlertDialog = (e) => {
+    const handleCloseAlertDialog = e => {
         setError(null);
         setUserToDelete(null);
     };
 
-    const handleConfirmAlertDialog = async (row) => {
+    const handleConfirmAlertDialog = async row => {
         try {
-            if (row) {
-                await deactivateUser(row.uuid);
-                refetch();
-            }
+            await deactivateUser(row.uuid);
+            invalidateEditUserQueries(queryClient, row);
             handleCloseAlertDialog();
             showSnackbar({ message: 'Usuario dado de baja correctamente' });
         } catch (err) {
@@ -91,17 +81,15 @@ export default function UsersTable({ users }) {
         }
     };
 
-    const handleCloseReactivateDialog = (e) => {
+    const handleCloseReactivateDialog = e => {
         setError(null);
         setUserToReactivate(null);
     };
 
-    const handleConfirmReactivateDialog = async (row) => {
+    const handleConfirmReactivateDialog = async row => {
         try {
-            if (row) {
-                await reactivateUser(row.uuid);
-                refetch();
-            }
+            await reactivateUser(row.uuid);
+            invalidateEditUserQueries(queryClient, row);
             handleCloseReactivateDialog();
             showSnackbar({ message: 'Usuario reactivado correctamente' });
         } catch (err) {
@@ -123,7 +111,7 @@ export default function UsersTable({ users }) {
                 field: 'actions',
                 type: 'actions',
                 flex: 2,
-                renderCell: (params) => (
+                renderCell: params => (
                     <ActionsCell {...params} onDelete={setUserToDelete} onReactivate={setUserToReactivate} />
                 ),
             },
@@ -132,25 +120,29 @@ export default function UsersTable({ users }) {
 
     return (
         <>
-            {!!userToReactivate && <AlertDialog
-                open={!!userToReactivate}
-                handleClose={handleCloseReactivateDialog}
-                handleConfirm={() => handleConfirmReactivateDialog(userToReactivate)}
-                title={`¿Reactivar la cuenta de ${!!userToReactivate && userToReactivate.name + ' ' + userToReactivate.surname}?`}
-                content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
-                error={error}
-                onErrorClose={() => setError(null)}
-            />}
-            {!!userToDelete && <AlertDialog
-                open={!!userToDelete}
-                handleClose={handleCloseAlertDialog}
-                handleConfirm={() => handleConfirmAlertDialog(userToDelete)}
-                title={`¿Dar de baja a ${!!userToDelete && userToDelete.name + ' ' + userToDelete.surname}?`}
-                content='Esta acción es reversible. Si el usuario tiene alguna dependencia activa en el sistema
+            {!!userToReactivate && (
+                <AlertDialog
+                    open={!!userToReactivate}
+                    handleClose={handleCloseReactivateDialog}
+                    handleConfirm={() => handleConfirmReactivateDialog(userToReactivate)}
+                    title={`¿Reactivar la cuenta de ${!!userToReactivate && userToReactivate.name + ' ' + userToReactivate.surname}?`}
+                    content='Esta acción es reversible. Al finalizar, el usuario será reactivado. '
+                    error={error}
+                    onErrorClose={() => setError(null)}
+                />
+            )}
+            {!!userToDelete && (
+                <AlertDialog
+                    open={!!userToDelete}
+                    handleClose={handleCloseAlertDialog}
+                    handleConfirm={() => handleConfirmAlertDialog(userToDelete)}
+                    title={`¿Dar de baja a ${!!userToDelete && userToDelete.name + ' ' + userToDelete.surname}?`}
+                    content='Esta acción es reversible. Si el usuario tiene alguna dependencia activa en el sistema
                 se cancelará el proceso. En caso contrario, el usuario será dado de baja. '
-                error={error}
-                onErrorClose={() => setError(null)}
-            />}
+                    error={error}
+                    onErrorClose={() => setError(null)}
+                />
+            )}
             <ContentLayout
                 error={!userToDelete && !userToReactivate ? error : null}
                 onErrorClose={() => setError(null)}
@@ -159,9 +151,9 @@ export default function UsersTable({ users }) {
                     rows={filteredUsers}
                     columns={columns}
                     searchValue={searchText}
-                    onSearchChange={(e) => setSearchText(e.target.value)}
+                    onSearchChange={e => setSearchText(e.target.value)}
                     searchPlaceholder='Busca por ID, nombre, apellidos, correo'
-                    onRowClick={(params) => {
+                    onRowClick={params => {
                         navigate(`/users/${params.row.uuid}`);
                     }}
                     actions={

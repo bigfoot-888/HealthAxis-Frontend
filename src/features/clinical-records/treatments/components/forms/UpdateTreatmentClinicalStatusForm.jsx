@@ -20,7 +20,6 @@ export default function UpdateTreatmentClinicalStatusForm({ treatment, handleClo
         formState: { errors },
     } = useForm({ mode: 'onBlur', defaultValues: { clinicalStatus: '' } });
 
-    const { refetch } = useTreatments();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
     const queryClient = useQueryClient(); 

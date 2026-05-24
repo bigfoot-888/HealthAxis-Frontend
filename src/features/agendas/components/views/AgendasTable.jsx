@@ -25,6 +25,8 @@ import { deactivateAgenda, reactivateAgenda } from '@/features/agendas/api/agend
 import { useNavigate } from 'react-router';
 import { AGENDA_COLUMNS } from '@agendas/config/agenda.columns';
 import UpdateAgendaPeriodStatusForm from '@agendas/components/forms/UpdateAgendaPeriodStatusForm';
+import { invalidateEditAgendaQueries } from '@agendas/utils/agenda-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, onUpdatePeriodStatus, ...gridParams }) {
     return (
@@ -72,9 +74,9 @@ function ActionsCell({ row, onDelete, onReactivate, onEdit, onCreatePeriod, onUp
 }
 
 export default function AgendasTable({ agendas }) {
-    const { refetch } = useAgendas();
     const [searchText, setSearchText] = useState('');
     const [error, setError] = useState(null);
+    const queryClient = useQueryClient(); 
 
     const [isCreateAgendaOpen, setIsCreateAgendaOpen] = useState(false);
     const [agendaToEdit, setAgendaToEdit] = useState(null);
@@ -90,7 +92,7 @@ export default function AgendasTable({ agendas }) {
     const handleConfirmAlertDialog = async row => {
         try {
             await deactivateAgenda(row.uuid);
-            refetch();
+            invalidateEditAgendaQueries(queryClient, row); 
             setAgendaToDelete(null);
         } catch (err) {
             handleApiError(err, setError, null);
@@ -100,7 +102,7 @@ export default function AgendasTable({ agendas }) {
     const handleConfirmReactivateDialog = async row => {
         try {
             await reactivateAgenda(row.uuid);
-            refetch();
+            invalidateEditAgendaQueries(queryClient, row); 
             setAgendaToReactivate(null);
         } catch (err) {
             handleApiError(err, setError, null);
@@ -189,7 +191,6 @@ export default function AgendasTable({ agendas }) {
                         setError(null);
                         setAgendaForNewPeriod(null);
                     }}
-                    refetch={refetch}
                 />
             )}
             {agendaToUpdatePeriodStatus && (

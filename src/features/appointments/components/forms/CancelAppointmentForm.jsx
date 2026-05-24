@@ -12,6 +12,7 @@ import { handleApiError } from '@/utils/handle-errors';
 import { useSnackbar } from '@/app/SnackBarContext';
 import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.constants';
 import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditAppointmentQueries } from '../../utils/appointment-query.utils';
 
 export default function CancelAppointmentForm({ appointment, handleClose }) {
     const {
@@ -29,9 +30,7 @@ export default function CancelAppointmentForm({ appointment, handleClose }) {
     const onSubmit = async (data) => {
         try {
             await updateAppointmentStatus(appointment.uuid, data.status, data.notes);
-            queryClient.invalidateQueries(['appointments']);
-            queryClient.invalidateQueries(['appointments', appointment.user.uuid]);
-            queryClient.invalidateQueries(['appointments', appointment.patient.uuid]);
+            invalidateEditAppointmentQueries(queryClient, appointment); 
             handleClose();
             showSnackbar({message: 'Cita cancelada correctamente',});
         } catch (err) {

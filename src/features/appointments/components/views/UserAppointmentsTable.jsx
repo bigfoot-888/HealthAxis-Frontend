@@ -75,7 +75,7 @@ function ActionsCell({ row, onCancel, onComplete, onCheckIn, userUuid, ...gridPa
     );
 }
 
-export default function UserAppointmentsTable({ user, appointments, refetch }) {
+export default function UserAppointmentsTable({ user, appointments }) {
     const [searchText, setSearchText] = useState('');
     const { showSnackbar } = useSnackbar();
     const [error, setError] = useState(null); 

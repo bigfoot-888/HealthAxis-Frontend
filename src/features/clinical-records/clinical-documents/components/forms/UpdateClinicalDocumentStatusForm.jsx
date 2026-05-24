@@ -8,10 +8,11 @@ import { handleApiError } from '@/utils/handle-errors';
 
 import { CLINICAL_DOCUMENT_STATUS_CONFIG } from '@/shared/constants/clinical-document.constants';
 
-import { useClinicalDocuments } from '@clinical-documents/hooks/useClinicalDocuments';
 import { updateClinicalDocumentStatus } from '@clinical-documents/api/clinical-document.api';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditDocumentQueries } from '../../utils/clinical-document-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function UpdateClinicalDocumentStatusForm({ clinicalDocument, handleClose }) {
     const {
@@ -24,14 +25,14 @@ export default function UpdateClinicalDocumentStatusForm({ clinicalDocument, han
         defaultValues: { status: '' },
     });
 
-    const { refetch } = useClinicalDocuments();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient();
 
-    const onSubmit = async (data) => {
+    const onSubmit = async data => {
         try {
             await updateClinicalDocumentStatus(clinicalDocument.uuid, data.status);
-            refetch();
+            invalidateEditDocumentQueries(queryClient, clinicalDocument);
             handleClose();
             showSnackbar({ message: 'Documento editado correctamente' });
         } catch (err) {
@@ -51,9 +52,7 @@ export default function UpdateClinicalDocumentStatusForm({ clinicalDocument, han
             handleSubmit={handleSubmit(onSubmit)}
             error={error}
             onErrorClose={() => setError(null)}
-            title={`Actualizar estado — ${
-                clinicalDocument?.title || clinicalDocument?.name || ''
-            }`}
+            title={`Actualizar estado — ${clinicalDocument?.title || clinicalDocument?.name || ''}`}
         >
             <Grid container columnSpacing={3} sx={{ pt: 1 }}>
                 <Grid size={12}>

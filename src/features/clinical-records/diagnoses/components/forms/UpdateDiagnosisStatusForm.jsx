@@ -13,6 +13,8 @@ import { updateDiagnosisStatus } from '@diagnoses/api/diagnosis.api';
 import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditDiagnosisQueries } from '../../utils/diagnosis-query.utils';
 
 export default function UpdateDiagnosisStatusForm({ diagnosis, handleClose }) {
     const {
@@ -22,14 +24,14 @@ export default function UpdateDiagnosisStatusForm({ diagnosis, handleClose }) {
         setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur', defaultValues: { status: '' } });
-    const { refetch } = useDiagnoses();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient();
 
-    const onSubmit = async (data) => {
+    const onSubmit = async data => {
         try {
             await updateDiagnosisStatus(diagnosis.uuid, data.status);
-            refetch();
+            invalidateEditDiagnosisQueries(queryClient, diagnosis);
             handleClose();
             showSnackbar({ message: 'Estado del diagnóstico actualizado correctamente' });
         } catch (err) {
@@ -41,7 +43,7 @@ export default function UpdateDiagnosisStatusForm({ diagnosis, handleClose }) {
         value,
         label: config.label,
     }));
-    
+
     return (
         <FormDialog
             open={!!diagnosis}

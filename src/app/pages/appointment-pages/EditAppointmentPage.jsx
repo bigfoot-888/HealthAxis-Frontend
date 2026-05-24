@@ -8,7 +8,7 @@ import Error from '@/components/feedback/Error';
 
 export default function EditAppointmentPage() {
     const { uuid } = useParams();
-    const { data: appointment, isLoading, error, refetch } = useAppointmentPlain(uuid);
+    const { data: appointment, isLoading, error } = useAppointmentPlain(uuid);
     if (error) return <Error msg="Error al cargar datos de la cita"/>
     if (isLoading) return <CustomCircularProgress />;
     return (

@@ -27,14 +27,17 @@ import { useSnackbar } from '@/app/SnackBarContext';
 
 import { DetailSectionHeader, RelatedEntityContainer } from '@/components/ui';
 import { DetailLayout } from '@/components/entity-detail';
+import { invalidateEditAppointmentQueries } from '@/features/appointments/utils/appointment-query.utils';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Error from '@/components/feedback/Error';
 
 export default function AppointmentDetailPage() {
     const { uuid } = useParams();
-    const { data: appointment, isLoading, error: fetchError, refetch: refetchAppointment } = useAppointment(uuid);
+    const { data: appointment, isLoading, error: fetchError } = useAppointment(uuid);
 
     const appointmentUuid = appointment?.uuid;
-    const { data: diagnoses = [], refetch: refetchDiagnoses } = useDiagnosesByAppointment(appointmentUuid);
-    const { data: treatments = [], refetch: refetchTreatments } = useTreatmentsByAppointment(appointmentUuid);
+    const { data: diagnoses = [] } = useDiagnosesByAppointment(appointmentUuid);
+    const { data: treatments = [] } = useTreatmentsByAppointment(appointmentUuid);
 
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
@@ -42,11 +45,12 @@ export default function AppointmentDetailPage() {
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+    const queryClient = useQueryClient(); 
 
     const handleCompleteAppointment = async (row) => {
         try {
             await updateAppointmentStatus(row.uuid, 'COMPLETED');
-            refetchAppointment();
+            invalidateEditAppointmentQueries(queryClient, appointment)
             setAppointmentToComplete(null);
             showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
@@ -57,7 +61,7 @@ export default function AppointmentDetailPage() {
     const handleCheckInAppointment = async (row) => {
         try {
             await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-            refetchAppointment();
+            invalidateEditAppointmentQueries(queryClient, appointment)
             setAppointmentToCheckIn(null);
             showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
@@ -65,7 +69,7 @@ export default function AppointmentDetailPage() {
         }
     };
 
-    if (fetchError) return <p>Error al cargar citas</p>;
+    if (fetchError) return <Error msg="Error al cargar las citas."/>
     if (isLoading || !appointment) return <CustomCircularProgress />;
 
     return (
@@ -98,7 +102,6 @@ export default function AppointmentDetailPage() {
                 <CancelAppointmentForm
                     appointment={appointmentToCancel}
                     handleClose={() => setAppointmentToCancel(null)}
-                    refetch={refetchAppointment}
                 />
             )}
             <DetailLayout>
@@ -138,7 +141,6 @@ export default function AppointmentDetailPage() {
                         <AppointmentDiagnosesTable
                             diagnoses={diagnoses}
                             appointment={appointment}
-                            refetch={refetchDiagnoses}
                         />
                     </Box>
                 </Box>

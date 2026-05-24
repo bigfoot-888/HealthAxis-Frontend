@@ -7,11 +7,11 @@ import { FormDialog } from '@/components/dialogs/index';
 import { handleApiError } from '@/utils/handle-errors';
 
 import { DIAGNOSIS_CLINICAL_STATUS_CONFIG } from '@/shared/constants/diagnosis.constants';
-
-import { useDiagnoses } from '@diagnoses/hooks/useDiagnoses';
 import { updateDiagnosisClinicalStatus} from '@diagnoses/api/diagnosis.api';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditDiagnosisQueries } from '../../utils/diagnosis-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function UpdateDiagnosisClinicalStatusForm({ diagnosis, handleClose }) {
     const {
@@ -21,14 +21,14 @@ export default function UpdateDiagnosisClinicalStatusForm({ diagnosis, handleClo
         setError: setFormError,
         formState: { errors },
     } = useForm({ mode: 'onBlur', defaultValues: { clinicalStatus: '' } });
-    const { refetch } = useDiagnoses();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient(); 
 
     const onSubmit = async (data) => {
         try {
             await updateDiagnosisClinicalStatus(diagnosis.uuid, data.clinicalStatus);
-            refetch();
+            invalidateEditDiagnosisQueries(queryClient, diagnosis); 
             handleClose();
             showSnackbar({ message: 'Estado clínico del diagnóstico actualizado correctamente' });
         } catch (err) {

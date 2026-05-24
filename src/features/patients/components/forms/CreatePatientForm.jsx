@@ -26,6 +26,8 @@ import { ErrorAlert } from '@/components/ui/index';
 import { BasicTextInput } from '@/components/forms/inputs/index';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCreatePatientQueries, invalidateEditPatientQueries } from '@patients/utils/patient-query.utils';
 
 export default function CreatePatientForm() {
     const {
@@ -39,14 +41,14 @@ export default function CreatePatientForm() {
     const [value, setValue] = useState(null);
     const [focused, setFocused] = useState(false);
     const navigate = useNavigate();
-    const { refetch } = usePatients();
+    const queryClient = useQueryClient(); 
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
 
     const onSubmit = async (data) => {
         try {
             await createPatient(data);
-            refetch();
+            invalidateCreatePatientQueries(queryClient)
             navigate('/patients');
             showSnackbar({ message: 'Paciente creado correctamente' });
         } catch (err) {

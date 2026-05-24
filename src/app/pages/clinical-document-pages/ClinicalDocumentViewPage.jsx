@@ -6,7 +6,7 @@ import Error from '@/components/feedback/Error';
 
 export default function ClinicalDocumentViewPage() {
     const { uuid } = useParams();
-    const { data: clinicalDocument, isLoading, error, refetch } = useClinicalDocument(uuid);
+    const { data: clinicalDocument, isLoading, error } = useClinicalDocument(uuid);
     if (error) return <Error msg="Error al cargar el documento"/>
     if (isLoading) return <CustomCircularProgress />;
     return <ClinicalDocumentView clinicalDocument={clinicalDocument} />;

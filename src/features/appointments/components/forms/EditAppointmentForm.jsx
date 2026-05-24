@@ -17,6 +17,7 @@ import { useAppointments } from '@appointments/hooks/useAppointments';
 import { updateAppointment } from '@appointments/api/appointment.api';
 
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditAppointmentQueries } from '../../utils/appointment-query.utils';
 
 export default function EditAppointmentForm({ appointment, uuid }) {
     const {
@@ -41,16 +42,13 @@ export default function EditAppointmentForm({ appointment, uuid }) {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from || '/appointments';
-
-    const { refetch } = useAppointments();
     const [error, setError] = useState(null);
 
     const queryClient = useQueryClient();
     const onSubmit = async (data) => {
         try {
             await updateAppointment(uuid, data);
-            queryClient.invalidateQueries(['appointment_plain', uuid]);
-            refetch();
+            invalidateEditAppointmentQueries(queryClient, appointment); 
             navigate(from);
             showSnackbar({ message: 'Cita editada correctamente' });
         } catch (err) {

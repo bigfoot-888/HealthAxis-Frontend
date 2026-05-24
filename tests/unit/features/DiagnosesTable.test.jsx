@@ -15,16 +15,19 @@ const mockNavigate = jest.fn();
 jest.mock('react-router', () => ({
     ...jest.requireActual('react-router'),
     useNavigate: () => mockNavigate,
+    useOutletContext: () => ({
+        searchText: '',
+    }),
 }));
 
 jest.mock('@/hooks/useSearchFilter', () => ({
-    useSearchFilter: (data) => data,
+    useSearchFilter: data => data,
 }));
 
 let capturedProps = null;
 
 jest.mock('@/components/tables/index', () => ({
-    BasicTableLayout: (props) => {
+    BasicTableLayout: props => {
         capturedProps = props;
         return <div data-testid='table' />;
     },
@@ -70,7 +73,7 @@ describe('DiagnosesTable', () => {
 
         act(() => {
             capturedProps.columns
-                .find((c) => c.field === 'actions')
+                .find(c => c.field === 'actions')
                 .renderCell({ row: baseDiagnosis })
                 .props.onUpdateClinicalStatus(baseDiagnosis);
         });
@@ -83,19 +86,12 @@ describe('DiagnosesTable', () => {
 
         act(() => {
             capturedProps.columns
-                .find((c) => c.field === 'actions')
+                .find(c => c.field === 'actions')
                 .renderCell({ row: baseDiagnosis })
                 .props.onUpdateStatus(baseDiagnosis);
         });
 
         expect(document.querySelector('[data-testid="status-form"]')).toBeInTheDocument();
-    });
-
-    it('passes search props to table', () => {
-        render(<DiagnosesTable diagnoses={[baseDiagnosis]} />);
-
-        expect(capturedProps.searchValue).toBe('');
-        expect(typeof capturedProps.onSearchChange).toBe('function');
     });
 });
 

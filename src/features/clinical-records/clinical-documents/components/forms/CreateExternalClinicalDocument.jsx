@@ -17,6 +17,8 @@ import { useSnackbar } from '@/app/SnackBarContext';
 import { ErrorAlert } from '@/components/ui';
 
 import { useState } from 'react';
+import { invalidateCreateDocumentQueries } from '@clinical-documents/utils/clinical-document-query.utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateExternalClinicalDocument() {
     const {
@@ -35,7 +37,7 @@ export default function CreateExternalClinicalDocument() {
     });
 
     const navigate = useNavigate();
-    const { refetch } = useClinicalDocuments();
+    const queryClient = useQueryClient(); 
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
 
@@ -67,7 +69,7 @@ export default function CreateExternalClinicalDocument() {
                 attachments: attachmentIds,
             });
 
-            refetch();
+            invalidateCreateDocumentQueries(queryClient); 
             navigate('/clinical-records/clinical-documents');
 
             showSnackbar({ message: 'Documento creado correctamente' });

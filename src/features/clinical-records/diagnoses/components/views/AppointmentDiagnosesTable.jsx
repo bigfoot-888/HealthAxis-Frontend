@@ -50,7 +50,7 @@ function ActionsCell({ row, onUpdateClinicalStatus, onUpdateStatus, appointmentU
     );
 }
 
-export default function AppointmentDiagnosesTable({ diagnoses, appointment, refetch }) {
+export default function AppointmentDiagnosesTable({ diagnoses, appointment }) {
     const [searchText, setSearchText] = useState('');
     const [createDiagnosis, setCreateDiagnosis] = useState(false);
     const navigate = useNavigate();
@@ -59,9 +59,9 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
     const [updateDiagnosisStatusRow, setUpdateDiagnosisStatusRow] = useState(null);
 
     const filteredDiagnoses = useSearchFilter(diagnoses, searchText, null, [
-        (t) => t.name,
-        (t) => t.users?.map((u) => u.fullName).join(', '),
-        (t) => DIAGNOSIS_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
+        t => t.name,
+        t => t.users?.map(u => u.fullName).join(', '),
+        t => DIAGNOSIS_CLINICAL_STATUS_CONFIG[t.clinicalStatus].label,
     ]);
 
     const columns = useMemo(() => {
@@ -77,7 +77,7 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                 field: 'actions',
                 type: 'actions',
                 flex: 2,
-                renderCell: (params) => (
+                renderCell: params => (
                     <ActionsCell
                         {...params}
                         onUpdateClinicalStatus={setUpdateDiagnosisClinicalStatusRow}
@@ -103,7 +103,6 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                     diagnosis={updateDiagnosisClinicalStatusRow}
                     handleClose={() => {
                         setUpdateDiagnosisClinicalStatusRow(null);
-                        refetch();
                     }}
                 />
             )}
@@ -113,7 +112,6 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                     diagnosis={updateDiagnosisStatusRow}
                     handleClose={() => {
                         setUpdateDiagnosisStatusRow(null);
-                        refetch();
                     }}
                 />
             )}
@@ -123,8 +121,8 @@ export default function AppointmentDiagnosesTable({ diagnoses, appointment, refe
                 columns={columns}
                 searchValue={searchText}
                 searchPlaceholder={'Busca por nombre, usuarios, estado clínico'}
-                onSearchChange={(e) => setSearchText(e.target.value)}
-                onRowClick={(params) => {
+                onSearchChange={e => setSearchText(e.target.value)}
+                onRowClick={params => {
                     navigate(`/clinical-records/diagnoses/${params.row.uuid}`);
                 }}
                 actions={

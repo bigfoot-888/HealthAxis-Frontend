@@ -8,7 +8,7 @@ import Error from '@/components/feedback/Error';
 
 export default function EditDiagnosisPage() {
     const { uuid } = useParams();
-    const { data: diagnosis, isLoading, error, refetch } = useDiagnosis(uuid);
+    const { data: diagnosis, isLoading, error } = useDiagnosis(uuid);
     if (error) return <Error msg="Error al cargar los datos del diagnóstico"/>
     if (isLoading) return <CustomCircularProgress />;
     return (

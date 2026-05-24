@@ -73,7 +73,7 @@ async function redirectIfAuthenticated() {
 export const router = createBrowserRouter([
     {
         Component: Layout,
-        loader: requireAuth, // <- protect all child routes
+        loader: requireAuth, 
         errorElement: <NotFoundPage />,
         children: [
             {

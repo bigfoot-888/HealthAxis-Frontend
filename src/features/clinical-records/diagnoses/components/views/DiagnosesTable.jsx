@@ -55,6 +55,7 @@ export default function DiagnosesTable({ diagnoses }) {
     const navigate = useNavigate();
     const [updateDiagnosisClinicalStatusRow, setUpdateDiagnosisClinicalStatusRow] = useState(null);
     const [updateDiagnosisStatusRow, setUpdateDiagnosisStatusRow] = useState(null);
+    const [error, setError] = useState(null); 
 
     const columns = useMemo(() => {
         return [

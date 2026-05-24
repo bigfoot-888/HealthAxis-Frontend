@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router';
 import { Grid, Paper, Button, Typography } from '@mui/material';
 
 import { createUser } from '@users//api/user.api';
-import { useUsers } from '@users/hooks/useUsers';
 
 import { PasswordInput, BasicTextInput } from '@/components/forms/inputs/index';
 import { RoleAutocomplete, AgendaAutocomplete } from '@/components/forms/autocompletes/index';
@@ -15,6 +14,7 @@ import { ErrorAlert } from '@/components/ui/index';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateCreateUserQueries } from '@users/utils/user-query.utils';
 
 export default function CreateUserForm() {
     const {
@@ -26,7 +26,6 @@ export default function CreateUserForm() {
     } = useForm({ mode: 'onBlur' });
 
     const navigate = useNavigate();
-    const { refetch: refetchUsers } = useUsers();
     const [error, setError] = useState(null);
     const queryClient = useQueryClient();
     const { showSnackbar } = useSnackbar();
@@ -34,7 +33,7 @@ export default function CreateUserForm() {
     const onSubmit = async (data) => {
         try {
             await createUser(data);
-            refetchUsers();
+            invalidateCreateUserQueries(queryClient); 
             await queryClient.invalidateQueries({ queryKey: ['users', data.agenda.uuid] });
             navigate('/users');
             showSnackbar({ message: 'Usuario creado correctamente' });

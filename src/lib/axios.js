@@ -10,17 +10,16 @@ export const axios = axiosImport.create({
     withCredentials: true,
 });
 
-// Request interceptor (auth, tracing)
+// Request interceptor for auth and tracing
 axios.interceptors.request.use((config) => {
     config.headers['X-Request-ID'] = window.crypto.randomUUID();
     return config;
 });
 
-// Response interceptor (explicit error handling)
+// Response interceptor for explicit error handling
 axios.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Centralized logging
         console.error('API error', error);
         return Promise.reject(error);
     },

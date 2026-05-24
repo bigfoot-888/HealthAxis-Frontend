@@ -7,18 +7,18 @@ export function useSearchFilter(items, searchText, fields = null, accessors = nu
         const lowerSearch = searchText.toLowerCase();
 
         if (fields) {
-            return items.filter((item) =>
-                fields.some((fieldPath) => {
+            return items.filter(item =>
+                fields.some(fieldPath => {
                     const value = getNestedValue(item, fieldPath)?.toString().toLowerCase() || '';
                     return value.includes(lowerSearch);
-                }),
+                })
             );
         } else {
-            return items.filter((item) =>
-                accessors.some((accessor) => {
+            return items.filter(item =>
+                accessors.some(accessor => {
                     const value = accessor(item)?.toString().toLowerCase() || '';
                     return value.includes(lowerSearch);
-                }),
+                })
             );
         }
     }, [items, searchText, fields, accessors]);

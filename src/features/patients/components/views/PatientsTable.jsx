@@ -16,10 +16,10 @@ import { ContentLayout } from '@/components/layout/index';
 
 import { useSearchFilter } from '@/hooks/useSearchFilter';
 import { handleApiError } from '@/utils/handle-errors';
-import { formatCreatedAt } from '@/utils/date-formatters';
 import { useSnackbar } from '@/app/SnackBarContext';
-import { PATIENT_STATUS_CONFIG } from '@/shared/constants/patient.constants';
 import { PATIENT_COLUMNS } from '@patients/config/patient.columns';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditPatientQueries } from '@patients/utils/patient-query.utils';
 
 function ActionsCell({ row, onDelete, onReactivate, ...gridParams }) {
     return (
@@ -63,22 +63,20 @@ export default function PatientsTable({ patients }) {
     const navigate = useNavigate(); 
     const filteredPatients = useSearchFilter(patients, searchText, ['nhc', 'name', 'surname', 'dni']);
 
-    const { refetch } = usePatients();
     const [patientToDelete, setPatientToDelete] = useState(null);
     const [patientToReactivate, setPatientToReactivate] = useState(null);
     const { showSnackbar } = useSnackbar();
+    const queryClient = useQueryClient(); 
 
-    const handleCloseAlertDialog = (e) => {
-        setError(null); 
+    const handleCloseAlertDialog = e => {
+        setError(null);
         setPatientToDelete(null);
     };
 
-    const handleConfirmAlertDialog = async (row) => {
+    const handleConfirmAlertDialog = async row => {
         try {
-            if (row) {
-                await deactivatePatient(row.uuid);
-                refetch();
-            }
+            await deactivatePatient(row.uuid);
+            invalidateEditPatientQueries(queryClient, row); 
             setPatientToDelete(null);
             showSnackbar({ message: 'Paciente dado de baja correctamente' });
         } catch (err) {
@@ -91,12 +89,11 @@ export default function PatientsTable({ patients }) {
         setPatientToReactivate(null);
     };
 
-    const handleConfirmReactivateDialog = async (row) => {
+    const handleConfirmReactivateDialog = async row => {
         try {
-            if (row) {
-                await reactivatePatient(row.uuid);
-                refetch();
-            }
+            await reactivatePatient(row.uuid);
+            invalidateEditPatientQueries(queryClient, row);
+
             handleCloseReactivateDialog();
             showSnackbar({ message: 'Paciente reactivado correctamente' });
         } catch (err) {

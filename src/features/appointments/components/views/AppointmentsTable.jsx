@@ -23,6 +23,8 @@ import { APPOINTMENT_STATUS_CONFIG } from '@/shared/constants/appointment.consta
 import { APPOINTMENT_COLUMNS } from '@appointments/config/appointment.columns';
 import { isCompleted, isCheckedIn, isScheduled, isAppointmentOver } from '@appointments/utils/appointment-status.utils';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateEditAppointmentQueries } from '@appointments/utils/appointment-query.utils';
 
 function ActionsCell({ row, onCancel, onComplete, onCheckIn, onAddClinicalData, ...gridParams }) {
     return (
@@ -95,7 +97,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
         });
     }, [filteredAppointments, todayOnly]);
 
-    const { refetch } = useAppointments();
+    const queryClient = useQueryClient(); 
     const [appointmentToComplete, setAppointmentToComplete] = useState(null);
     const [appointmentToCheckIn, setAppointmentToCheckIn] = useState(null);
     const [appointmentToCancel, setAppointmentToCancel] = useState(null);
@@ -103,7 +105,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
     const handleCompleteAppointment = async row => {
         try {
             await updateAppointmentStatus(row.uuid, 'COMPLETED');
-            refetch();
+            invalidateEditAppointmentQueries(queryClient, row); 
             setAppointmentToComplete(null);
             showSnackbar({ message: 'Cita completada correctamente' });
         } catch (err) {
@@ -114,7 +116,7 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
     const handleCheckInAppointment = async row => {
         try {
             await updateAppointmentStatus(row.uuid, 'CHECKED_IN');
-            refetch();
+            invalidateEditAppointmentQueries(queryClient, row); 
             setAppointmentToCheckIn(null);
             showSnackbar({ message: 'Cita registrada correctamente' });
         } catch (err) {
@@ -190,7 +192,6 @@ export default function AppointmentsTable({ appointments, setError, searchText, 
                 <CancelAppointmentForm
                     appointment={appointmentToCancel}
                     handleClose={() => {setError(null);setAppointmentToCancel(null)}}
-                    refetch={refetch}
                 />
             )}
 

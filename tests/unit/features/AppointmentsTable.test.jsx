@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import AppointmentsTable from '@appointments/components/views/AppointmentsTable';
 import { act } from 'react';
 import { waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../../test.utils';
 
 const originalError = console.error;
 beforeAll(() => {
@@ -12,16 +13,9 @@ beforeAll(() => {
     };
 });
 
-const mockRefetch = jest.fn();
 const mockShowSnackbar = jest.fn();
 const mockNavigate = jest.fn();
 const mockUpdateStatus = jest.fn();
-
-jest.mock('@appointments/hooks/useAppointments', () => ({
-    useAppointments: () => ({
-        refetch: mockRefetch,
-    }),
-}));
 
 jest.mock('@/app/SnackBarContext', () => ({
     useSnackbar: () => ({
@@ -70,7 +64,7 @@ describe('AppointmentsTable', () => {
 it('calls updateAppointmentStatus with CHECKED_IN', async () => {
     mockUpdateStatus.mockResolvedValue();
 
-    render(<AppointmentsTable appointments={[baseAppointment]} setError={jest.fn()} searchText='' />);
+    renderWithProviders(<AppointmentsTable appointments={[baseAppointment]} setError={jest.fn()} searchText='' />);
 
     act(() => {
         capturedProps.columns
@@ -86,7 +80,6 @@ it('calls updateAppointmentStatus with CHECKED_IN', async () => {
     await userEvent.click(screen.getByText('confirm'));
 
     expect(mockUpdateStatus).toHaveBeenCalledWith('1', 'CHECKED_IN');
-    expect(mockRefetch).toHaveBeenCalled();
 });
 
 it('calls updateAppointmentStatus with COMPLETED', async () => {
@@ -97,7 +90,7 @@ it('calls updateAppointmentStatus with COMPLETED', async () => {
         status: 'CHECKED_IN',
     };
 
-    render(<AppointmentsTable appointments={[checkedInAppointment]} setError={jest.fn()} searchText='' />);
+    renderWithProviders(<AppointmentsTable appointments={[checkedInAppointment]} setError={jest.fn()} searchText='' />);
 
     act(() => {
         capturedProps.columns
@@ -116,7 +109,7 @@ it('calls updateAppointmentStatus with COMPLETED', async () => {
 });
 
     it('navigates on row click', () => {
-        render(<AppointmentsTable appointments={[baseAppointment]} setError={jest.fn()} searchText='' />);
+        renderWithProviders(<AppointmentsTable appointments={[baseAppointment]} setError={jest.fn()} searchText='' />);
 
         capturedProps.onRowClick({
             row: baseAppointment,
@@ -135,7 +128,7 @@ it('calls updateAppointmentStatus with COMPLETED', async () => {
             { ...baseAppointment, status: 'OTHER', startTime: new Date(now.getTime() - 100000).toISOString() }, // 3
         ];
 
-        render(<AppointmentsTable appointments={data} setError={jest.fn()} searchText='' />);
+        renderWithProviders(<AppointmentsTable appointments={data} setError={jest.fn()} searchText='' />);
 
         const rows = capturedProps.rows;
 

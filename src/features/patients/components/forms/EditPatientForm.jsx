@@ -13,6 +13,7 @@ import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
 import { BasicTextInput } from '@/components/forms/inputs/index';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditPatientQueries } from '../../utils/patient-query.utils';
 
 export default function CreatePatientForm({ patient, uuid }) {
     const {
@@ -41,13 +42,12 @@ export default function CreatePatientForm({ patient, uuid }) {
     const from = location.state?.from || '/patients';
 
     const navigate = useNavigate();
-    const { refetch } = usePatients();
     const [error, setError] = useState(null);
 
     const onSubmit = async (data) => {
         try {
             await updatePatient(uuid, data);
-            refetch();
+            invalidateEditPatientQueries(queryClient, patient); 
             queryClient.invalidateQueries(['patient', uuid]);
             navigate(from);
             showSnackbar({ message: 'Paciente editado correctamente' });

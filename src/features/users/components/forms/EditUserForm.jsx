@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Grid, Paper, Button, Typography } from '@mui/material';
 
 import { updateUser } from '@users/api/user.api';
-import { useUsers } from '@users/hooks/useUsers';
 
 import { BasicFormLayout } from '@/components/forms/index';
 import { ErrorAlert } from '@/components/ui/index';
@@ -15,6 +14,7 @@ import { BasicTextInput } from '@/components/forms/inputs/index';
 import { handleApiError } from '@/utils/handle-errors';
 import { AgendaAutocomplete, RoleAutocomplete } from '@/components/forms/autocompletes';
 import { useSnackbar } from '@/app/SnackBarContext';
+import { invalidateEditUserQueries } from '../../utils/user-query.utils';
 
 export default function EditUserForm({ user, uuid }) {
     const {
@@ -38,8 +38,6 @@ export default function EditUserForm({ user, uuid }) {
     const navigate = useNavigate();
     const location = useLocation();
     const from = location.state?.from || '/users';
-
-    const { refetch } = useUsers();
     const queryClient = useQueryClient();
     const [error, setError] = useState(null);
     const { showSnackbar } = useSnackbar();
@@ -47,8 +45,7 @@ export default function EditUserForm({ user, uuid }) {
     const onSubmit = async (data) => {
         try {
             await updateUser(uuid, data);
-            queryClient.invalidateQueries(['user', uuid]);
-            refetch();
+            invalidateEditUserQueries(queryClient, user); 
             navigate(from);
             showSnackbar({ message: 'Usuario editado correctamente' });
         } catch (err) {

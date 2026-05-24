@@ -8,7 +8,6 @@ export function formatDateTimeUTC(value) {
     if (isNaN(date)) return '';
 
     return date.toLocaleString(APP_LOCALE, {
-        timeZone: APP_TIMEZONE,
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',

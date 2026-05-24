@@ -19,7 +19,6 @@ export default function UserDetailPage() {
         data: appointments,
         isLoading: appointmentsIsLoading,
         error: appointmentsFetchError,
-        refetch: refetchAppointments,
     } = useAppointmentsByUser(uuid);
 
     const [error, setError] = useState(null);
@@ -39,7 +38,7 @@ export default function UserDetailPage() {
                 <Box>
                     <DetailSectionHeader label='Citas Asociadas' />
                     <Box sx={{ px: 1 }}>
-                        <UserAppointmentsTable user={user} appointments={appointments} refetch={refetchAppointments} />
+                        <UserAppointmentsTable user={user} appointments={appointments} />
                     </Box>
                 </Box>
             </DetailLayout>
